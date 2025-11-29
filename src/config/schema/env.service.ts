@@ -57,4 +57,12 @@ export class EnvService {
   get geminiApiKey(): string {
     return this.configService.get('GEMINI_API_KEY', { infer: true })!;
   }
+
+  get githubClientId(): string {
+    return this.configService.get('GITHUB_CLIENT_ID', { infer: true })!;
+  }
+
+  get githubClientSecret(): string {
+    return this.configService.get('GITHUB_CLIENT_SECRET', { infer: true })!;
+  }
 }

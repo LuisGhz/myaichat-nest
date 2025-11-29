@@ -17,6 +17,8 @@ export const envSchema = z.object({
 
   OPENAI_API_KEY: z.string(),
   GEMINI_API_KEY: z.string(),
+  GITHUB_CLIENT_ID: z.string(),
+  GITHUB_CLIENT_SECRET: z.string(),
 });
 
 export type Env = z.infer<typeof envSchema>;
