@@ -15,7 +15,13 @@
     "outDir": "./dist",
     "baseUrl": "./",
     "paths": {
-      "@cfg/*": ["src/config/*"]
+      "@cfg/*": ["src/config/*"],
+      "@cmn/*": ["src/common/*"],
+      "@mod/*": ["src/modules/*"],
+      "@auth/*": ["src/modules/auth/*"],
+      "@usr/*": ["src/modules/user/*"],
+      "@chat/*": ["src/modules/chat/*"],
+      "@prompts/*": ["src/modules/prompts/*"]
     },
     "incremental": true,
     "skipLibCheck": true,
