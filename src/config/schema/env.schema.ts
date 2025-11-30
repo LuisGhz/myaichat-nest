@@ -19,6 +19,9 @@ export const envSchema = z.object({
   GEMINI_API_KEY: z.string(),
   GITHUB_CLIENT_ID: z.string(),
   GITHUB_CLIENT_SECRET: z.string(),
+  GITHUB_CALLBACK_URL: z.string(),
+  FRONTEND_URL: z.string(),
+  MAX_SESSIONS_PER_USER: z.string().transform((val) => Number(val)),
 });
 
 export type Env = z.infer<typeof envSchema>;

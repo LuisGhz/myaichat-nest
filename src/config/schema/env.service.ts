@@ -65,4 +65,20 @@ export class EnvService {
   get githubClientSecret(): string {
     return this.configService.get('GITHUB_CLIENT_SECRET', { infer: true })!;
   }
+
+  get githubCallbackUrl(): string {
+    return this.configService.get('GITHUB_CALLBACK_URL', { infer: true })!;
+  }
+
+  get frontendUrl(): string {
+    return this.configService.get('FRONTEND_URL', { infer: true })!;
+  }
+
+  get maxSessionsPerUser(): number {
+    return this.configService.get('MAX_SESSIONS_PER_USER', { infer: true })!;
+  }
+
+  get isProduction(): boolean {
+    return this.nodeEnv === 'production';
+  }
 }
