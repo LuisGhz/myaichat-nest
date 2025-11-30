@@ -16,6 +16,7 @@ import {
   COOKIE_CODE_VERIFIER,
   COOKIE_REFRESH_TOKEN,
 } from './const/cookies.const';
+import { Public } from '@cmn/decorators';
 
 @Controller('auth')
 export class AuthController {
@@ -26,6 +27,7 @@ export class AuthController {
     private readonly envService: EnvService,
   ) {}
 
+  @Public()
   @Get('login')
   async login(@Res() res: Response): Promise<void> {
     const pkceData = await this.authService.generatePkceData();
@@ -46,6 +48,7 @@ export class AuthController {
     res.redirect(authorizeUrl);
   }
 
+  @Public()
   @Get('callback')
   async callback(
     @Query('code') code: string,
@@ -118,23 +121,5 @@ export class AuthController {
 
     res.clearCookie(COOKIE_REFRESH_TOKEN);
     res.json({ message: 'Logged out successfully' });
-  }
-
-  @Post('refresh')
-  async refresh(@Req() req: Request, @Res() res: Response): Promise<void> {
-    const refreshToken = req.cookies[COOKIE_REFRESH_TOKEN];
-
-    if (!refreshToken) {
-      throw new UnauthorizedException('No refresh token provided');
-    }
-
-    try {
-      const accessToken =
-        await this.authService.refreshAccessToken(refreshToken);
-      res.json({ accessToken });
-    } catch {
-      res.clearCookie(COOKIE_REFRESH_TOKEN);
-      throw new UnauthorizedException('Invalid or expired refresh token');
-    }
   }
 }
