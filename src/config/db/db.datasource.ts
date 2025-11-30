@@ -8,6 +8,6 @@ ConfigModule.forRoot({
 });
 export default new DataSource({
   ...typeormConfig(),
-  entities: [__dirname + '/../../**/*.entity{.ts}'],
-  migrations: [__dirname + '/../../migrations/*{.ts}'],
+  entities: [__dirname + '/../../**/*.entity{.ts,.js}'],
+  migrations: [__dirname + '/../../**/migrations/*.{ts,js}'],
 } as any);
