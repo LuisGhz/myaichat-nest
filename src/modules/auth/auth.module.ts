@@ -8,6 +8,7 @@ import { RefreshToken } from './entities';
 import {
   AuthService,
   GithubOauthService,
+  JwtService,
   RefreshTokenService,
 } from './services';
 import { AuthController } from './auth.controller';
@@ -25,7 +26,7 @@ import { AuthController } from './auth.controller';
     UserModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, GithubOauthService, RefreshTokenService],
-  exports: [AuthService],
+  providers: [AuthService, GithubOauthService, RefreshTokenService, JwtService],
+  exports: [AuthService, JwtService, RefreshTokenService],
 })
 export class AuthModule {}
