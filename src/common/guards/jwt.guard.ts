@@ -48,10 +48,8 @@ export class JwtGuard implements CanActivate {
     } catch (error) {
       if (!(error instanceof TokenExpiredError)) return false;
 
-      this.handleExpiredToken(token, request, response);
+      return await this.handleExpiredToken(token, request, response);
     }
-
-    return false;
   }
 
   private async handleExpiredToken(
