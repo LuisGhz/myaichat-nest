@@ -19,7 +19,7 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "typeorm": "typeorm-ts-node-commonjs",
+    "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js",
     "migration:run": "npm run typeorm migration:run -- -d src/config/db/db.datasource.ts",
     "migration:revert": "npm run typeorm migration:revert -- -d src/config/db/db.datasource.ts",
     "migration:show": "npm run typeorm migration:show -- -d src/config/db/db.datasource.ts",
@@ -32,7 +32,9 @@
     "migration:chat:generate": "cross-var npm run typeorm migration:generate -- -d src/config/db/db.datasource.ts src/modules/chat/migrations/$npm_config_name",
     "migration:chat:create": "cross-var npm run typeorm migration:create -- src/modules/chat/migrations/$npm_config_name",
     "migration:prompts:generate": "cross-var npm run typeorm migration:generate -- -d src/config/db/db.datasource.ts src/modules/prompts/migrations/$npm_config_name",
-    "migration:prompts:create": "cross-var npm run typeorm migration:create -- src/modules/prompts/migrations/$npm_config_name"
+    "migration:prompts:create": "cross-var npm run typeorm migration:create -- src/modules/prompts/migrations/$npm_config_name",
+    "migration:models:generate": "cross-var npm run typeorm migration:generate -- -d src/config/db/db.datasource.ts src/modules/models/migrations/$npm_config_name",
+    "migration:models:create": "cross-var npm run typeorm migration:create -- src/modules/models/migrations/$npm_config_name"
   },
   "dependencies": {
     "@google/genai": "^1.30.0",

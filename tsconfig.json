@@ -21,7 +21,8 @@
       "@auth/*": ["src/modules/auth/*"],
       "@usr/*": ["src/modules/user/*"],
       "@chat/*": ["src/modules/chat/*"],
-      "@prompts/*": ["src/modules/prompts/*"]
+      "@prompts/*": ["src/modules/prompts/*"],
+      "@models/*": ["src/modules/models/*"]
     },
     "incremental": true,
     "skipLibCheck": true,

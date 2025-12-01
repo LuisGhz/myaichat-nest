@@ -5,6 +5,7 @@ import { UserModule } from '@usr/user.module';
 import { CommonModule } from '@cmn/common.module';
 import { ChatModule } from '@chat/chat.module';
 import { PromptsModule } from '@prompts/prompts.module';
+import { ModelsModule } from '@models/models.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { PromptsModule } from '@prompts/prompts.module';
     UserModule,
     ChatModule,
     PromptsModule,
+    ModelsModule,
   ],
   controllers: [],
   providers: [],
