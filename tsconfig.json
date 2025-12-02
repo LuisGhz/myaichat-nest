@@ -22,7 +22,8 @@
       "@usr/*": ["src/modules/user/*"],
       "@chat/*": ["src/modules/chat/*"],
       "@prompts/*": ["src/modules/prompts/*"],
-      "@models/*": ["src/modules/models/*"]
+      "@models/*": ["src/modules/models/*"],
+      "@mdl/*": ["src/modules/models/*"]
     },
     "incremental": true,
     "skipLibCheck": true,

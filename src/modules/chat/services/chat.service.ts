@@ -1,7 +1,7 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Chat, Message, MessageRole, OpenAIModel } from '../entities';
+import { Chat, Message, MessageRole } from '../entities';
 import { User } from '@usr/entities';
 import { OpenAIService } from './openai.service';
 import {
@@ -12,7 +12,7 @@ import {
 
 export interface CreateChatData {
   user: User;
-  model: OpenAIModel;
+  model: string;
   maxTokens: number;
 }
 
@@ -27,7 +27,7 @@ export interface SaveMessageData {
 export interface HandleStreamMessageParams {
   chatId?: string;
   message: string;
-  model: OpenAIModel;
+  model: string;
   maxTokens: number;
   userId: string;
   onEvent: (event: ChatStreamEvent) => void;

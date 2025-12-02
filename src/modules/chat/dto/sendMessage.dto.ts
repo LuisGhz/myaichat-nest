@@ -1,5 +1,4 @@
 import {
-  IsEnum,
   IsInt,
   IsNotEmpty,
   IsOptional,
@@ -8,7 +7,7 @@ import {
   Max,
   Min,
 } from 'class-validator';
-import { OpenAIModel } from '../entities';
+import { IsValidModel } from '@mdl/validators';
 
 export class SendMessageReqDto {
   @IsOptional()
@@ -19,10 +18,10 @@ export class SendMessageReqDto {
   @IsString()
   message: string;
 
-  @IsEnum(OpenAIModel, {
-    message: `model must be one of: ${Object.values(OpenAIModel).join(', ')}`,
-  })
-  model: OpenAIModel;
+  @IsNotEmpty()
+  @IsString()
+  @IsValidModel({ message: 'Invalid model. Please use a registered model value.' })
+  model: string;
 
   @IsInt()
   @Min(1)

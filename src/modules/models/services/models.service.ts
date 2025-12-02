@@ -60,7 +60,8 @@ export class ModelsService {
           link: dto.developer.link,
           imageUrl: dto.developer.imageUrl,
         });
-        existingDeveloper = await this.developerRepository.save(existingDeveloper);
+        existingDeveloper =
+          await this.developerRepository.save(existingDeveloper);
       }
 
       developer = existingDeveloper;
@@ -202,6 +203,13 @@ export class ModelsService {
     return this.developerRepository.find({
       order: { name: 'ASC' },
     });
+  }
+
+  async existsByValue(value: string): Promise<boolean> {
+    const count = await this.modelRepository.count({
+      where: { value },
+    });
+    return count > 0;
   }
 
   private async findByIdOrFail(id: string): Promise<Model> {

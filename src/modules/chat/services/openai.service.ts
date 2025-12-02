@@ -1,11 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
 import OpenAI from 'openai';
 import { EnvService } from '@cfg/schema/env.service';
-import { OpenAIModel } from '../entities';
 
 export interface StreamResponseParams {
   message: string;
-  model: OpenAIModel;
+  model: string;
   maxTokens: number;
 }
 
@@ -74,7 +73,7 @@ export class OpenAIService {
   ): Promise<string> {
     try {
       const response = await this.client.responses.create({
-        model: OpenAIModel.GPT_4O_MINI,
+        model: 'gpt-4o-mini',
         input: `Generate a very short title (max 6 words) for a conversation that starts with this exchange. Return only the title, no quotes or extra text.
 
 User: ${userMessage}
