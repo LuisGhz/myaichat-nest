@@ -1,21 +1,15 @@
 import { Injectable, Logger } from '@nestjs/common';
 import OpenAI from 'openai';
 import { EnvService } from '@cfg/schema/env.service';
-
-export interface StreamResponseParams {
-  message: string;
-  model: string;
-  maxTokens: number;
-}
-
-export interface StreamResponseResult {
-  content: string;
-  inputTokens: number;
-  outputTokens: number;
-}
+import type {
+  AIProvider,
+  StreamResponseParams,
+  StreamResponseResult,
+} from '../interfaces';
 
 @Injectable()
-export class OpenAIService {
+export class OpenAIService implements AIProvider {
+  readonly providerName = 'openai';
   private readonly logger = new Logger(OpenAIService.name);
   private readonly client: OpenAI;
 
