@@ -21,7 +21,6 @@ export interface StreamDoneEvent {
   type: StreamEventType.DONE;
   data: {
     chatId: string;
-    message: string;
     inputTokens: number;
     outputTokens: number;
     title?: string;
