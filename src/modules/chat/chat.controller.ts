@@ -46,22 +46,10 @@ export class ChatController {
   async getChatMessages(
     @Param('id', ParseUUIDPipe) chatId: string,
     @CurrentUser() user: JwtPayload,
-  ): Promise<ChatMessagesResDto> {
-    const { chat, messages } = await this.chatService.getChatMessages(
-      chatId,
-      user.sub,
-    );
+  ): Promise<ChatMessagesResDto[]> {
+    const messages = await this.chatService.getChatMessages(chatId, user.sub);
 
-    return {
-      chatId: chat.id,
-      title: chat.title,
-      messages: messages.map((m) => ({
-        id: m.id,
-        content: m.content,
-        role: m.role,
-        createdAt: m.createdAt,
-      })),
-    };
+    return messages;
   }
 
   #setSSEHeaders(res: Response): void {

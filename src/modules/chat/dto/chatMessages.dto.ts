@@ -1,7 +1,8 @@
-import { Message } from '../entities';
-
 export class ChatMessagesResDto {
-  chatId: string;
-  title?: string;
-  messages: Pick<Message, 'id' | 'content' | 'role' | 'createdAt'>[];
+  id: string;
+  content: string;
+  role: string;
+  createdAt: Date;
+  inputTokens?: number;
+  outputTokens?: number;
 }

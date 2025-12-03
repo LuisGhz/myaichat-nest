@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Chat, Message, MessageRole } from '../entities';
 import { User } from '@usr/entities';
-import { UserChatsResDto } from '../dto';
+import { ChatMessagesResDto, UserChatsResDto } from '../dto';
 
 export interface CreateChatData {
   user: User;
@@ -77,16 +77,37 @@ export class ChatService {
   async getChatMessages(
     chatId: string,
     userId: string,
-  ): Promise<{ chat: Chat; messages: Message[] }> {
-    const chat = await this.findChatByIdOrFail(chatId, userId);
-
+  ): Promise<ChatMessagesResDto[]> {
     const messages = await this.messageRepository.find({
-      where: { chat: { id: chatId } },
+      where: { chat: { id: chatId, user: { id: userId } } },
       order: { createdAt: 'ASC' },
-      select: ['id', 'content', 'role', 'createdAt'],
+      select: [
+        'id',
+        'content',
+        'role',
+        'createdAt',
+        'inputTokens',
+        'outputTokens',
+      ],
     });
 
-    return { chat, messages };
+    if (!messages) {
+      this.logger.error(
+        `Messages for chat with id ${chatId} not found for user ${userId}`,
+      );
+      throw new NotFoundException(
+        `Messages for chat with id ${chatId} not found for user ${userId}`,
+      );
+    }
+
+    return messages.map((m) => ({
+      id: m.id,
+      content: m.content,
+      role: m.role,
+      createdAt: m.createdAt,
+      inputTokens: m.inputTokens,
+      outputTokens: m.outputTokens,
+    }));
   }
 
   async getUserChats(userId: string): Promise<UserChatsResDto[]> {
