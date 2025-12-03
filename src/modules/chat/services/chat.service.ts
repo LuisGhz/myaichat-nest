@@ -6,6 +6,7 @@ import { User } from '@usr/entities';
 import { OpenAIService } from './openai.service';
 import {
   StreamEventType,
+  UserChatsResDto,
   type ChatStreamEvent,
   type StreamDoneEvent,
 } from '../dto';
@@ -113,11 +114,11 @@ export class ChatService {
     return { chat, messages };
   }
 
-  async getUserChats(userId: string): Promise<Chat[]> {
+  async getUserChats(userId: string): Promise<UserChatsResDto[]> {
     return this.chatRepository.find({
       where: { user: { id: userId } },
-      order: { updatedAt: 'DESC' },
-      select: ['id', 'title', 'model', 'createdAt', 'updatedAt'],
+      order: { createdAt: 'DESC' },
+      select: ['id', 'title', 'createdAt'],
     });
   }
 

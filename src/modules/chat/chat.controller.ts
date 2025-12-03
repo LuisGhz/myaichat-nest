@@ -25,6 +25,11 @@ export class ChatController {
 
   constructor(private readonly chatService: ChatService) {}
 
+  @Get()
+  async getUserChats(@CurrentUser() user: JwtPayload) {
+    return this.chatService.getUserChats(user.sub);
+  }
+
   @Post('openai')
   async sendMessage(
     @Body() dto: SendMessageReqDto,
@@ -77,11 +82,6 @@ export class ChatController {
         createdAt: m.createdAt,
       })),
     };
-  }
-
-  @Get()
-  async getUserChats(@CurrentUser() user: JwtPayload) {
-    return this.chatService.getUserChats(user.sub);
   }
 
   #setSSEHeaders(res: Response): void {

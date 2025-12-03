@@ -1,3 +1,4 @@
+export { UserChatsResDto } from './chat.dto';
 export { SendMessageReqDto, SendMessageResDto } from './sendMessage.dto';
 export { StreamEventType } from './chatStreamEvent.dto';
 export type {
