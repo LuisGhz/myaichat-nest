@@ -92,6 +92,6 @@ export class ChatController {
   }
 
   #sendSSEEvent(res: Response, event: ChatStreamEvent): void {
-    res.write(`data: ${JSON.stringify(event)}\n\n`);
+    res.write(`${JSON.stringify(event)}\n\n`);
   }
 }
