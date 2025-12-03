@@ -75,6 +75,7 @@ export class ChatService {
     const chat = await this.findChatById(id, userId);
 
     if (!chat) {
+      this.logger.error(`Chat with id ${id} not found for user ${userId}`);
       throw new NotFoundException(`Chat with id ${id} not found`);
     }
 
@@ -130,9 +131,7 @@ export class ChatService {
   /**
    * Handle streaming message to OpenAI, save messages, and generate title for new chats
    */
-  async handleStreamMessage(
-    params: HandleStreamMessageParams,
-  ): Promise<HandleStreamMessageResult> {
+  async handleStreamMessage(params: HandleStreamMessageParams) {
     const { chatId, message, model, maxTokens, userId, onEvent } = params;
 
     // Get or create chat
@@ -174,7 +173,7 @@ export class ChatService {
     // Save assistant message with output tokens
     await this.saveMessage({
       chat,
-      content: result.content,
+      content: fullContent,
       role: MessageRole.ASSISTANT,
       outputTokens: result.outputTokens,
     });
@@ -182,14 +181,13 @@ export class ChatService {
     // Generate title for new chats
     let title: string | undefined;
     if (isNewChat) {
-      title = await this.openAIService.generateTitle(message, result.content);
+      title = await this.openAIService.generateTitle(message, fullContent);
       await this.updateChatTitle(chat.id, title);
     }
 
     // Send done event
     const doneEventData: StreamDoneEvent['data'] = {
       chatId: chat.id,
-      message: result.content,
       inputTokens: result.inputTokens,
       outputTokens: result.outputTokens,
       title,
@@ -199,14 +197,5 @@ export class ChatService {
       type: StreamEventType.DONE,
       data: doneEventData,
     });
-
-    return {
-      success: true,
-      chatId: chat.id,
-      content: result.content,
-      inputTokens: result.inputTokens,
-      outputTokens: result.outputTokens,
-      title,
-    };
   }
 }
