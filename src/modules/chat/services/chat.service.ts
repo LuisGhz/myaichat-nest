@@ -124,4 +124,9 @@ export class ChatService {
     });
     return count > 0;
   }
+
+  async deleteChat(chatId: string, userId: string): Promise<void> {
+    const chat = await this.findChatByIdOrFail(chatId, userId);
+    await this.chatRepository.remove(chat);
+  }
 }

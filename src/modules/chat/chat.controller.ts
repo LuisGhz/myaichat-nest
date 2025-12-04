@@ -1,7 +1,10 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Logger,
   Param,
   ParseUUIDPipe,
@@ -50,6 +53,15 @@ export class ChatController {
     const messages = await this.chatService.getChatMessages(chatId, user.sub);
 
     return messages;
+  }
+
+  @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteChat(
+    @Param('id', ParseUUIDPipe) chatId: string,
+    @CurrentUser() user: JwtPayload,
+  ): Promise<void> {
+    await this.chatService.deleteChat(chatId, user.sub);
   }
 
   #setSSEHeaders(res: Response): void {
