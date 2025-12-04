@@ -1,0 +1,9 @@
+export const CHAT_TITLE_MODEL = 'gpt-4o-mini';
+
+export const CHAT_TITLE_PROMPT = (
+  userMessage: string,
+  assistantResponse: string,
+) => `Generate a very short title (max 6 words) for a conversation that starts with this exchange. Return only the title, no quotes or extra text.
+
+User: ${userMessage}
+Assistant: ${assistantResponse.slice(0, 500)}`;
