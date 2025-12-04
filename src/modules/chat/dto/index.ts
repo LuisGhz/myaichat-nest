@@ -8,3 +8,4 @@ export type {
   StreamErrorEvent,
 } from './chatStreamEvent.dto';
 export { ChatMessagesResDto } from './chatMessages.dto';
+export { RenameChatReqDto } from './renameChat.dto';

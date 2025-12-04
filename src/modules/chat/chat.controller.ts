@@ -8,6 +8,7 @@ import {
   Logger,
   Param,
   ParseUUIDPipe,
+  Patch,
   Post,
   Res,
 } from '@nestjs/common';
@@ -17,6 +18,7 @@ import type { JwtPayload } from '@cmn/interfaces';
 import { ChatService, ChatStreamService } from './services';
 import {
   ChatMessagesResDto,
+  RenameChatReqDto,
   SendMessageReqDto,
   StreamEventType,
   type ChatStreamEvent,
@@ -53,6 +55,17 @@ export class ChatController {
     const messages = await this.chatService.getChatMessages(chatId, user.sub);
 
     return messages;
+  }
+
+  @Patch(':id/rename')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async renameChat(
+    @Param('id', ParseUUIDPipe) chatId: string,
+    @Body() dto: RenameChatReqDto,
+    @CurrentUser() user: JwtPayload,
+  ): Promise<void> {
+    await this.chatService.findChatByIdOrFail(chatId, user.sub);
+    await this.chatService.updateChatTitle(chatId, dto.title);
   }
 
   @Delete(':id')
