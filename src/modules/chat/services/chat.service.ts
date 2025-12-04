@@ -43,7 +43,7 @@ export class ChatService {
   async findChatById(id: string, userId: string): Promise<Chat | null> {
     return this.chatRepository.findOne({
       where: { id, user: { id: userId } },
-      relations: ['user'],
+      relations: ['user', 'messages'],
     });
   }
 

@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Chat, MessageRole } from '../entities';
 import { User } from '@usr/entities';
 import { ChatService } from './chat.service';
@@ -22,31 +22,25 @@ export interface HandleStreamMessageParams {
 
 @Injectable()
 export class ChatStreamService {
-  private readonly logger = new Logger(ChatStreamService.name);
-
   constructor(
     private readonly chatService: ChatService,
     private readonly aiProviderRegistry: AIProviderRegistry,
   ) {}
 
-  /**
-   * Handle streaming message to AI provider, save messages, and generate title for new chats
-   */
   async handleStreamMessage(params: HandleStreamMessageParams): Promise<void> {
     const { chatId, message, model, maxTokens, userId, provider, onEvent } =
       params;
 
     const aiProvider = this.aiProviderRegistry.getProvider(provider);
 
-    // Get or create chat
-    const chat = await this.getOrCreateChat(chatId, userId, model, maxTokens);
+    const chat = await this.#getOrCreateChat(chatId, userId, model, maxTokens);
     const isNewChat = !chatId;
     let fullContent = '';
-
-    // Stream response from AI provider
+    const messages = chat.messages || [];
     const result = await aiProvider.streamResponse(
       {
-        message,
+        previousMessages: messages,
+        newMessage: message,
         model: chat.model,
         maxTokens: chat.maxTokens,
       },
@@ -59,19 +53,21 @@ export class ChatStreamService {
       },
     );
 
-    // Save messages
-    await this.saveMessages(chat, message, fullContent, result);
+    await this.#saveMessages(chat, message, fullContent, result);
 
-    // Generate title for new chats
     const title = isNewChat
-      ? await this.generateAndSaveTitle(aiProvider, chat.id, message, fullContent)
+      ? await this.#generateAndSaveTitle(
+          aiProvider,
+          chat.id,
+          message,
+          fullContent,
+        )
       : undefined;
 
-    // Send done event
-    this.sendDoneEvent(onEvent, chat.id, result, title);
+    this.#sendDoneEvent(onEvent, chat.id, result, title);
   }
 
-  private async getOrCreateChat(
+  async #getOrCreateChat(
     chatId: string | undefined,
     userId: string,
     model: string,
@@ -86,13 +82,12 @@ export class ChatStreamService {
     });
   }
 
-  private async saveMessages(
+  async #saveMessages(
     chat: Chat,
     userMessage: string,
     assistantContent: string,
     result: { inputTokens: number; outputTokens: number },
   ): Promise<void> {
-    // Save user message with input tokens
     await this.chatService.saveMessage({
       chat,
       content: userMessage,
@@ -100,7 +95,6 @@ export class ChatStreamService {
       inputTokens: result.inputTokens,
     });
 
-    // Save assistant message with output tokens
     await this.chatService.saveMessage({
       chat,
       content: assistantContent,
@@ -109,7 +103,7 @@ export class ChatStreamService {
     });
   }
 
-  private async generateAndSaveTitle(
+  async #generateAndSaveTitle(
     aiProvider: AIProvider,
     chatId: string,
     userMessage: string,
@@ -120,7 +114,7 @@ export class ChatStreamService {
     return title;
   }
 
-  private sendDoneEvent(
+  #sendDoneEvent(
     onEvent: (event: ChatStreamEvent) => void,
     chatId: string,
     result: { inputTokens: number; outputTokens: number },

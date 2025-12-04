@@ -1,5 +1,8 @@
+import { Message } from "../entities";
+
 export interface StreamResponseParams {
-  message: string;
+  previousMessages: Message[];
+  newMessage: string;
   model: string;
   maxTokens: number;
 }
