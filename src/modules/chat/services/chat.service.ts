@@ -9,6 +9,7 @@ export interface CreateChatData {
   user: User;
   model: string;
   maxTokens: number;
+  temperature: number;
 }
 
 export interface SaveMessageData {
@@ -35,6 +36,7 @@ export class ChatService {
       user: data.user,
       model: data.model,
       maxTokens: data.maxTokens,
+      temperature: data.temperature,
     });
 
     return this.chatRepository.save(chat);

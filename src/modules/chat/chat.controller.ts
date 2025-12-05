@@ -102,6 +102,7 @@ export class ChatController {
         message: dto.message,
         model: dto.model,
         maxTokens: dto.maxTokens,
+        temperature: dto.temperature,
         userId,
         provider,
         onEvent: (event: ChatStreamEvent) => this.#sendSSEEvent(res, event),

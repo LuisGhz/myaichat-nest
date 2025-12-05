@@ -25,7 +25,7 @@ export class OpenAIService implements AIProvider {
     params: StreamResponseParams,
     onDelta: (delta: string) => void,
   ): Promise<StreamResponseResult> {
-    const { previousMessages, newMessage, model, maxTokens } = params;
+    const { previousMessages, newMessage, model, maxTokens, temperature } = params;
     const transformedMessages =
       this.#transformMessagesToOpenAIFormat(previousMessages);
     transformedMessages.push({ role: 'user', content: newMessage });
@@ -35,6 +35,7 @@ export class OpenAIService implements AIProvider {
         model,
         input: transformedMessages,
         max_output_tokens: maxTokens,
+        temperature,
       });
 
       stream.on('response.output_text.delta', (event) => {

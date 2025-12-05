@@ -8,17 +8,11 @@ import {
   type ChatStreamEvent,
   type StreamDoneEvent,
 } from '../dto';
-import type { AIProvider } from '../interfaces';
-
-export interface HandleStreamMessageParams {
-  chatId?: string;
-  message: string;
-  model: string;
-  maxTokens: number;
-  userId: string;
-  provider: string;
-  onEvent: (event: ChatStreamEvent) => void;
-}
+import type {
+  AIProvider,
+  HandleStreamMessageParams,
+  GetOrCreateChatParams,
+} from '../interfaces';
 
 @Injectable()
 export class ChatStreamService {
@@ -28,12 +22,26 @@ export class ChatStreamService {
   ) {}
 
   async handleStreamMessage(params: HandleStreamMessageParams): Promise<void> {
-    const { chatId, message, model, maxTokens, userId, provider, onEvent } =
-      params;
+    const {
+      chatId,
+      message,
+      model,
+      maxTokens,
+      temperature,
+      userId,
+      provider,
+      onEvent,
+    } = params;
 
     const aiProvider = this.aiProviderRegistry.getProvider(provider);
 
-    const chat = await this.#getOrCreateChat(chatId, userId, model, maxTokens);
+    const chat = await this.#getOrCreateChat({
+      chatId,
+      userId,
+      model,
+      maxTokens,
+      temperature,
+    });
     const isNewChat = !chatId;
     let fullContent = '';
     const messages = chat.messages || [];
@@ -43,6 +51,7 @@ export class ChatStreamService {
         newMessage: message,
         model: chat.model,
         maxTokens: chat.maxTokens,
+        temperature: chat.temperature,
       },
       (delta) => {
         fullContent += delta;
@@ -67,18 +76,16 @@ export class ChatStreamService {
     this.#sendDoneEvent(onEvent, chat.id, result, title);
   }
 
-  async #getOrCreateChat(
-    chatId: string | undefined,
-    userId: string,
-    model: string,
-    maxTokens: number,
-  ): Promise<Chat> {
+  async #getOrCreateChat(params: GetOrCreateChatParams): Promise<Chat> {
+    const { chatId, userId, model, maxTokens, temperature } = params;
+
     if (chatId) return this.chatService.findChatByIdOrFail(chatId, userId);
 
     return this.chatService.createChat({
       user: { id: userId } as User,
       model,
       maxTokens,
+      temperature,
     });
   }
 

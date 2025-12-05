@@ -5,6 +5,7 @@ export interface StreamResponseParams {
   newMessage: string;
   model: string;
   maxTokens: number;
+  temperature: number;
 }
 
 export interface StreamResponseResult {
