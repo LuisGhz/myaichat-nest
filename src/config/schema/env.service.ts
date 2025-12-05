@@ -81,4 +81,20 @@ export class EnvService {
   get isProduction(): boolean {
     return this.nodeEnv === 'production';
   }
+
+  get cdnDomain(): string {
+    return this.configService.get('CDN_DOMAIN', { infer: true })!;
+  }
+
+  get s3AccessKey(): string {
+    return this.configService.get('S3_ACCESS_KEY', { infer: true })!;
+  }
+
+  get s3SecretKey(): string {
+    return this.configService.get('S3_SECRET_KEY', { infer: true })!;
+  }
+
+  get s3BucketName(): string {
+    return this.configService.get('S3_BUCKET_NAME', { infer: true })!;
+  }
 }

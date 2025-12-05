@@ -22,6 +22,11 @@ export const envSchema = z.object({
   GITHUB_CALLBACK_URL: z.string(),
   FRONTEND_URL: z.string(),
   MAX_SESSIONS_PER_USER: z.string().transform((val) => Number(val)),
+
+  CDN_DOMAIN: z.string(),
+  S3_ACCESS_KEY: z.string(),
+  S3_SECRET_KEY: z.string(),
+  S3_BUCKET_NAME: z.string(),
 });
 
 export type Env = z.infer<typeof envSchema>;
