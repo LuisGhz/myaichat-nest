@@ -29,7 +29,7 @@ export class OpenAIService implements AIProvider {
     const transformedMessages =
       this.#transformMessagesToOpenAIFormat(previousMessages);
     transformedMessages.push({ role: 'user', content: newMessage });
-
+    this.logger.debug('Transformed Messages:', transformedMessages);
     try {
       const stream = this.client.responses.stream({
         model,
