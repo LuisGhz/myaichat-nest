@@ -1,6 +1,7 @@
 import {
   IsInt,
   IsNotEmpty,
+  IsNumber,
   IsOptional,
   IsString,
   IsUUID,
@@ -27,6 +28,11 @@ export class SendMessageReqDto {
   @Min(1)
   @Max(16384)
   maxTokens: number;
+
+  @IsNumber()
+  @Min(0)
+  @Max(1)
+  temperature: number;
 }
 
 export class SendMessageResDto {
