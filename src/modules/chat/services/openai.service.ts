@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import OpenAI from 'openai';
+import type { ResponseInput } from 'openai/resources/responses/responses';
 import { EnvService } from '@cfg/schema/env.service';
 import type {
   AIProvider,
@@ -25,10 +26,14 @@ export class OpenAIService implements AIProvider {
     params: StreamResponseParams,
     onDelta: (delta: string) => void,
   ): Promise<StreamResponseResult> {
-    const { previousMessages, newMessage, model, maxTokens, temperature } = params;
+    const { previousMessages, newMessage, model, maxTokens, temperature } =
+      params;
     const transformedMessages =
       this.#transformMessagesToOpenAIFormat(previousMessages);
-    transformedMessages.push({ role: 'user', content: newMessage });
+    transformedMessages.push({
+      role: 'user',
+      content: [{ type: 'input_text', text: newMessage }],
+    });
     this.logger.debug('Transformed Messages:', transformedMessages);
     try {
       const stream = this.client.responses.stream({
@@ -73,10 +78,10 @@ export class OpenAIService implements AIProvider {
     }
   }
 
-  #transformMessagesToOpenAIFormat(messages: Message[]): any[] {
+  #transformMessagesToOpenAIFormat(messages: Message[]): ResponseInput {
     return messages.map((msg) => ({
-      role: msg.role === MessageRole.USER ? 'user' : 'assistant',
-      content: msg.content,
+      role: msg.role,
+      content: [{ type: 'input_text' as const, text: msg.content }],
     }));
   }
 }

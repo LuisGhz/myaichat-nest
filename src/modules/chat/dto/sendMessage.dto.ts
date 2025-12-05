@@ -21,13 +21,18 @@ export class SendMessageReqDto {
 
   @IsNotEmpty()
   @IsString()
-  @IsValidModel({ message: 'Invalid model. Please use a registered model value.' })
+  @IsValidModel({
+    message: 'Invalid model. Please use a registered model value.',
+  })
   model: string;
 
   @IsInt()
   @Min(1)
   @Max(16384)
   maxTokens: number;
+
+  @IsOptional()
+  file: File;
 
   @IsNumber()
   @Min(0)

@@ -8,3 +8,16 @@ export {
   type HandleStreamMessageParams,
   type GetOrCreateChatParams,
 } from './chat-stream.interface';
+export {
+  type OpenAIInputText,
+  type OpenAIInputImage,
+  type OpenAIInputFile,
+  type OpenAIInputAudio,
+  type OpenAIMessageContent,
+  type OpenAIMessageContentList,
+  type OpenAIMessageRole,
+  type OpenAIMessageItem,
+  type OpenAIEasyInputMessage,
+  type OpenAIInputItem,
+  type OpenAIResponseInput,
+} from './openai-input.interface';
