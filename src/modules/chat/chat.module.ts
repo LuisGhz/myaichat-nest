@@ -6,6 +6,7 @@ import {
   ChatService,
   ChatStreamService,
   OpenAIService,
+  TranscriptionService,
 } from './services';
 import { ChatController } from './chat.controller';
 import { ModelsModule } from '@mdl/models.module';
@@ -17,6 +18,7 @@ import { AI_PROVIDERS } from './interfaces';
   providers: [
     ChatService,
     ChatStreamService,
+    TranscriptionService,
     AIProviderRegistry,
     OpenAIService,
     {
