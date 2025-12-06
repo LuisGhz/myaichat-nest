@@ -3,6 +3,8 @@ import { Chat, MessageRole } from '../entities';
 import { User } from '@usr/entities';
 import { ChatService } from './chat.service';
 import { AIProviderRegistry } from './ai-provider-registry.service';
+import { ImageUploadService } from '@s3/services';
+import { EnvService } from '@cfg/schema/env.service';
 import {
   StreamEventType,
   type ChatStreamEvent,
@@ -20,6 +22,8 @@ export class ChatStreamService {
   constructor(
     private readonly chatService: ChatService,
     private readonly aiProviderRegistry: AIProviderRegistry,
+    private readonly imageUploadService: ImageUploadService,
+    private readonly envService: EnvService,
   ) {}
 
   async handleStreamMessage(params: HandleStreamMessageParams): Promise<void> {
@@ -32,6 +36,8 @@ export class ChatStreamService {
       fileKey,
       userId,
       provider,
+      isImageGeneration,
+      isWebSearch,
       onEvent,
     } = params;
 
@@ -55,6 +61,8 @@ export class ChatStreamService {
         maxTokens: chat.maxTokens,
         temperature: chat.temperature,
         fileKey,
+        isImageGeneration: isImageGeneration,
+        isWebSearch: isWebSearch,
       },
       (delta) => {
         fullContent += delta;
@@ -65,6 +73,13 @@ export class ChatStreamService {
       },
     );
 
+    let uploadedImageKey: string | undefined;
+    if (result.imageKey) {
+      uploadedImageKey = await this.imageUploadService.uploadBase64Image(
+        result.imageKey,
+      );
+    }
+
     await this.#saveMessages({
       chat,
       userMessage: message,
@@ -72,6 +87,7 @@ export class ChatStreamService {
       inputTokens: result.inputTokens,
       outputTokens: result.outputTokens,
       fileKey,
+      imageKey: uploadedImageKey,
     });
 
     const title = isNewChat
@@ -83,7 +99,7 @@ export class ChatStreamService {
         )
       : undefined;
 
-    this.#sendDoneEvent(onEvent, chat.id, result, title);
+    this.#sendDoneEvent(onEvent, chat.id, result, title, uploadedImageKey);
   }
 
   async #getOrCreateChat(params: GetOrCreateChatParams): Promise<Chat> {
@@ -107,6 +123,7 @@ export class ChatStreamService {
       inputTokens,
       outputTokens,
       fileKey,
+      imageKey,
     } = params;
 
     await this.chatService.saveMessage({
@@ -122,6 +139,7 @@ export class ChatStreamService {
       content: assistantContent,
       role: MessageRole.ASSISTANT,
       outputTokens,
+      fileKey: imageKey,
     });
   }
 
@@ -141,12 +159,16 @@ export class ChatStreamService {
     chatId: string,
     result: { inputTokens: number; outputTokens: number },
     title?: string,
+    imageKey?: string,
   ): void {
     const doneEventData: StreamDoneEvent['data'] = {
       chatId,
       inputTokens: result.inputTokens,
       outputTokens: result.outputTokens,
       title,
+      imageUrl: imageKey
+        ? `${this.envService.cdnDomain}${imageKey}`
+        : undefined,
     };
 
     onEvent({
