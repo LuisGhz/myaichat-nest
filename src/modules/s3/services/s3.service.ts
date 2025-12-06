@@ -1,5 +1,9 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import { Injectable, BadRequestException, Logger } from '@nestjs/common';
+import {
+  S3Client,
+  PutObjectCommand,
+  DeleteObjectsCommand,
+} from '@aws-sdk/client-s3';
 import { randomBytes } from 'crypto';
 import { EnvService } from '@cfg/schema/env.service';
 import { ALLOWED_FILE_TYPES, ALLOWED_FILE_EXTENSIONS } from '../consts';
@@ -7,7 +11,29 @@ import path from 'path';
 
 @Injectable()
 export class S3Service {
+  readonly #logger = new Logger(S3Service.name);
+
   constructor(private readonly envService: EnvService) {}
+
+  async deleteFiles(keys: string[]): Promise<void> {
+    if (keys.length === 0) return;
+
+    const client = this.#getClient();
+    const command = new DeleteObjectsCommand({
+      Bucket: this.envService.s3BucketName,
+      Delete: {
+        Objects: keys.map((key) => ({ Key: key })),
+      },
+    });
+
+    try {
+      await client.send(command);
+      this.#logger.log(`Deleted ${keys.length} files from S3`);
+    } catch (error) {
+      this.#logger.error('Failed to delete files from S3', error);
+      throw error;
+    }
+  }
 
   async uploadFile(file: Express.Multer.File): Promise<string> {
     this.#validateFile(file);

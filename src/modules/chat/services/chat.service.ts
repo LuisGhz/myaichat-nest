@@ -5,6 +5,7 @@ import { Chat, Message, MessageRole } from '../entities';
 import { User } from '@usr/entities';
 import { ChatMessagesResDto, UserChatsResDto } from '../dto';
 import { EnvService } from '@cfg/schema/env.service';
+import { S3Service } from '@s3/services';
 
 export interface CreateChatData {
   user: User;
@@ -32,6 +33,7 @@ export class ChatService {
     @InjectRepository(Message)
     private readonly messageRepository: Repository<Message>,
     private readonly envService: EnvService,
+    private readonly s3Service: S3Service,
   ) {}
 
   async createChat(data: CreateChatData): Promise<Chat> {
@@ -137,6 +139,15 @@ export class ChatService {
 
   async deleteChat(chatId: string, userId: string): Promise<void> {
     const chat = await this.findChatByIdOrFail(chatId, userId);
+
+    const fileKeys = chat.messages
+      .map((m) => m.fileKey)
+      .filter((key): key is string => !!key);
+
+    if (fileKeys.length > 0) {
+      await this.s3Service.deleteFiles(fileKeys);
+    }
+
     await this.chatRepository.remove(chat);
   }
 }
