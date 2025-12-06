@@ -6,5 +6,7 @@ export interface HandleStreamRequestParams {
   dto: SendMessageReqDto;
   userId: string;
   provider: string;
+  isImageGeneration: boolean;
+  isWebSearch: boolean;
   fileKey?: string;
 }
