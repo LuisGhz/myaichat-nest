@@ -9,6 +9,8 @@ export interface HandleStreamMessageParams {
   userId: string;
   provider: string;
   fileKey?: string;
+  isImageGeneration: boolean;
+  isWebSearch: boolean;
   onEvent: (event: ChatStreamEvent) => void;
 }
 
