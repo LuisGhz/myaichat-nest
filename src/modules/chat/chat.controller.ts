@@ -67,6 +67,8 @@ export class ChatController {
       userId: user.sub,
       provider: 'openai',
       fileKey,
+      isImageGeneration: dto.isImageGeneration,
+      isWebSearch: dto.isWebSearch,
     });
   }
 
@@ -123,6 +125,8 @@ export class ChatController {
     userId,
     provider,
     fileKey,
+    isImageGeneration,
+    isWebSearch,
   }: HandleStreamRequestParams): Promise<void> {
     this.#setSSEHeaders(res);
 
@@ -136,6 +140,8 @@ export class ChatController {
         userId,
         provider,
         fileKey,
+        isImageGeneration,
+        isWebSearch,
         onEvent: (event: ChatStreamEvent) => this.#sendSSEEvent(res, event),
       });
 
