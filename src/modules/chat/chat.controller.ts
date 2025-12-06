@@ -27,6 +27,8 @@ import {
   RenameChatReqDto,
   SendMessageReqDto,
   StreamEventType,
+  UpdateImageGenerationReqDto,
+  UpdateWebSearchReqDto,
   type ChatStreamEvent,
 } from './dto';
 import type { HandleStreamRequestParams } from './interfaces';
@@ -91,6 +93,28 @@ export class ChatController {
   ): Promise<void> {
     await this.chatService.findChatByIdOrFail(chatId, user.sub);
     await this.chatService.updateChatTitle(chatId, dto.title);
+  }
+
+  @Patch(':id/update-web-search')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async updateWebSearch(
+    @Param('id', ParseUUIDPipe) chatId: string,
+    @Body() dto: UpdateWebSearchReqDto,
+    @CurrentUser() user: JwtPayload,
+  ): Promise<void> {
+    await this.chatService.findChatByIdOrFail(chatId, user.sub);
+    await this.chatService.updateChatWebSearch(chatId, dto.isWebSearch);
+  }
+
+  @Patch(':id/update-image-generation')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async updateImageGeneration(
+    @Param('id', ParseUUIDPipe) chatId: string,
+    @Body() dto: UpdateImageGenerationReqDto,
+    @CurrentUser() user: JwtPayload,
+  ): Promise<void> {
+    await this.chatService.findChatByIdOrFail(chatId, user.sub);
+    await this.chatService.updateChatImageGeneration(chatId, dto.isImageGeneration);
   }
 
   @Delete(':id')

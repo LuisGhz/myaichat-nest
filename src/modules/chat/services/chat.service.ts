@@ -86,6 +86,14 @@ export class ChatService {
     await this.chatRepository.update(chatId, { title });
   }
 
+  async updateChatWebSearch(chatId: string, isWebSearch: boolean): Promise<void> {
+    await this.chatRepository.update(chatId, { isWebSearch });
+  }
+
+  async updateChatImageGeneration(chatId: string, isImageGeneration: boolean): Promise<void> {
+    await this.chatRepository.update(chatId, { isImageGeneration });
+  }
+
   async getChatMessages(
     chatId: string,
     userId: string,

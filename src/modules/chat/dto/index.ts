@@ -9,3 +9,5 @@ export type {
 } from './chatStreamEvent.dto';
 export { ChatMessagesResDto } from './chatMessages.dto';
 export { RenameChatReqDto } from './renameChat.dto';
+export { UpdateWebSearchReqDto } from './updateWebSearch.dto';
+export { UpdateImageGenerationReqDto } from './updateImageGeneration.dto';
