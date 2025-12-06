@@ -12,6 +12,8 @@ export interface CreateChatData {
   model: string;
   maxTokens: number;
   temperature: number;
+  isImageGeneration?: boolean;
+  isWebSearch?: boolean;
 }
 
 export interface SaveMessageData {
@@ -42,6 +44,8 @@ export class ChatService {
       model: data.model,
       maxTokens: data.maxTokens,
       temperature: data.temperature,
+      isImageGeneration: data.isImageGeneration ?? false,
+      isWebSearch: data.isWebSearch ?? false,
     });
 
     return this.chatRepository.save(chat);

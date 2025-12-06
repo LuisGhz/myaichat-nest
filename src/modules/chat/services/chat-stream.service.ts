@@ -49,6 +49,8 @@ export class ChatStreamService {
       model,
       maxTokens,
       temperature,
+      isImageGeneration,
+      isWebSearch,
     });
     const isNewChat = !chatId;
     let fullContent = '';
@@ -112,6 +114,8 @@ export class ChatStreamService {
       model,
       maxTokens,
       temperature,
+      isImageGeneration: params.isImageGeneration,
+      isWebSearch: params.isWebSearch,
     });
   }
 

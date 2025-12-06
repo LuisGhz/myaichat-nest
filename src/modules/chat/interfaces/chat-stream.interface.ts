@@ -20,4 +20,6 @@ export interface GetOrCreateChatParams {
   model: string;
   maxTokens: number;
   temperature: number;
+  isImageGeneration: boolean;
+  isWebSearch: boolean;
 }

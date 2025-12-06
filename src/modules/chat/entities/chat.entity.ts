@@ -42,6 +42,12 @@ export class Chat {
   @Column({ type: 'varchar' })
   model: string;
 
+  @Column({ type: 'boolean', default: false })
+  isImageGeneration: boolean;
+
+  @Column({ type: 'boolean', default: false })
+  isWebSearch: boolean;
+
   @CreateDateColumn()
   createdAt: Date;
 
