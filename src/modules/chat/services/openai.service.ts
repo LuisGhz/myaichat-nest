@@ -11,6 +11,7 @@ import type {
 } from '../interfaces';
 import { Message } from '../entities';
 import { CHAT_TITLE_MODEL, CHAT_TITLE_PROMPT } from '../consts';
+import { calculateImageGenerationTokens } from '../helpers';
 
 @Injectable()
 export class OpenAIService implements AIProvider {
@@ -65,17 +66,24 @@ export class OpenAIService implements AIProvider {
       const response = await stream.finalResponse();
 
       let imageBase64: string | null = null;
+      let imageTokens = 0;
       if (isImageGeneration) {
         const imageData = response.output
           .filter((out) => out.type === 'image_generation_call')
           .map((out) => out.result);
         imageBase64 = imageData[0];
+        // Calculate tokens for image generation if tool was used
+        const imageGenTool = tools.find(
+          (tool) => tool.type === 'image_generation',
+        );
+        if (imageGenTool)
+          imageTokens = calculateImageGenerationTokens(imageGenTool);
       }
 
       return {
         content: response.output_text,
         inputTokens: response.usage?.input_tokens ?? 0,
-        outputTokens: response.usage?.output_tokens ?? 0,
+        outputTokens: response.usage?.output_tokens ?? 0 + imageTokens,
         imageKey: imageBase64 ?? undefined,
       };
     } catch (error) {
@@ -154,6 +162,7 @@ export class OpenAIService implements AIProvider {
         size: '1024x1024',
         quality: 'medium',
         background: 'auto',
+        input_fidelity: 'high',
       };
       tools.push(imageGenTool);
     }
