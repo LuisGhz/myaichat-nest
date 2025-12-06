@@ -6,8 +6,10 @@ import type {
   AIProvider,
   StreamResponseParams,
   StreamResponseResult,
+  CreateImageGenerationTool,
+  CreateWebSearchTool,
 } from '../interfaces';
-import { Message, MessageRole } from '../entities';
+import { Message } from '../entities';
 import { CHAT_TITLE_MODEL, CHAT_TITLE_PROMPT } from '../consts';
 
 @Injectable()
@@ -33,6 +35,8 @@ export class OpenAIService implements AIProvider {
       maxTokens,
       temperature,
       fileKey,
+      isImageGeneration,
+      isWebSearch,
     } = params;
     const transformedMessages =
       this.#transformMessagesToOpenAIFormat(previousMessages);
@@ -40,11 +44,17 @@ export class OpenAIService implements AIProvider {
       ...this.#transformNewMessageToOpenAIFormat(newMessage, fileKey),
     );
     this.logger.debug('Transformed Messages:', transformedMessages);
+    const tools = this.#createToolParamsIfEnabled(
+      isWebSearch,
+      isImageGeneration,
+    );
+
     try {
       const stream = this.client.responses.stream({
         model,
         input: transformedMessages,
         max_output_tokens: maxTokens,
+        tools,
         temperature,
       });
 
@@ -54,10 +64,19 @@ export class OpenAIService implements AIProvider {
 
       const response = await stream.finalResponse();
 
+      let imageBase64: string | null = null;
+      if (isImageGeneration) {
+        const imageData = response.output
+          .filter((out) => out.type === 'image_generation_call')
+          .map((out) => out.result);
+        imageBase64 = imageData[0];
+      }
+
       return {
         content: response.output_text,
         inputTokens: response.usage?.input_tokens ?? 0,
         outputTokens: response.usage?.output_tokens ?? 0,
+        imageKey: imageBase64 ?? undefined,
       };
     } catch (error) {
       this.logger.error('Error streaming response from OpenAI', error);
@@ -124,5 +143,29 @@ export class OpenAIService implements AIProvider {
   #isImage(fileKey: string): boolean {
     const imageExtensions = ['.png', '.jpg', '.jpeg'];
     return imageExtensions.some((ext) => fileKey.endsWith(ext));
+  }
+
+  #createToolParamsIfEnabled(isWebSearch: boolean, isImageGeneration: boolean) {
+    const tools: Array<CreateImageGenerationTool | CreateWebSearchTool> = [];
+
+    if (isImageGeneration) {
+      const imageGenTool: CreateImageGenerationTool = {
+        type: 'image_generation',
+        size: '1024x1024',
+        quality: 'medium',
+        background: 'auto',
+      };
+      tools.push(imageGenTool);
+    }
+
+    if (isWebSearch) {
+      const webSearchTool: CreateWebSearchTool = {
+        type: 'web_search',
+        search_context_size: 'medium',
+      };
+      tools.push(webSearchTool);
+    }
+
+    return tools;
   }
 }
