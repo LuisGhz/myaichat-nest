@@ -23,3 +23,11 @@ export {
   type OpenAIInputItem,
   type OpenAIResponseInput,
 } from './openai-input.interface';
+export {
+  type ImageGenerationToolConfig,
+  type WebSearchToolConfig,
+  type WebSearchUserLocation,
+  type WebSearchFilters,
+  type CreateImageGenerationTool,
+  type CreateWebSearchTool,
+} from './openai-tools.interface';
