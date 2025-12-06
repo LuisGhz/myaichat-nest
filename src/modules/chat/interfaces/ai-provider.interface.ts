@@ -6,6 +6,7 @@ export interface StreamResponseParams {
   model: string;
   maxTokens: number;
   temperature: number;
+  fileKey?: string;
 }
 
 export interface StreamResponseResult {

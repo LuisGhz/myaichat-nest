@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -11,10 +12,15 @@ import {
   Patch,
   Post,
   Res,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import type { Response } from 'express';
 import { CurrentUser } from '@cmn/decorators';
 import type { JwtPayload } from '@cmn/interfaces';
+import { S3Service } from '@s3/services';
+import { IsValidFileTypeConstraint } from '@s3/validators';
 import { ChatService, ChatStreamService } from './services';
 import {
   ChatMessagesResDto,
@@ -23,6 +29,7 @@ import {
   StreamEventType,
   type ChatStreamEvent,
 } from './dto';
+import type { HandleStreamRequestParams } from './interfaces';
 
 @Controller('chat')
 export class ChatController {
@@ -31,6 +38,7 @@ export class ChatController {
   constructor(
     private readonly chatService: ChatService,
     private readonly chatStreamService: ChatStreamService,
+    private readonly s3Service: S3Service,
   ) {}
 
   @Get()
@@ -39,12 +47,27 @@ export class ChatController {
   }
 
   @Post('openai')
+  @UseInterceptors(FileInterceptor('file'))
   async sendMessageOpenAI(
     @Body() dto: SendMessageReqDto,
+    @UploadedFile() file: Express.Multer.File | undefined,
     @CurrentUser() user: JwtPayload,
     @Res() res: Response,
   ): Promise<void> {
-    await this.#handleStreamRequest(res, dto, user.sub, 'openai');
+    let fileKey: string | undefined;
+
+    if (file) {
+      this.#validateFile(file);
+      fileKey = await this.s3Service.uploadFile(file);
+    }
+    console.log('File Key:', fileKey);
+    await this.#handleStreamRequest({
+      res,
+      dto,
+      userId: user.sub,
+      provider: 'openai',
+      fileKey,
+    });
   }
 
   @Get(':id/messages')
@@ -77,6 +100,12 @@ export class ChatController {
     await this.chatService.deleteChat(chatId, user.sub);
   }
 
+  #validateFile(file: Express.Multer.File): void {
+    const validator = new IsValidFileTypeConstraint();
+    if (!validator.validate(file))
+      throw new BadRequestException(validator.defaultMessage());
+  }
+
   #setSSEHeaders(res: Response): void {
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Cache-Control', 'no-cache');
@@ -88,12 +117,13 @@ export class ChatController {
     res.write(`${JSON.stringify(event)}\n\n`);
   }
 
-  async #handleStreamRequest(
-    res: Response,
-    dto: SendMessageReqDto,
-    userId: string,
-    provider: string,
-  ): Promise<void> {
+  async #handleStreamRequest({
+    res,
+    dto,
+    userId,
+    provider,
+    fileKey,
+  }: HandleStreamRequestParams): Promise<void> {
     this.#setSSEHeaders(res);
 
     try {
@@ -105,6 +135,7 @@ export class ChatController {
         temperature: dto.temperature,
         userId,
         provider,
+        fileKey,
         onEvent: (event: ChatStreamEvent) => this.#sendSSEEvent(res, event),
       });
 

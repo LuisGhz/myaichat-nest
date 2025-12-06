@@ -27,7 +27,16 @@ export class Chat {
   @Column({ type: 'int', default: 4096 })
   maxTokens: number;
 
-  @Column({ type: 'decimal', precision: 3, scale: 2, default: 1.0 })
+  @Column({
+    type: 'decimal',
+    precision: 3,
+    scale: 2,
+    default: 1.0,
+    transformer: {
+      to: (value: number) => value,
+      from: (value: string) => parseFloat(value),
+    },
+  })
   temperature: number;
 
   @Column({ type: 'varchar' })

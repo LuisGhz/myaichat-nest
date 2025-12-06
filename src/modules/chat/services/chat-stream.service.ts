@@ -12,6 +12,7 @@ import type {
   AIProvider,
   HandleStreamMessageParams,
   GetOrCreateChatParams,
+  SaveMessagesParams,
 } from '../interfaces';
 
 @Injectable()
@@ -28,6 +29,7 @@ export class ChatStreamService {
       model,
       maxTokens,
       temperature,
+      fileKey,
       userId,
       provider,
       onEvent,
@@ -52,6 +54,7 @@ export class ChatStreamService {
         model: chat.model,
         maxTokens: chat.maxTokens,
         temperature: chat.temperature,
+        fileKey,
       },
       (delta) => {
         fullContent += delta;
@@ -62,7 +65,14 @@ export class ChatStreamService {
       },
     );
 
-    await this.#saveMessages(chat, message, fullContent, result);
+    await this.#saveMessages({
+      chat,
+      userMessage: message,
+      assistantContent: fullContent,
+      inputTokens: result.inputTokens,
+      outputTokens: result.outputTokens,
+      fileKey,
+    });
 
     const title = isNewChat
       ? await this.#generateAndSaveTitle(
@@ -89,24 +99,29 @@ export class ChatStreamService {
     });
   }
 
-  async #saveMessages(
-    chat: Chat,
-    userMessage: string,
-    assistantContent: string,
-    result: { inputTokens: number; outputTokens: number },
-  ): Promise<void> {
+  async #saveMessages(params: SaveMessagesParams): Promise<void> {
+    const {
+      chat,
+      userMessage,
+      assistantContent,
+      inputTokens,
+      outputTokens,
+      fileKey,
+    } = params;
+
     await this.chatService.saveMessage({
       chat,
       content: userMessage,
       role: MessageRole.USER,
-      inputTokens: result.inputTokens,
+      inputTokens,
+      fileKey,
     });
 
     await this.chatService.saveMessage({
       chat,
       content: assistantContent,
       role: MessageRole.ASSISTANT,
-      outputTokens: result.outputTokens,
+      outputTokens,
     });
   }
 

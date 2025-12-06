@@ -6,6 +6,7 @@ import { CommonModule } from '@cmn/common.module';
 import { ChatModule } from '@chat/chat.module';
 import { PromptsModule } from '@prompts/prompts.module';
 import { ModelsModule } from '@models/models.module';
+import { S3Module } from '@s3/s3.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { ModelsModule } from '@models/models.module';
     ChatModule,
     PromptsModule,
     ModelsModule,
+    S3Module,
   ],
   controllers: [],
   providers: [],

@@ -18,6 +18,7 @@ export interface SaveMessageData {
   role: MessageRole;
   inputTokens?: number;
   outputTokens?: number;
+  fileKey?: string;
 }
 
 @Injectable()
@@ -67,6 +68,7 @@ export class ChatService {
       role: data.role,
       inputTokens: data.inputTokens,
       outputTokens: data.outputTokens,
+      fileKey: data.fileKey,
     });
 
     return this.messageRepository.save(message);

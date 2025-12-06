@@ -26,14 +26,19 @@ export class OpenAIService implements AIProvider {
     params: StreamResponseParams,
     onDelta: (delta: string) => void,
   ): Promise<StreamResponseResult> {
-    const { previousMessages, newMessage, model, maxTokens, temperature } =
-      params;
+    const {
+      previousMessages,
+      newMessage,
+      model,
+      maxTokens,
+      temperature,
+      fileKey,
+    } = params;
     const transformedMessages =
       this.#transformMessagesToOpenAIFormat(previousMessages);
-    transformedMessages.push({
-      role: 'user',
-      content: [{ type: 'input_text', text: newMessage }],
-    });
+    transformedMessages.push(
+      ...this.#transformNewMessageToOpenAIFormat(newMessage, fileKey),
+    );
     this.logger.debug('Transformed Messages:', transformedMessages);
     try {
       const stream = this.client.responses.stream({
@@ -83,5 +88,41 @@ export class OpenAIService implements AIProvider {
       role: msg.role,
       content: [{ type: 'input_text' as const, text: msg.content }],
     }));
+  }
+
+  #transformNewMessageToOpenAIFormat(
+    message: string,
+    fileKey?: string,
+  ): ResponseInput {
+    if (fileKey) {
+      if (this.#isImage(fileKey)) {
+        const imageUrl = `${this.envService.cdnDomain}${fileKey}`;
+        this.logger.debug('Image URL:', imageUrl);
+        return [
+          {
+            role: 'user',
+            content: [
+              { type: 'input_text' as const, text: message },
+              {
+                type: 'input_image' as const,
+                image_url: imageUrl,
+                detail: 'auto',
+              },
+            ],
+          },
+        ];
+      }
+    }
+    return [
+      {
+        role: 'user',
+        content: [{ type: 'input_text' as const, text: message }],
+      },
+    ];
+  }
+
+  #isImage(fileKey: string): boolean {
+    const imageExtensions = ['.png', '.jpg', '.jpeg'];
+    return imageExtensions.some((ext) => fileKey.endsWith(ext));
   }
 }

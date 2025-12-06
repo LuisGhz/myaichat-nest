@@ -1,3 +1,4 @@
+import { Transform } from 'class-transformer';
 import {
   IsInt,
   IsNotEmpty,
@@ -26,14 +27,13 @@ export class SendMessageReqDto {
   })
   model: string;
 
+  @Transform(({ value }) => parseInt(value, 10))
   @IsInt()
   @Min(1)
   @Max(16384)
   maxTokens: number;
 
-  @IsOptional()
-  file: File;
-
+  @Transform(({ value }) => Number(value))
   @IsNumber()
   @Min(0)
   @Max(1)

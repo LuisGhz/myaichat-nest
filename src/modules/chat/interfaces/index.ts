@@ -8,6 +8,8 @@ export {
   type HandleStreamMessageParams,
   type GetOrCreateChatParams,
 } from './chat-stream.interface';
+export { type HandleStreamRequestParams } from './handle-stream-request.interface';
+export { type SaveMessagesParams } from './save-messages.interface';
 export {
   type OpenAIInputText,
   type OpenAIInputImage,

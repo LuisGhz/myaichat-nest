@@ -8,6 +8,7 @@ export interface HandleStreamMessageParams {
   temperature: number;
   userId: string;
   provider: string;
+  fileKey?: string;
   onEvent: (event: ChatStreamEvent) => void;
 }
 

@@ -23,7 +23,8 @@
       "@chat/*": ["src/modules/chat/*"],
       "@prompts/*": ["src/modules/prompts/*"],
       "@models/*": ["src/modules/models/*"],
-      "@mdl/*": ["src/modules/models/*"]
+      "@mdl/*": ["src/modules/models/*"],
+      "@s3/*": ["src/modules/s3/*"]
     },
     "incremental": true,
     "skipLibCheck": true,

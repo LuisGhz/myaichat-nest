@@ -33,6 +33,9 @@ export class Message {
   @Column({ type: 'int', nullable: true })
   outputTokens?: number;
 
+  @Column({ type: 'varchar', nullable: true })
+  fileKey?: string;
+
   @CreateDateColumn()
   createdAt: Date;
 }
