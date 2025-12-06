@@ -21,7 +21,8 @@ import { CurrentUser } from '@cmn/decorators';
 import type { JwtPayload } from '@cmn/interfaces';
 import { S3Service } from '@s3/services';
 import { IsValidFileTypeConstraint } from '@s3/validators';
-import { ChatService, ChatStreamService } from './services';
+import { ChatService, ChatStreamService, TranscriptionService } from './services';
+import { IsValidAudioTypeConstraint } from './validators';
 import {
   ChatMessagesResDto,
   RenameChatReqDto,
@@ -29,6 +30,8 @@ import {
   StreamEventType,
   UpdateImageGenerationReqDto,
   UpdateWebSearchReqDto,
+  TranscribeAudioReqDto,
+  TranscribeAudioResDto,
   type ChatStreamEvent,
 } from './dto';
 import type { HandleStreamRequestParams } from './interfaces';
@@ -40,6 +43,7 @@ export class ChatController {
   constructor(
     private readonly chatService: ChatService,
     private readonly chatStreamService: ChatStreamService,
+    private readonly transcriptionService: TranscriptionService,
     private readonly s3Service: S3Service,
   ) {}
 
@@ -126,8 +130,27 @@ export class ChatController {
     await this.chatService.deleteChat(chatId, user.sub);
   }
 
+  @Post('transcribe')
+  @UseInterceptors(FileInterceptor('audio'))
+  async transcribeAudio(
+    @UploadedFile() audio: Express.Multer.File | undefined,
+    @Body() dto: TranscribeAudioReqDto,
+    @CurrentUser() _user: JwtPayload,
+  ): Promise<TranscribeAudioResDto> {
+    if (!audio) throw new BadRequestException('Audio file is required');
+
+    this.#validateAudioFile(audio);
+    return this.transcriptionService.transcribeAudio(audio, dto.temperature);
+  }
+
   #validateFile(file: Express.Multer.File): void {
     const validator = new IsValidFileTypeConstraint();
+    if (!validator.validate(file))
+      throw new BadRequestException(validator.defaultMessage());
+  }
+
+  #validateAudioFile(file: Express.Multer.File): void {
+    const validator = new IsValidAudioTypeConstraint();
     if (!validator.validate(file))
       throw new BadRequestException(validator.defaultMessage());
   }
