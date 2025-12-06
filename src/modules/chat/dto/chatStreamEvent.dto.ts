@@ -24,6 +24,7 @@ export interface StreamDoneEvent {
     inputTokens: number;
     outputTokens: number;
     title?: string;
+    imageUrl?: string;
   };
 }
 
