@@ -7,4 +7,5 @@ export interface SaveMessagesParams {
   inputTokens: number;
   outputTokens: number;
   fileKey?: string;
+  imageKey?: string;
 }
