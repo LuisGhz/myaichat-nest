@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { Chat, Message, MessageRole } from '../entities';
 import { User } from '@usr/entities';
 import { ChatMessagesResDto, UserChatsResDto } from '../dto';
+import { EnvService } from '@cfg/schema/env.service';
 
 export interface CreateChatData {
   user: User;
@@ -30,6 +31,7 @@ export class ChatService {
     private readonly chatRepository: Repository<Chat>,
     @InjectRepository(Message)
     private readonly messageRepository: Repository<Message>,
+    private readonly envService: EnvService,
   ) {}
 
   async createChat(data: CreateChatData): Promise<Chat> {
@@ -92,6 +94,7 @@ export class ChatService {
         'createdAt',
         'inputTokens',
         'outputTokens',
+        'fileKey',
       ],
     });
 
@@ -111,6 +114,9 @@ export class ChatService {
       createdAt: m.createdAt,
       inputTokens: m.inputTokens,
       outputTokens: m.outputTokens,
+      file: m.fileKey
+        ? `${this.envService.cdnDomain}${m.fileKey}`
+        : undefined,
     }));
   }
 

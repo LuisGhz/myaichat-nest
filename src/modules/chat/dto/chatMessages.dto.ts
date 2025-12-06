@@ -5,4 +5,5 @@ export class ChatMessagesResDto {
   createdAt: Date;
   inputTokens?: number;
   outputTokens?: number;
+  file?: string;
 }
