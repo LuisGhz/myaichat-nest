@@ -7,12 +7,15 @@ export interface StreamResponseParams {
   maxTokens: number;
   temperature: number;
   fileKey?: string;
+  isImageGeneration: boolean;
+  isWebSearch: boolean;
 }
 
 export interface StreamResponseResult {
   content: string;
   inputTokens: number;
   outputTokens: number;
+  imageKey?: string;
 }
 
 export interface AIProvider {
