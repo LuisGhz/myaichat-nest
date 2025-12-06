@@ -1,5 +1,6 @@
 import { Transform } from 'class-transformer';
 import {
+  IsBoolean,
   IsInt,
   IsNotEmpty,
   IsNumber,
@@ -38,6 +39,14 @@ export class SendMessageReqDto {
   @Min(0)
   @Max(1)
   temperature: number;
+
+  @IsBoolean()
+  @Transform(({ value }) => value === 'true' || value === true)
+  isImageGeneration: boolean;
+
+  @IsBoolean()
+  @Transform(({ value }) => value === 'true' || value === true)
+  isWebSearch: boolean;
 }
 
 export class SendMessageResDto {
