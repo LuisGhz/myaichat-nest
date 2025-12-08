@@ -15,6 +15,7 @@ import {
   UpdatePromptResDto,
   PromptResDto,
   PromptListItemResDto,
+  PromptListItemSummaryResDto,
 } from '../dto';
 
 @Injectable()
@@ -66,10 +67,34 @@ export class PromptsService {
     }));
   }
 
+  async findAllSummary(userId: string): Promise<PromptListItemSummaryResDto[]> {
+    const prompts = await this.promptRepository.find({
+      where: { user: { id: userId } },
+      select: ['id', 'name'],
+      order: { name: 'ASC' },
+    });
+
+    return prompts.map((prompt) => ({
+      id: prompt.id,
+      name: prompt.name,
+    }));
+  }
+
   async findOne(id: string, userId: string): Promise<PromptResDto> {
     const prompt = await this.findByIdOrFail(id, userId);
 
     return this.mapToResponseDto(prompt);
+  }
+
+  async findOneForChat(id: string, userId: string): Promise<Prompt> {
+    const prompt = await this.promptRepository.findOne({
+      where: { id, user: { id: userId } },
+      relations: ['messages'],
+    });
+
+    if (!prompt) throw new NotFoundException(`Prompt with id ${id} not found`);
+
+    return prompt;
   }
 
   async update(
@@ -152,7 +177,11 @@ export class PromptsService {
     await this.promptRepository.remove(prompt);
   }
 
-  async deleteMessage(id: string, msgId: string, userId: string): Promise<void> {
+  async deleteMessage(
+    id: string,
+    msgId: string,
+    userId: string,
+  ): Promise<void> {
     const prompt = await this.findByIdOrFail(id, userId);
 
     const message = prompt.messages.find((msg) => msg.id === msgId);
