@@ -94,6 +94,14 @@ export class ChatService {
     await this.chatRepository.update(chatId, { isImageGeneration });
   }
 
+  async updateChatMaxTokens(chatId: string, maxTokens: number): Promise<void> {
+    await this.chatRepository.update(chatId, { maxTokens });
+  }
+
+  async updateChatTemperature(chatId: string, temperature: number): Promise<void> {
+    await this.chatRepository.update(chatId, { temperature });
+  }
+
   async getChatMessages(
     chatId: string,
     userId: string,

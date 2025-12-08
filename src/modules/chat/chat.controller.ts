@@ -30,6 +30,8 @@ import {
   StreamEventType,
   UpdateImageGenerationReqDto,
   UpdateWebSearchReqDto,
+  UpdateMaxTokensReqDto,
+  UpdateTemperatureReqDto,
   TranscribeAudioReqDto,
   TranscribeAudioResDto,
   type ChatStreamEvent,
@@ -117,6 +119,28 @@ export class ChatController {
   ): Promise<void> {
     await this.chatService.findChatByIdOrFail(chatId, user.sub);
     await this.chatService.updateChatImageGeneration(chatId, dto.isImageGeneration);
+  }
+
+  @Patch(':id/update-max-tokens')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async updateMaxTokens(
+    @Param('id', ParseUUIDPipe) chatId: string,
+    @Body() dto: UpdateMaxTokensReqDto,
+    @CurrentUser() user: JwtPayload,
+  ): Promise<void> {
+    await this.chatService.findChatByIdOrFail(chatId, user.sub);
+    await this.chatService.updateChatMaxTokens(chatId, dto.maxTokens);
+  }
+
+  @Patch(':id/update-temperature')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async updateTemperature(
+    @Param('id', ParseUUIDPipe) chatId: string,
+    @Body() dto: UpdateTemperatureReqDto,
+    @CurrentUser() user: JwtPayload,
+  ): Promise<void> {
+    await this.chatService.findChatByIdOrFail(chatId, user.sub);
+    await this.chatService.updateChatTemperature(chatId, dto.temperature);
   }
 
   @Delete(':id')
