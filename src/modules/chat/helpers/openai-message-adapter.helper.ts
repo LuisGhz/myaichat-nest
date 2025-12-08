@@ -52,7 +52,7 @@ export const transformMessagesToOpenAIFormat = (
 export const transformNewMessageToOpenAIFormat = (
   message: string,
   cdnDomain: string,
-  prevMessage: Message,
+  prevMessage?: Message,
   fileKey?: string,
 ): ResponseInput => {
   const content: Array<ResponseInputText | ResponseInputImage> = [
@@ -61,8 +61,10 @@ export const transformNewMessageToOpenAIFormat = (
   if (fileKey && isImage(fileKey)) {
     const imageUrl = `${cdnDomain}${fileKey}`;
     content.push(img(imageUrl));
-    const prevContent = handlePrevMessageWithImage(prevMessage, cdnDomain);
-    content.push(...prevContent);
+    if (prevMessage) {
+      const prevContent = handlePrevMessageWithImage(prevMessage, cdnDomain);
+      content.push(...prevContent);
+    }
   }
   return [
     {
