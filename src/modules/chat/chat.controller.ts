@@ -21,7 +21,11 @@ import { CurrentUser } from '@cmn/decorators';
 import type { JwtPayload } from '@cmn/interfaces';
 import { S3Service } from '@s3/services';
 import { IsValidFileTypeConstraint } from '@s3/validators';
-import { ChatService, ChatStreamService, TranscriptionService } from './services';
+import {
+  ChatService,
+  ChatStreamService,
+  TranscriptionService,
+} from './services';
 import { IsValidAudioTypeConstraint } from './validators';
 import {
   ChatMessagesResDto,
@@ -68,7 +72,7 @@ export class ChatController {
       this.#validateFile(file);
       fileKey = await this.s3Service.uploadFile(file);
     }
-    console.log('File Key:', fileKey);
+
     await this.#handleStreamRequest({
       res,
       dto,
@@ -118,7 +122,10 @@ export class ChatController {
     @CurrentUser() user: JwtPayload,
   ): Promise<void> {
     await this.chatService.findChatByIdOrFail(chatId, user.sub);
-    await this.chatService.updateChatImageGeneration(chatId, dto.isImageGeneration);
+    await this.chatService.updateChatImageGeneration(
+      chatId,
+      dto.isImageGeneration,
+    );
   }
 
   @Patch(':id/update-max-tokens')
@@ -202,6 +209,7 @@ export class ChatController {
     try {
       await this.chatStreamService.handleStreamMessage({
         chatId: dto.chatId,
+        promptId: dto.promptId,
         message: dto.message,
         model: dto.model,
         maxTokens: dto.maxTokens,
