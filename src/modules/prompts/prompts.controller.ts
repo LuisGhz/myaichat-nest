@@ -20,6 +20,7 @@ import {
   UpdatePromptResDto,
   PromptResDto,
   PromptListItemResDto,
+  PromptListItemSummaryResDto,
 } from './dto';
 
 @Controller('prompts')
@@ -39,6 +40,13 @@ export class PromptsController {
     @CurrentUser() user: JwtPayload,
   ): Promise<PromptListItemResDto[]> {
     return this.promptsService.findAll(user.sub);
+  }
+
+  @Get('summary')
+  async findAllSummary(
+    @CurrentUser() user: JwtPayload,
+  ): Promise<PromptListItemSummaryResDto[]> {
+    return this.promptsService.findAllSummary(user.sub);
   }
 
   @Get(':id')
