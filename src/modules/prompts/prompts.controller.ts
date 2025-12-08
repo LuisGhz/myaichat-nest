@@ -66,4 +66,14 @@ export class PromptsController {
   ): Promise<void> {
     return this.promptsService.remove(id, user.sub);
   }
+
+  @Delete(':id/messages/:msgId')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteMessage(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Param('msgId', ParseUUIDPipe) msgId: string,
+    @CurrentUser() user: JwtPayload,
+  ): Promise<void> {
+    return this.promptsService.deleteMessage(id, msgId, user.sub);
+  }
 }
