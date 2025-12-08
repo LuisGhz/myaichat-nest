@@ -25,3 +25,8 @@ export class PromptListItemResDto {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export class PromptListItemSummaryResDto {
+  id: string;
+  name: string;
+}
