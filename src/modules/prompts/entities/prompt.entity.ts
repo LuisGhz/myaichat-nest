@@ -24,8 +24,8 @@ export class Prompt {
   @Column({ type: 'text' })
   content: string;
 
-  @OneToOne(() => User)
-  @JoinColumn()
+  @ManyToOne(() => User)
+  @JoinColumn({ name: 'userId' })
   user: User;
 
   @OneToMany(() => Chat, (chat) => chat.prompt)
