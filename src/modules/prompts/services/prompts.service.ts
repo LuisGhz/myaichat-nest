@@ -90,6 +90,7 @@ export class PromptsService {
     const prompt = await this.promptRepository.findOne({
       where: { id, user: { id: userId } },
       relations: ['messages'],
+      order: { messages: { createdAt: 'ASC' } },
     });
 
     if (!prompt) throw new NotFoundException(`Prompt with id ${id} not found`);

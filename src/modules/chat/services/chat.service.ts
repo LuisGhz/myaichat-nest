@@ -57,7 +57,11 @@ export class ChatService {
   async findChatById(id: string, userId: string): Promise<Chat | null> {
     return this.chatRepository.findOne({
       where: { id, user: { id: userId } },
-      relations: ['user', 'messages', 'prompt'],
+      relations: ['user', 'messages', 'prompt', 'prompt.messages'],
+      order: {
+        messages: { createdAt: 'ASC' },
+        prompt: { messages: { createdAt: 'ASC' } },
+      },
     });
   }
 
@@ -89,11 +93,17 @@ export class ChatService {
     await this.chatRepository.update(chatId, { title });
   }
 
-  async updateChatWebSearch(chatId: string, isWebSearch: boolean): Promise<void> {
+  async updateChatWebSearch(
+    chatId: string,
+    isWebSearch: boolean,
+  ): Promise<void> {
     await this.chatRepository.update(chatId, { isWebSearch });
   }
 
-  async updateChatImageGeneration(chatId: string, isImageGeneration: boolean): Promise<void> {
+  async updateChatImageGeneration(
+    chatId: string,
+    isImageGeneration: boolean,
+  ): Promise<void> {
     await this.chatRepository.update(chatId, { isImageGeneration });
   }
 
@@ -101,7 +111,10 @@ export class ChatService {
     await this.chatRepository.update(chatId, { maxTokens });
   }
 
-  async updateChatTemperature(chatId: string, temperature: number): Promise<void> {
+  async updateChatTemperature(
+    chatId: string,
+    temperature: number,
+  ): Promise<void> {
     await this.chatRepository.update(chatId, { temperature });
   }
 
@@ -115,9 +128,7 @@ export class ChatService {
     });
 
     if (!chat) {
-      this.logger.error(
-        `Chat with id ${chatId} not found for user ${userId}`,
-      );
+      this.logger.error(`Chat with id ${chatId} not found for user ${userId}`);
       throw new NotFoundException(
         `Chat with id ${chatId} not found for user ${userId}`,
       );
