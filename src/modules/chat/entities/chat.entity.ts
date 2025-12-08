@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import { User } from '../../user/entities';
 import { Message } from './message.entity';
+import { Prompt } from '@prompts/entities';
 
 @Entity('chats')
 export class Chat {
@@ -20,6 +21,9 @@ export class Chat {
 
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
   user: User;
+
+  @ManyToOne(() => Prompt, (prompt) => prompt.chats, { nullable: true, onDelete: 'RESTRICT' })
+  prompt?: Prompt;
 
   @OneToMany(() => Message, (message) => message.chat)
   messages: Message[];

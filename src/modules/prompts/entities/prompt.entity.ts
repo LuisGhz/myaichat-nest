@@ -28,8 +28,8 @@ export class Prompt {
   @JoinColumn()
   user: User;
 
-  @ManyToOne(() => Chat, { nullable: true, onDelete: 'SET NULL' })
-  chat?: Chat;
+  @OneToMany(() => Chat, (chat) => chat.prompt)
+  chats: Chat[];
 
   @OneToMany(() => PromptMessage, (message) => message.prompt, { cascade: true })
   messages: PromptMessage[];
