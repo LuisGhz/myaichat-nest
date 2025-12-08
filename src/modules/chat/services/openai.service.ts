@@ -1,17 +1,18 @@
 import { Injectable, Logger } from '@nestjs/common';
 import OpenAI from 'openai';
-import type { ResponseInput } from 'openai/resources/responses/responses';
 import { EnvService } from '@cfg/schema/env.service';
 import type {
   AIProvider,
   StreamResponseParams,
   StreamResponseResult,
-  CreateImageGenerationTool,
-  CreateWebSearchTool,
 } from '../interfaces';
-import { Message } from '../entities';
 import { CHAT_TITLE_MODEL, CHAT_TITLE_PROMPT } from '../consts';
-import { calculateImageGenerationTokens } from '../helpers';
+import {
+  calculateImageGenerationTokens,
+  createToolParamsIfEnabled,
+  transformMessagesToOpenAIFormat,
+  transformNewMessageToOpenAIFormat,
+} from '../helpers';
 
 @Injectable()
 export class OpenAIService implements AIProvider {
@@ -39,16 +40,19 @@ export class OpenAIService implements AIProvider {
       isImageGeneration,
       isWebSearch,
     } = params;
-    const transformedMessages =
-      this.#transformMessagesToOpenAIFormat(previousMessages);
+    const transformedMessages = transformMessagesToOpenAIFormat(
+      previousMessages,
+      this.envService.cdnDomain,
+    );
     transformedMessages.push(
-      ...this.#transformNewMessageToOpenAIFormat(newMessage, fileKey),
+      ...transformNewMessageToOpenAIFormat(
+        newMessage,
+        this.envService.cdnDomain,
+        fileKey,
+      ),
     );
     this.logger.debug('Transformed Messages:', transformedMessages);
-    const tools = this.#createToolParamsIfEnabled(
-      isWebSearch,
-      isImageGeneration,
-    );
+    const tools = createToolParamsIfEnabled(isWebSearch, isImageGeneration);
 
     try {
       const stream = this.client.responses.stream({
@@ -108,73 +112,5 @@ export class OpenAIService implements AIProvider {
       this.logger.error('Error generating chat title', error);
       return 'New Chat';
     }
-  }
-
-  #transformMessagesToOpenAIFormat(messages: Message[]): ResponseInput {
-    return messages.map((msg) => ({
-      role: msg.role,
-      content: [{ type: 'input_text' as const, text: msg.content }],
-    }));
-  }
-
-  #transformNewMessageToOpenAIFormat(
-    message: string,
-    fileKey?: string,
-  ): ResponseInput {
-    if (fileKey) {
-      if (this.#isImage(fileKey)) {
-        const imageUrl = `${this.envService.cdnDomain}${fileKey}`;
-        this.logger.debug('Image URL:', imageUrl);
-        return [
-          {
-            role: 'user',
-            content: [
-              { type: 'input_text' as const, text: message },
-              {
-                type: 'input_image' as const,
-                image_url: imageUrl,
-                detail: 'auto',
-              },
-            ],
-          },
-        ];
-      }
-    }
-    return [
-      {
-        role: 'user',
-        content: [{ type: 'input_text' as const, text: message }],
-      },
-    ];
-  }
-
-  #isImage(fileKey: string): boolean {
-    const imageExtensions = ['.png', '.jpg', '.jpeg'];
-    return imageExtensions.some((ext) => fileKey.endsWith(ext));
-  }
-
-  #createToolParamsIfEnabled(isWebSearch: boolean, isImageGeneration: boolean) {
-    const tools: Array<CreateImageGenerationTool | CreateWebSearchTool> = [];
-
-    if (isImageGeneration) {
-      const imageGenTool: CreateImageGenerationTool = {
-        type: 'image_generation',
-        size: '1024x1024',
-        quality: 'medium',
-        background: 'auto',
-        input_fidelity: 'high',
-      };
-      tools.push(imageGenTool);
-    }
-
-    if (isWebSearch) {
-      const webSearchTool: CreateWebSearchTool = {
-        type: 'web_search',
-        search_context_size: 'medium',
-      };
-      tools.push(webSearchTool);
-    }
-
-    return tools;
   }
 }
