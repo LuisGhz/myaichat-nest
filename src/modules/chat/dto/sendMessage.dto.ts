@@ -17,6 +17,10 @@ export class SendMessageReqDto {
   @IsUUID()
   chatId?: string;
 
+  @IsOptional()
+  @IsUUID()
+  promptId?: string;
+
   @IsNotEmpty()
   @IsString()
   message: string;

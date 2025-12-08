@@ -8,7 +8,6 @@ import {
 import { Chat } from './chat.entity';
 
 export enum MessageRole {
-  SYSTEM = 'system',
   ASSISTANT = 'assistant',
   USER = 'user',
 }
