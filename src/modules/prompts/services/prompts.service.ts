@@ -32,25 +32,10 @@ export class PromptsService {
     dto: CreatePromptReqDto,
     userId: string,
   ): Promise<CreatePromptResDto> {
-    let chat: Chat | undefined;
-
-    if (dto.chatId) {
-      const foundChat = await this.chatRepository.findOne({
-        where: { id: dto.chatId, user: { id: userId } },
-      });
-
-      if (!foundChat) {
-        throw new NotFoundException(`Chat with id ${dto.chatId} not found`);
-      }
-
-      chat = foundChat;
-    }
-
     const prompt = this.promptRepository.create({
       name: dto.name,
       content: dto.content,
       user: { id: userId } as User,
-      chat,
       messages: dto.messages?.map((msg) =>
         this.promptMessageRepository.create({
           role: msg.role,
@@ -67,7 +52,7 @@ export class PromptsService {
   async findAll(userId: string): Promise<PromptListItemResDto[]> {
     const prompts = await this.promptRepository.find({
       where: { user: { id: userId } },
-      relations: ['chat', 'messages'],
+      relations: ['messages'],
       order: { updatedAt: 'DESC' },
     });
 
@@ -75,7 +60,6 @@ export class PromptsService {
       id: prompt.id,
       name: prompt.name,
       content: prompt.content,
-      chatId: prompt.chat?.id,
       messageCount: prompt.messages?.length ?? 0,
       createdAt: prompt.createdAt,
       updatedAt: prompt.updatedAt,
@@ -101,22 +85,6 @@ export class PromptsService {
 
     if (dto.content !== undefined) {
       prompt.content = dto.content;
-    }
-
-    if (dto.chatId !== undefined) {
-      if (dto.chatId) {
-        const chat = await this.chatRepository.findOne({
-          where: { id: dto.chatId, user: { id: userId } },
-        });
-
-        if (!chat) {
-          throw new NotFoundException(`Chat with id ${dto.chatId} not found`);
-        }
-
-        prompt.chat = chat;
-      } else {
-        prompt.chat = undefined;
-      }
     }
 
     if (dto.messages !== undefined) {
@@ -170,19 +138,37 @@ export class PromptsService {
   async remove(id: string, userId: string): Promise<void> {
     const prompt = await this.findByIdOrFail(id, userId);
 
-    if (prompt.chat) {
+    // Check if any chats are using this prompt
+    const chatsUsingPrompt = await this.chatRepository.count({
+      where: { prompt: { id } },
+    });
+
+    if (chatsUsingPrompt > 0) {
       throw new BadRequestException(
-        'Cannot delete a prompt that belongs to a chat. Remove the chat association first.',
+        `Cannot delete prompt. It is currently being used by ${chatsUsingPrompt} chat(s).`,
       );
     }
 
     await this.promptRepository.remove(prompt);
   }
 
+  async deleteMessage(id: string, msgId: string, userId: string): Promise<void> {
+    const prompt = await this.findByIdOrFail(id, userId);
+
+    const message = prompt.messages.find((msg) => msg.id === msgId);
+    if (!message) {
+      throw new NotFoundException(
+        `Message with id ${msgId} not found in prompt ${id}`,
+      );
+    }
+
+    await this.promptMessageRepository.remove(message);
+  }
+
   private async findByIdOrFail(id: string, userId: string): Promise<Prompt> {
     const prompt = await this.promptRepository.findOne({
       where: { id, user: { id: userId } },
-      relations: ['chat', 'messages', 'user'],
+      relations: ['messages', 'user'],
     });
 
     if (!prompt) {
@@ -197,7 +183,6 @@ export class PromptsService {
       id: prompt.id,
       name: prompt.name,
       content: prompt.content,
-      chatId: prompt.chat?.id,
       messages:
         prompt.messages?.map((msg) => ({
           id: msg.id,
