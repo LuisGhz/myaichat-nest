@@ -1,11 +1,11 @@
 import {
   IsOptional,
   IsString,
-  IsUUID,
   MaxLength,
   IsArray,
   ValidateNested,
   IsEnum,
+  IsUUID,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { PromptMessageRole } from '../entities';
@@ -35,10 +35,6 @@ export class UpdatePromptReqDto {
   content?: string;
 
   @IsOptional()
-  @IsUUID()
-  chatId?: string;
-
-  @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => UpdatePromptMessageDto)
@@ -49,7 +45,6 @@ export class UpdatePromptResDto {
   id: string;
   name: string;
   content: string;
-  chatId?: string;
   messages: { id: string; role: PromptMessageRole; content: string }[];
   createdAt: Date;
   updatedAt: Date;

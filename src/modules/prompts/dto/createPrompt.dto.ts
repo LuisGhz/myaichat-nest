@@ -2,7 +2,6 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
-  IsUUID,
   MaxLength,
   IsArray,
   ValidateNested,
@@ -33,10 +32,6 @@ export class CreatePromptReqDto {
   content: string;
 
   @IsOptional()
-  @IsUUID()
-  chatId?: string;
-
-  @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => CreatePromptMessageDto)
@@ -47,7 +42,6 @@ export class CreatePromptResDto {
   id: string;
   name: string;
   content: string;
-  chatId?: string;
   messages: { id: string; role: PromptMessageRole; content: string }[];
   createdAt: Date;
   updatedAt: Date;
