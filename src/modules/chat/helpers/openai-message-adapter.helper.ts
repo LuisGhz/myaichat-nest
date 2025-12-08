@@ -20,27 +20,13 @@ export const transformMessagesToOpenAIFormat = (
       // Add image if present in user message
       if (msg.fileKey && isImage(msg.fileKey)) {
         const imageUrl = `${cdnDomain}${msg.fileKey}`;
-        content.push({
-          type: 'input_image',
-          image_url: imageUrl,
-          detail: 'auto',
-        });
+        content.push(img(imageUrl));
       }
 
       if (index > 0) {
         const prevMsg = messages[index - 1];
-        if (
-          prevMsg.role === 'assistant' &&
-          prevMsg.fileKey &&
-          isImage(prevMsg.fileKey)
-        ) {
-          const assistantImageUrl = `${cdnDomain}${prevMsg.fileKey}`;
-          content.push({
-            type: 'input_image',
-            image_url: assistantImageUrl,
-            detail: 'high',
-          });
-        }
+        const prevContent = handlePrevMessageWithImage(prevMsg, cdnDomain);
+        content.push(...prevContent);
       }
 
       return { role: 'user', content };
@@ -56,6 +42,7 @@ export const transformMessagesToOpenAIFormat = (
 export const transformNewMessageToOpenAIFormat = (
   message: string,
   cdnDomain: string,
+  prevMessage: Message,
   fileKey?: string,
 ): ResponseInput => {
   const content: Array<ResponseInputText | ResponseInputImage> = [
@@ -63,11 +50,9 @@ export const transformNewMessageToOpenAIFormat = (
   ];
   if (fileKey && isImage(fileKey)) {
     const imageUrl = `${cdnDomain}${fileKey}`;
-    content.push({
-      type: 'input_image' as const,
-      image_url: imageUrl,
-      detail: 'high',
-    });
+    content.push(img(imageUrl));
+    const prevContent = handlePrevMessageWithImage(prevMessage, cdnDomain);
+    content.push(...prevContent);
   }
   return [
     {
@@ -81,3 +66,26 @@ export const isImage = (fileKey: string): boolean => {
   const imageExtensions = ['.png', '.jpg', '.jpeg'];
   return imageExtensions.some((ext) => fileKey.endsWith(ext));
 };
+
+const handlePrevMessageWithImage = (
+  prevMessage: Message,
+  cdnDomain: string,
+): Array<ResponseInputText | ResponseInputImage> => {
+  const content: Array<ResponseInputText | ResponseInputImage> = [];
+  if (
+    prevMessage &&
+    prevMessage.role === 'assistant' &&
+    prevMessage.fileKey &&
+    isImage(prevMessage.fileKey)
+  ) {
+    const assistantImageUrl = `${cdnDomain}${prevMessage.fileKey}`;
+    content.push(img(assistantImageUrl));
+  }
+  return content;
+};
+
+const img = (url: string): ResponseInputImage => ({
+  type: 'input_image' as const,
+  image_url: url,
+  detail: 'high',
+});

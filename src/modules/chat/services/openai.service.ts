@@ -48,6 +48,7 @@ export class OpenAIService implements AIProvider {
       ...transformNewMessageToOpenAIFormat(
         newMessage,
         this.envService.cdnDomain,
+        previousMessages[previousMessages.length - 1],
         fileKey,
       ),
     );
