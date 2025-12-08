@@ -97,9 +97,24 @@ export class ChatService {
   async getChatMessages(
     chatId: string,
     userId: string,
-  ): Promise<ChatMessagesResDto[]> {
+  ): Promise<ChatMessagesResDto> {
+    const chat = await this.chatRepository.findOne({
+      where: { id: chatId, user: { id: userId } },
+      relations: ['messages'],
+      select: ['maxTokens', 'temperature'],
+    });
+
+    if (!chat) {
+      this.logger.error(
+        `Chat with id ${chatId} not found for user ${userId}`,
+      );
+      throw new NotFoundException(
+        `Chat with id ${chatId} not found for user ${userId}`,
+      );
+    }
+
     const messages = await this.messageRepository.find({
-      where: { chat: { id: chatId, user: { id: userId } } },
+      where: { chat: { id: chatId } },
       order: { createdAt: 'ASC' },
       select: [
         'id',
@@ -112,26 +127,21 @@ export class ChatService {
       ],
     });
 
-    if (!messages) {
-      this.logger.error(
-        `Messages for chat with id ${chatId} not found for user ${userId}`,
-      );
-      throw new NotFoundException(
-        `Messages for chat with id ${chatId} not found for user ${userId}`,
-      );
-    }
-
-    return messages.map((m) => ({
-      id: m.id,
-      content: m.content,
-      role: m.role,
-      createdAt: m.createdAt,
-      inputTokens: m.inputTokens,
-      outputTokens: m.outputTokens,
-      file: m.fileKey
-        ? `${this.envService.cdnDomain}${m.fileKey}`
-        : undefined,
-    }));
+    return {
+      messages: messages.map((m) => ({
+        id: m.id,
+        content: m.content,
+        role: m.role,
+        createdAt: m.createdAt,
+        inputTokens: m.inputTokens,
+        outputTokens: m.outputTokens,
+        file: m.fileKey
+          ? `${this.envService.cdnDomain}${m.fileKey}`
+          : undefined,
+      })),
+      maxTokens: chat.maxTokens,
+      temperature: chat.temperature,
+    };
   }
 
   async getUserChats(userId: string): Promise<UserChatsResDto[]> {

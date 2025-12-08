@@ -82,10 +82,8 @@ export class ChatController {
   async getChatMessages(
     @Param('id', ParseUUIDPipe) chatId: string,
     @CurrentUser() user: JwtPayload,
-  ): Promise<ChatMessagesResDto[]> {
-    const messages = await this.chatService.getChatMessages(chatId, user.sub);
-
-    return messages;
+  ): Promise<ChatMessagesResDto> {
+    return this.chatService.getChatMessages(chatId, user.sub);
   }
 
   @Patch(':id/rename')
