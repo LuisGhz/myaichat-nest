@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Chat, Message, MessageRole } from '../entities';
 import { User } from '@usr/entities';
+import { Prompt } from '@prompts/entities';
 import { ChatMessagesResDto, UserChatsResDto } from '../dto';
 import { EnvService } from '@cfg/schema/env.service';
 import { S3Service } from '@s3/services';
@@ -14,6 +15,7 @@ export interface CreateChatData {
   temperature: number;
   isImageGeneration?: boolean;
   isWebSearch?: boolean;
+  prompt?: Prompt;
 }
 
 export interface SaveMessageData {
@@ -46,6 +48,7 @@ export class ChatService {
       temperature: data.temperature,
       isImageGeneration: data.isImageGeneration ?? false,
       isWebSearch: data.isWebSearch ?? false,
+      prompt: data.prompt,
     });
 
     return this.chatRepository.save(chat);
@@ -54,7 +57,7 @@ export class ChatService {
   async findChatById(id: string, userId: string): Promise<Chat | null> {
     return this.chatRepository.findOne({
       where: { id, user: { id: userId } },
-      relations: ['user', 'messages'],
+      relations: ['user', 'messages', 'prompt'],
     });
   }
 

@@ -5,6 +5,16 @@ import {
 } from 'openai/resources/responses/responses.js';
 import { Message } from '../entities';
 
+export const setSystemMessage = (systemPrompt?: string): ResponseInput => {
+  const content = systemPrompt ? systemPrompt : 'You are a helpful assistant.';
+  return [
+    {
+      role: 'system',
+      content,
+    },
+  ];
+};
+
 export const transformMessagesToOpenAIFormat = (
   messages: Message[],
   cdnDomain: string,

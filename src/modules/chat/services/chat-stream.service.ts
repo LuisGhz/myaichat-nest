@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { Chat, MessageRole } from '../entities';
+import { Chat, Message, MessageRole } from '../entities';
 import { User } from '@usr/entities';
 import { ChatService } from './chat.service';
 import { AIProviderRegistry } from './ai-provider-registry.service';
 import { ImageUploadService } from '@s3/services';
 import { EnvService } from '@cfg/schema/env.service';
+import { PromptsService } from '@prompts/services';
 import {
   StreamEventType,
   type ChatStreamEvent,
@@ -16,6 +17,7 @@ import type {
   GetOrCreateChatParams,
   SaveMessagesParams,
 } from '../interfaces';
+import { Prompt } from '@prompts/entities';
 
 @Injectable()
 export class ChatStreamService {
@@ -24,11 +26,13 @@ export class ChatStreamService {
     private readonly aiProviderRegistry: AIProviderRegistry,
     private readonly imageUploadService: ImageUploadService,
     private readonly envService: EnvService,
+    private readonly promptsService: PromptsService,
   ) {}
 
   async handleStreamMessage(params: HandleStreamMessageParams): Promise<void> {
     const {
       chatId,
+      promptId,
       message,
       model,
       maxTokens,
@@ -45,6 +49,7 @@ export class ChatStreamService {
 
     const chat = await this.#getOrCreateChat({
       chatId,
+      promptId,
       userId,
       model,
       maxTokens,
@@ -55,6 +60,13 @@ export class ChatStreamService {
     const isNewChat = !chatId;
     let fullContent = '';
     const messages = chat.messages || [];
+    if (chat.prompt && chat.prompt.messages) {
+      const promptMessages = chat.prompt.messages.map((msg) => ({
+        role: msg.role as unknown as MessageRole,
+        content: msg.content,
+      }));
+      messages.unshift(...(promptMessages as Message[]));
+    }
     const result = await aiProvider.streamResponse(
       {
         previousMessages: messages,
@@ -65,6 +77,7 @@ export class ChatStreamService {
         fileKey,
         isImageGeneration: isImageGeneration,
         isWebSearch: isWebSearch,
+        systemPrompt: chat.prompt?.content || undefined,
       },
       (delta) => {
         fullContent += delta;
@@ -105,9 +118,13 @@ export class ChatStreamService {
   }
 
   async #getOrCreateChat(params: GetOrCreateChatParams): Promise<Chat> {
-    const { chatId, userId, model, maxTokens, temperature } = params;
+    const { chatId, promptId, userId, model, maxTokens, temperature } = params;
 
     if (chatId) return this.chatService.findChatByIdOrFail(chatId, userId);
+
+    let prompt: Prompt | undefined;
+    if (promptId)
+      prompt = await this.promptsService.findOneForChat(promptId, userId);
 
     return this.chatService.createChat({
       user: { id: userId } as User,
@@ -116,9 +133,9 @@ export class ChatStreamService {
       temperature,
       isImageGeneration: params.isImageGeneration,
       isWebSearch: params.isWebSearch,
+      prompt,
     });
   }
-
   async #saveMessages(params: SaveMessagesParams): Promise<void> {
     const {
       chat,

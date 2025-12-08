@@ -1,6 +1,7 @@
 import { Message } from "../entities";
 
 export interface StreamResponseParams {
+  systemPrompt?: string;
   previousMessages: Message[];
   newMessage: string;
   model: string;

@@ -10,6 +10,7 @@ import { CHAT_TITLE_MODEL, CHAT_TITLE_PROMPT } from '../consts';
 import {
   calculateImageGenerationTokens,
   createToolParamsIfEnabled,
+  setSystemMessage,
   transformMessagesToOpenAIFormat,
   transformNewMessageToOpenAIFormat,
 } from '../helpers';
@@ -39,11 +40,14 @@ export class OpenAIService implements AIProvider {
       fileKey,
       isImageGeneration,
       isWebSearch,
+      systemPrompt,
     } = params;
+    const systemMessage = setSystemMessage(systemPrompt);
     const transformedMessages = transformMessagesToOpenAIFormat(
       previousMessages,
       this.envService.cdnDomain,
     );
+    transformedMessages.unshift(...systemMessage);
     transformedMessages.push(
       ...transformNewMessageToOpenAIFormat(
         newMessage,
@@ -54,7 +58,6 @@ export class OpenAIService implements AIProvider {
     );
     this.logger.debug('Transformed Messages:', transformedMessages);
     const tools = createToolParamsIfEnabled(isWebSearch, isImageGeneration);
-
     try {
       const stream = this.client.responses.stream({
         model,

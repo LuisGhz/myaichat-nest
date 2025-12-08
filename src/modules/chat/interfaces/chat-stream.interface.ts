@@ -2,6 +2,7 @@ import type { ChatStreamEvent } from '../dto';
 
 export interface HandleStreamMessageParams {
   chatId?: string;
+  promptId?: string;
   message: string;
   model: string;
   maxTokens: number;
@@ -16,6 +17,7 @@ export interface HandleStreamMessageParams {
 
 export interface GetOrCreateChatParams {
   chatId?: string;
+  promptId?: string;
   userId: string;
   model: string;
   maxTokens: number;

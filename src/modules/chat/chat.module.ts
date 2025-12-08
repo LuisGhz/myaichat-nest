@@ -10,10 +10,11 @@ import {
 } from './services';
 import { ChatController } from './chat.controller';
 import { ModelsModule } from '@mdl/models.module';
+import { PromptsModule } from '@prompts/prompts.module';
 import { AI_PROVIDERS } from './interfaces';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Chat, Message]), ModelsModule],
+  imports: [TypeOrmModule.forFeature([Chat, Message]), ModelsModule, PromptsModule],
   controllers: [ChatController],
   providers: [
     ChatService,

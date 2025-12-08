@@ -7,5 +7,6 @@ export {
   transformMessagesToOpenAIFormat,
   transformNewMessageToOpenAIFormat,
   isImage,
+  setSystemMessage,
 } from './openai-message-adapter.helper';
 export { createToolParamsIfEnabled } from './openai-tools.helper';
