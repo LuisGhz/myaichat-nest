@@ -121,6 +121,7 @@ export class ChatService {
   async getChatMessages(
     chatId: string,
     userId: string,
+    beforeMessageId?: string,
   ): Promise<ChatMessagesResDto> {
     const chat = await this.chatRepository.findOne({
       where: { id: chatId, user: { id: userId } },
@@ -134,22 +135,40 @@ export class ChatService {
       );
     }
 
-    const messages = await this.messageRepository.find({
-      where: { chat: { id: chatId } },
-      order: { createdAt: 'ASC' },
-      select: [
-        'id',
-        'content',
-        'role',
-        'createdAt',
-        'inputTokens',
-        'outputTokens',
-        'fileKey',
-      ],
-    });
+    const pageSize = 20;
+    const queryBuilder = this.messageRepository
+      .createQueryBuilder('message')
+      .where('message.chatId = :chatId', { chatId })
+      .select([
+        'message.id',
+        'message.content',
+        'message.role',
+        'message.createdAt',
+        'message.inputTokens',
+        'message.outputTokens',
+        'message.fileKey',
+      ])
+      .orderBy('message.createdAt', 'DESC')
+      .take(pageSize + 1);
+
+    if (beforeMessageId) {
+      const beforeMessage = await this.messageRepository.findOne({
+        where: { id: beforeMessageId, chat: { id: chatId } },
+        select: ['id', 'createdAt'],
+      });
+
+      if (beforeMessage)
+        queryBuilder.andWhere('message.createdAt < :beforeDate', {
+          beforeDate: beforeMessage.createdAt,
+        });
+    }
+
+    const messages = await queryBuilder.getMany();
+    const hasMore = messages.length > pageSize;
+    const paginatedMessages = hasMore ? messages.slice(0, pageSize) : messages;
 
     return {
-      messages: messages.map((m) => ({
+      messages: paginatedMessages.reverse().map((m) => ({
         id: m.id,
         content: m.content,
         role: m.role,
@@ -160,6 +179,7 @@ export class ChatService {
           ? `${this.envService.cdnDomain}${m.fileKey}`
           : undefined,
       })),
+      hasMore,
       maxTokens: chat.maxTokens,
       temperature: chat.temperature,
     };
