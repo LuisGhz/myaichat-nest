@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ThrottlerModule } from '@nestjs/throttler';
 import { AppConfigModule } from '@cfg/app-config.module';
 import { AuthModule } from '@auth/auth.module';
 import { UserModule } from '@usr/user.module';
@@ -7,6 +8,7 @@ import { ChatModule } from '@chat/chat.module';
 import { PromptsModule } from '@prompts/prompts.module';
 import { ModelsModule } from '@models/models.module';
 import { S3Module } from '@s3/s3.module';
+import { EnvService } from '@cfg/schema/env.service';
 
 @Module({
   imports: [
@@ -18,6 +20,18 @@ import { S3Module } from '@s3/s3.module';
     PromptsModule,
     ModelsModule,
     S3Module,
+    ThrottlerModule.forRootAsync({
+      inject: [EnvService],
+      useFactory: async (envService: EnvService) => {
+        const throttle = await envService.throttle;
+        return [
+          {
+            ttl: throttle.ttl,
+            limit: throttle.limit,
+          },
+        ];
+      },
+    }),
   ],
   controllers: [],
   providers: [],

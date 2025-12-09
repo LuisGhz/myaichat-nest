@@ -97,4 +97,11 @@ export class EnvService {
   get s3BucketName(): string {
     return this.configService.get('S3_BUCKET_NAME', { infer: true })!;
   }
+
+  get throttle(): { ttl: number; limit: number } {
+    return {
+      ttl: this.configService.get('THROTTLE_TTL', { infer: true })!,
+      limit: this.configService.get('THROTTLE_LIMIT', { infer: true })!,
+    };
+  }
 }

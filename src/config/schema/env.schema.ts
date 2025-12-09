@@ -27,6 +27,9 @@ export const envSchema = z.object({
   S3_ACCESS_KEY: z.string(),
   S3_SECRET_KEY: z.string(),
   S3_BUCKET_NAME: z.string(),
+
+  THROTTLE_TTL: z.string().transform((val) => Number(val)),
+  THROTTLE_LIMIT: z.string().transform((val) => Number(val)),
 });
 
 export type Env = z.infer<typeof envSchema>;
