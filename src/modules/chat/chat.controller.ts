@@ -11,6 +11,7 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
+  Query,
   Res,
   UploadedFile,
   UseInterceptors,
@@ -28,6 +29,7 @@ import {
 } from './services';
 import { IsValidAudioTypeConstraint } from './validators';
 import {
+  ChatMessagesReqDto,
   ChatMessagesResDto,
   RenameChatReqDto,
   SendMessageReqDto,
@@ -87,9 +89,10 @@ export class ChatController {
   @Get(':id/messages')
   async getChatMessages(
     @Param('id', ParseUUIDPipe) chatId: string,
+    @Query() dto: ChatMessagesReqDto,
     @CurrentUser() user: JwtPayload,
   ): Promise<ChatMessagesResDto> {
-    return this.chatService.getChatMessages(chatId, user.sub);
+    return this.chatService.getChatMessages(chatId, user.sub, dto.beforeMessageId);
   }
 
   @Patch(':id/rename')
