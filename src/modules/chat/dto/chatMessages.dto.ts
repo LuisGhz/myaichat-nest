@@ -1,3 +1,5 @@
+import { IsOptional, IsUUID } from 'class-validator';
+
 class MessageDto {
   id: string;
   content: string;
@@ -8,8 +10,15 @@ class MessageDto {
   file?: string;
 }
 
+export class ChatMessagesReqDto {
+  @IsOptional()
+  @IsUUID()
+  beforeMessageId?: string;
+}
+
 export class ChatMessagesResDto {
   messages: MessageDto[];
+  hasMore: boolean;
   maxTokens: number;
   temperature: number;
 }
