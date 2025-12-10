@@ -43,7 +43,7 @@ export class ModelsController {
     );
     if (cachedData) return cachedData;
     const data = await this.modelsService.findAll();
-    await this.appCacheService.setShort(CACHE_KEYS.MODELS_FIND_ALL, data);
+    await this.appCacheService.setLong(CACHE_KEYS.MODELS_FIND_ALL, data);
     return data;
   }
 
