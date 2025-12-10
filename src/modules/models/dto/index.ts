@@ -12,4 +12,9 @@ export {
   UpdateModelPriceDto,
   UpdateModelMetadataDto,
 } from './updateModel.dto';
-export { ModelResDto, ModelListItemResDto, ModelDeveloperResDto } from './model.dto';
+export {
+  ModelResDto,
+  ModelListItemResDto,
+  ModelDeveloperResDto,
+  DeveloperListItemResDto,
+} from './model.dto';

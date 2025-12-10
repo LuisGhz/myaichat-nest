@@ -5,6 +5,13 @@ export class ModelDeveloperResDto {
   imageUrl: string;
 }
 
+export class DeveloperListItemResDto {
+  id: string;
+  name: string;
+  link: string;
+  imageUrl: string;
+}
+
 export class ModelResDto {
   id: string;
   name: string;

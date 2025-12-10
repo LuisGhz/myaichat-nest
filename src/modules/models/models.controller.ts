@@ -19,6 +19,7 @@ import {
   UpdateModelResDto,
   ModelResDto,
   ModelListItemResDto,
+  DeveloperListItemResDto,
 } from './dto';
 import { AppCacheService } from '@cmn/services/app-cache.service';
 import { CACHE_KEYS } from '@cmn/consts/cache.const';
@@ -45,6 +46,11 @@ export class ModelsController {
     const data = await this.modelsService.findAll();
     await this.appCacheService.setLong(CACHE_KEYS.MODELS_FIND_ALL, data);
     return data;
+  }
+
+  @Get('developers')
+  async getDevelopers(): Promise<DeveloperListItemResDto[]> {
+    return this.modelsService.getDevelopers();
   }
 
   @Get('by-value')
