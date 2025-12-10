@@ -104,4 +104,20 @@ export class EnvService {
       limit: this.configService.get('THROTTLE_LIMIT', { infer: true })!,
     };
   }
+
+  get redisHost(): string {
+    return this.configService.get('REDIS_HOST', { infer: true })!;
+  }
+
+  get cacheShortTTL(): number {
+    return this.configService.get('CACHE_SHORT_TTL', { infer: true })!;
+  }
+
+  get cacheTTL(): number {
+    return this.configService.get('CACHE_TTL', { infer: true })!;
+  }
+
+  get cacheLongTTL(): number {
+    return this.configService.get('CACHE_LONG_TTL', { infer: true })!;
+  }
 }
