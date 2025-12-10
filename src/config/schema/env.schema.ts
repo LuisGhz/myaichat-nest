@@ -30,6 +30,11 @@ export const envSchema = z.object({
 
   THROTTLE_TTL: z.string().transform((val) => Number(val)),
   THROTTLE_LIMIT: z.string().transform((val) => Number(val)),
+
+  REDIS_HOST: z.string(),
+  CACHE_SHORT_TTL: z.string().transform((val) => Number(val)),
+  CACHE_TTL: z.string().transform((val) => Number(val)),
+  CACHE_LONG_TTL: z.string().transform((val) => Number(val)),
 });
 
 export type Env = z.infer<typeof envSchema>;
