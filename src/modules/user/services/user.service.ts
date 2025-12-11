@@ -34,12 +34,16 @@ export class UserService {
   }
 
   async create(data: CreateUserData): Promise<User> {
-    const defaultRole = await this.roleRepository.findOne({
-      where: { name: 'user' },
+    const userCount = await this.userRepository.count();
+    const isFirstUser = userCount === 0;
+
+    const roleName = isFirstUser ? 'admin' : 'guest';
+    const assignedRole = await this.roleRepository.findOne({
+      where: { name: roleName },
     });
 
-    if (!defaultRole) {
-      throw new Error('Default role "user" not found. Ensure roles are seeded.');
+    if (!assignedRole) {
+      throw new Error(`Role "${roleName}" not found. Ensure roles are seeded.`);
     }
 
     const user = this.userRepository.create({
@@ -47,7 +51,7 @@ export class UserService {
       name: data.name || data.ghLogin,
       avatar: data.avatar,
       email: data.email,
-      role: defaultRole,
+      role: assignedRole,
     });
 
     return this.userRepository.save(user);

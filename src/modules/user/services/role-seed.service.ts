@@ -27,9 +27,10 @@ export class RoleSeedService implements OnModuleInit {
     const roles: Partial<Role>[] = [
       { name: 'user', description: 'Default user role' },
       { name: 'admin', description: 'Administrator role with full access' },
+      { name: 'guest', description: 'Role with limited access' },
     ];
 
     await this.roleRepository.save(roles);
-    this.logger.log('Roles seeded successfully: user, admin');
+    this.logger.log('Roles seeded successfully: user, admin, guest');
   }
 }
