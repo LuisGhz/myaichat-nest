@@ -18,6 +18,7 @@ export class ModelResDto {
   shortName: string;
   value: string;
   link: string;
+  guestAccess: boolean;
   price: {
     input: number;
     output: number;
@@ -37,6 +38,7 @@ export class ModelListItemResDto {
   name: string;
   shortName: string;
   value: string;
+  guestAccess: boolean;
   developer: {
     name: string;
     imageUrl: string;
