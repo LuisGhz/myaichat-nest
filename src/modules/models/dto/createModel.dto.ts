@@ -1,4 +1,5 @@
 import {
+  IsBoolean,
   IsNotEmpty,
   IsNumber,
   IsOptional,
@@ -71,6 +72,10 @@ export class CreateModelReqDto {
   @IsUrl()
   link: string;
 
+  @IsOptional()
+  @IsBoolean()
+  guestAccess?: boolean;
+
   @ValidateNested()
   @Type(() => CreateModelPriceDto)
   price: CreateModelPriceDto;
@@ -95,6 +100,7 @@ export class CreateModelResDto {
   shortName: string;
   value: string;
   link: string;
+  guestAccess: boolean;
   price: {
     input: number;
     output: number;
