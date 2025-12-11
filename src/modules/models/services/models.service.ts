@@ -76,6 +76,7 @@ export class ModelsService {
       shortName: dto.shortName,
       value: dto.value,
       link: dto.link,
+      guestAccess: dto.guestAccess ?? false,
       priceInput: dto.price.input,
       priceOutput: dto.price.output,
       contextWindow: dto.metadata.contextWindow,
@@ -100,6 +101,7 @@ export class ModelsService {
       name: model.name,
       shortName: model.shortName,
       value: model.value,
+      guestAccess: model.guestAccess,
       developer: {
         name: model.developer.name,
         imageUrl: model.developer.imageUrl,
@@ -152,6 +154,10 @@ export class ModelsService {
 
     if (dto.link !== undefined) {
       model.link = dto.link;
+    }
+
+    if (dto.guestAccess !== undefined) {
+      model.guestAccess = dto.guestAccess;
     }
 
     if (dto.price !== undefined) {
@@ -232,6 +238,7 @@ export class ModelsService {
       shortName: model.shortName,
       value: model.value,
       link: model.link,
+      guestAccess: model.guestAccess,
       price: {
         input: Number(model.priceInput),
         output: Number(model.priceOutput),
