@@ -14,6 +14,8 @@ import {
   ModelResDto,
   ModelListItemResDto,
 } from '../dto';
+import { AppCacheService } from '@cmn/services/app-cache.service';
+import { CACHE_KEYS } from '@cmn/consts/cache.const';
 
 @Injectable()
 export class ModelsService {
@@ -22,6 +24,7 @@ export class ModelsService {
     private readonly modelRepository: Repository<Model>,
     @InjectRepository(ModelDeveloper)
     private readonly developerRepository: Repository<ModelDeveloper>,
+    private readonly appCacheService: AppCacheService,
   ) {}
 
   async create(dto: CreateModelReqDto): Promise<CreateModelResDto> {
@@ -115,6 +118,11 @@ export class ModelsService {
   }
 
   async findByValue(value: string): Promise<ModelResDto> {
+    const cachedData = await this.appCacheService.get<ModelResDto>(
+      `${CACHE_KEYS.GET_BY_VALUE}:${value}`,
+    );
+    if (cachedData) return cachedData;
+
     const model = await this.modelRepository.findOne({
       where: { value },
       relations: ['developer'],
@@ -124,11 +132,18 @@ export class ModelsService {
       throw new NotFoundException(`Model with value "${value}" not found`);
     }
 
+    this.appCacheService.setLong(
+      `${CACHE_KEYS.GET_BY_VALUE}:${value}`,
+      model,
+    );
+
     return this.mapToResponseDto(model);
   }
 
   async update(id: string, dto: UpdateModelReqDto): Promise<UpdateModelResDto> {
     const model = await this.findByIdOrFail(id);
+    const modelValue = model.value;
+    await this.deleteCacheByValueIfApplicable(modelValue);
 
     if (dto.name !== undefined) {
       model.name = dto.name;
@@ -202,6 +217,8 @@ export class ModelsService {
 
   async remove(id: string): Promise<void> {
     const model = await this.findByIdOrFail(id);
+    const modelValue = model.value;
+    await this.deleteCacheByValueIfApplicable(modelValue);
     await this.modelRepository.remove(model);
   }
 
@@ -257,5 +274,10 @@ export class ModelsService {
       createdAt: model.createdAt,
       updatedAt: model.updatedAt,
     };
+  }
+
+  async deleteCacheByValueIfApplicable(value: string): Promise<void> {
+    if (await this.appCacheService.get(`${CACHE_KEYS.GET_BY_VALUE}:${value}`))
+      this.appCacheService.del(`${CACHE_KEYS.GET_BY_VALUE}:${value}`);
   }
 }

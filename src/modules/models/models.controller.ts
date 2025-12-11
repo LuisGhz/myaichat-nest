@@ -55,7 +55,8 @@ export class ModelsController {
 
   @Get('by-value')
   async findByValue(@Query('value') value: string): Promise<ModelResDto> {
-    return this.modelsService.findByValue(value);
+    const data = await this.modelsService.findByValue(value);
+    return data;
   }
 
   @Get(':id')
