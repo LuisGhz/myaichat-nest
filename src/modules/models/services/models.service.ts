@@ -90,16 +90,24 @@ export class ModelsService {
 
     const savedModel = await this.modelRepository.save(model);
 
+    await this.#invalidateFindAllCache();
+
     return this.mapToResponseDto(savedModel);
   }
 
   async findAll(): Promise<ModelListItemResDto[]> {
+    const cachedData = await this.appCacheService.get<ModelListItemResDto[]>(
+      CACHE_KEYS.MODELS_FIND_ALL,
+    );
+
+    if (cachedData) return cachedData;
+
     const models = await this.modelRepository.find({
       relations: ['developer'],
       order: { name: 'ASC' },
     });
 
-    return models.map((model) => ({
+    const data = models.map((model) => ({
       id: model.id,
       name: model.name,
       shortName: model.shortName,
@@ -110,6 +118,10 @@ export class ModelsService {
         imageUrl: model.developer.imageUrl,
       },
     }));
+
+    this.appCacheService.setLong(CACHE_KEYS.MODELS_FIND_ALL, data);
+
+    return data;
   }
 
   async findOne(id: string): Promise<ModelResDto> {
@@ -132,12 +144,14 @@ export class ModelsService {
       throw new NotFoundException(`Model with value "${value}" not found`);
     }
 
+    const responseDto = this.mapToResponseDto(model);
+
     this.appCacheService.setLong(
       `${CACHE_KEYS.GET_BY_VALUE}:${value}`,
-      model,
+      responseDto,
     );
 
-    return this.mapToResponseDto(model);
+    return responseDto;
   }
 
   async update(id: string, dto: UpdateModelReqDto): Promise<UpdateModelResDto> {
@@ -212,6 +226,8 @@ export class ModelsService {
 
     const savedModel = await this.modelRepository.save(model);
 
+    await this.#invalidateFindAllCache();
+
     return this.mapToResponseDto(savedModel);
   }
 
@@ -220,6 +236,7 @@ export class ModelsService {
     const modelValue = model.value;
     await this.deleteCacheByValueIfApplicable(modelValue);
     await this.modelRepository.remove(model);
+    await this.#invalidateFindAllCache();
   }
 
   async getDevelopers(): Promise<ModelDeveloper[]> {
@@ -279,5 +296,9 @@ export class ModelsService {
   async deleteCacheByValueIfApplicable(value: string): Promise<void> {
     if (await this.appCacheService.get(`${CACHE_KEYS.GET_BY_VALUE}:${value}`))
       this.appCacheService.del(`${CACHE_KEYS.GET_BY_VALUE}:${value}`);
+  }
+
+  async #invalidateFindAllCache(): Promise<void> {
+    await this.appCacheService.del(CACHE_KEYS.MODELS_FIND_ALL);
   }
 }
