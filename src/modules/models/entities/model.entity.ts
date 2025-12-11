@@ -40,6 +40,9 @@ export class Model {
   @Column()
   knowledgeCutoff: string;
 
+  @Column({ type: 'boolean', default: false })
+  guestAccess: boolean;
+
   @ManyToOne(() => ModelDeveloper, (developer) => developer.models, {
     onDelete: 'CASCADE',
   })
