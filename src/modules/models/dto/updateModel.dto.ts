@@ -1,4 +1,5 @@
 import {
+  IsBoolean,
   IsNumber,
   IsOptional,
   IsPositive,
@@ -75,6 +76,10 @@ export class UpdateModelReqDto {
   link?: string;
 
   @IsOptional()
+  @IsBoolean()
+  guestAccess?: boolean;
+
+  @IsOptional()
   @ValidateNested()
   @Type(() => UpdateModelPriceDto)
   price?: UpdateModelPriceDto;
@@ -95,6 +100,7 @@ export class UpdateModelResDto {
   shortName: string;
   value: string;
   link: string;
+  guestAccess: boolean;
   price: {
     input: number;
     output: number;
