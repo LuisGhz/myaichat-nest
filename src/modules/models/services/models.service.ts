@@ -252,6 +252,48 @@ export class ModelsService {
     return count > 0;
   }
 
+  async validateGuestAccess(
+    modelValue: string,
+    userRole: string,
+  ): Promise<void> {
+    if (userRole !== 'guest') return;
+
+    const cache = await this.appCacheService.get<ModelResDto>(
+      `${CACHE_KEYS.GET_BY_VALUE_FOR_GUEST}:${modelValue}`,
+    );
+
+    if (cache) {
+      if (!cache.guestAccess) {
+        throw new BadRequestException(
+          `Access denied. Model "${cache.name}" is not available for guest users.`,
+        );
+      }
+      return;
+    }
+
+    const model = await this.modelRepository.findOne({
+      where: { value: modelValue },
+      select: ['id', 'name', 'guestAccess'],
+    });
+
+    if (!model)
+      throw new NotFoundException(`Model with value "${modelValue}" not found`);
+
+    if (!model.guestAccess)
+      throw new BadRequestException(
+        `Access denied. Model "${model.name}" is not available for guest users.`,
+      );
+
+    this.appCacheService.setLong(
+      `${CACHE_KEYS.GET_BY_VALUE_FOR_GUEST}:${modelValue}`,
+      {
+        id: model.id,
+        name: model.name,
+        guestAccess: model.guestAccess,
+      },
+    );
+  }
+
   private async findByIdOrFail(id: string): Promise<Model> {
     const model = await this.modelRepository.findOne({
       where: { id },
