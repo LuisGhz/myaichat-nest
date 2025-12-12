@@ -14,12 +14,14 @@ import {
   Query,
   Res,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import type { Response } from 'express';
 import { CurrentUser } from '@cmn/decorators';
 import type { JwtPayload } from '@cmn/interfaces';
+import { GuestModelAccessGuard } from '@cmn/guards';
 import { S3Service } from '@s3/services';
 import { IsValidFileTypeConstraint } from '@s3/validators';
 import {
@@ -61,6 +63,7 @@ export class ChatController {
   }
 
   @Post('openai')
+  @UseGuards(GuestModelAccessGuard)
   @UseInterceptors(FileInterceptor('file'))
   async sendMessageOpenAI(
     @Body() dto: SendMessageReqDto,
