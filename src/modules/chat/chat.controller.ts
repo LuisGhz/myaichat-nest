@@ -82,7 +82,7 @@ export class ChatController {
       res,
       dto,
       userId: user.sub,
-      provider: 'openai',
+      provider: dto.modelDeveloper,
       fileKey,
       isImageGeneration: dto.isImageGeneration,
       isWebSearch: dto.isWebSearch,

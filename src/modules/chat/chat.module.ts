@@ -5,6 +5,7 @@ import {
   AIProviderRegistry,
   ChatService,
   ChatStreamService,
+  GeminiService,
   OpenAIService,
   TranscriptionService,
 } from './services';
@@ -15,7 +16,11 @@ import { AI_PROVIDERS } from './interfaces';
 import { GuestModelAccessGuard } from '@cmn/guards';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Chat, Message]), ModelsModule, PromptsModule],
+  imports: [
+    TypeOrmModule.forFeature([Chat, Message]),
+    ModelsModule,
+    PromptsModule,
+  ],
   controllers: [ChatController],
   providers: [
     ChatService,
@@ -23,11 +28,15 @@ import { GuestModelAccessGuard } from '@cmn/guards';
     TranscriptionService,
     AIProviderRegistry,
     OpenAIService,
+    GeminiService,
     GuestModelAccessGuard,
     {
       provide: AI_PROVIDERS,
-      useFactory: (openai: OpenAIService) => [openai],
-      inject: [OpenAIService],
+      useFactory: (openai: OpenAIService, gemini: GeminiService) => [
+        openai,
+        gemini,
+      ],
+      inject: [OpenAIService, GeminiService],
     },
   ],
   exports: [ChatService, ChatStreamService],

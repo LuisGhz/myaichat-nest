@@ -10,3 +10,8 @@ export {
   setSystemMessage,
 } from './openai-message-adapter.helper';
 export { createToolParamsIfEnabled } from './openai-tools.helper';
+export {
+  setSystemMessageGemini,
+  messagesTransformerForGemini,
+  newMessageTransformerForGemini,
+} from './gemini-message-adapter.helper';

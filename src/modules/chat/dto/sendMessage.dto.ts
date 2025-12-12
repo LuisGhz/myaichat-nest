@@ -32,6 +32,10 @@ export class SendMessageReqDto {
   })
   model: string;
 
+  @IsNotEmpty()
+  @IsString()
+  modelDeveloper: string;
+
   @Transform(({ value }) => parseInt(value, 10))
   @IsInt()
   @Min(1)
