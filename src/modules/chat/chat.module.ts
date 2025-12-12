@@ -12,6 +12,7 @@ import { ChatController } from './chat.controller';
 import { ModelsModule } from '@mdl/models.module';
 import { PromptsModule } from '@prompts/prompts.module';
 import { AI_PROVIDERS } from './interfaces';
+import { GuestModelAccessGuard } from '@cmn/guards';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Chat, Message]), ModelsModule, PromptsModule],
@@ -22,6 +23,7 @@ import { AI_PROVIDERS } from './interfaces';
     TranscriptionService,
     AIProviderRegistry,
     OpenAIService,
+    GuestModelAccessGuard,
     {
       provide: AI_PROVIDERS,
       useFactory: (openai: OpenAIService) => [openai],
