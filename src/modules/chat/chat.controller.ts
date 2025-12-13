@@ -95,7 +95,11 @@ export class ChatController {
     @Query() dto: ChatMessagesReqDto,
     @CurrentUser() user: JwtPayload,
   ): Promise<ChatMessagesResDto> {
-    return this.chatService.getChatMessages(chatId, user.sub, dto.beforeMessageId);
+    return this.chatService.getChatMessages(
+      chatId,
+      user.sub,
+      dto.beforeMessageId,
+    );
   }
 
   @Patch(':id/rename')
