@@ -21,4 +21,6 @@ export class ChatMessagesResDto {
   hasMore: boolean;
   maxTokens: number;
   temperature: number;
+  isWebSearch: boolean;
+  isImageGeneration: boolean;
 }

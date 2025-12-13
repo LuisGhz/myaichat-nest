@@ -125,7 +125,7 @@ export class ChatService {
   ): Promise<ChatMessagesResDto> {
     const chat = await this.chatRepository.findOne({
       where: { id: chatId, user: { id: userId } },
-      select: ['id', 'maxTokens', 'temperature'],
+      select: ['id', 'maxTokens', 'temperature', 'isImageGeneration', 'isWebSearch'],
     });
 
     if (!chat) {
@@ -182,6 +182,8 @@ export class ChatService {
       hasMore,
       maxTokens: chat.maxTokens,
       temperature: chat.temperature,
+      isWebSearch: chat.isWebSearch,
+      isImageGeneration: chat.isImageGeneration,
     };
   }
 
