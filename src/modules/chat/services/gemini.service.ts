@@ -41,7 +41,13 @@ export class GeminiService implements AIProvider {
     } = params;
     const transformedMessages = messagesTransformerForGemini(previousMessages);
 
-    transformedMessages.push(newMessageTransformerForGemini(newMessage));
+    const image = fileKey
+      ? await this.#fetchImageAsBase64(`${this.envService.cdnDomain}${fileKey}`)
+      : undefined;
+
+    transformedMessages.push(
+      newMessageTransformerForGemini(newMessage, image),
+    );
     let fullText = '';
     let inputTokens = 0;
     let outputTokens = 0;
@@ -117,5 +123,31 @@ export class GeminiService implements AIProvider {
       },
     });
     return res.text!.trim();
+  }
+
+  async #fetchImageAsBase64(url: string): Promise<
+    | {
+        mimeType: string;
+        dataBase64: string;
+      }
+    | undefined
+  > {
+    try {
+      const res = await fetch(url);
+      if (!res.ok) {
+        this.logger.warn(`Failed to fetch image: ${res.status} ${res.statusText}`);
+        return undefined;
+      }
+
+      const contentType = res.headers.get('content-type')?.split(';')[0]?.trim();
+      const mimeType = contentType || 'image/png';
+      const arrayBuffer = await res.arrayBuffer();
+      const dataBase64 = Buffer.from(arrayBuffer).toString('base64');
+
+      return { mimeType, dataBase64 };
+    } catch (error) {
+      this.logger.warn(`Failed to fetch image: ${url}`);
+      return undefined;
+    }
   }
 }
