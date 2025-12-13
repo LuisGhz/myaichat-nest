@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { GoogleGenAI } from '@google/genai';
+import { GoogleGenAI, ToolListUnion } from '@google/genai';
 import {
   AIProvider,
   StreamResponseParams,
@@ -56,6 +56,11 @@ export class GeminiService implements AIProvider {
 
     this.logger.debug('Transformed Messages:', transformedMessages);
 
+    const tools: ToolListUnion = [];
+    if (isWebSearch) {
+      tools.push({ googleSearch: {} });
+    }
+
     const res = await this.client.models.generateContentStream({
       model: isImageGeneration ? 'gemini-2.5-flash-image' : model,
       contents: [setSystemMessageGemini(systemPrompt), ...transformedMessages],
@@ -63,6 +68,7 @@ export class GeminiService implements AIProvider {
       config: {
         temperature: temperature,
         maxOutputTokens: maxTokens,
+        tools,
       },
     });
     let imageBase64: string | null = null;
