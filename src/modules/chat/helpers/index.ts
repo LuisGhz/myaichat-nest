@@ -15,3 +15,4 @@ export {
   messagesTransformerForGemini,
   newMessageTransformerForGemini,
 } from './gemini-message-adapter.helper';
+export { fetchImageAsBase64 } from './image-fetcher.helper';
