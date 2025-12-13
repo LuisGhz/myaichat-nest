@@ -58,14 +58,19 @@ export const transformNewMessageToOpenAIFormat = (
   const content: Array<ResponseInputText | ResponseInputImage> = [
     { type: 'input_text' as const, text: message },
   ];
+
+  // Add user's uploaded image if present
   if (fileKey && isImage(fileKey)) {
     const imageUrl = `${cdnDomain}${fileKey}`;
     content.push(img(imageUrl));
-    if (prevMessage) {
-      const prevContent = handlePrevMessageWithImage(prevMessage, cdnDomain);
-      content.push(...prevContent);
-    }
   }
+
+  // Add previous assistant's image if present (for image modification)
+  if (prevMessage) {
+    const prevContent = handlePrevMessageWithImage(prevMessage, cdnDomain);
+    content.push(...prevContent);
+  }
+
   return [
     {
       role: 'user',
