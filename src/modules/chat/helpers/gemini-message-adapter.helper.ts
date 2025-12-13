@@ -1,5 +1,6 @@
 import { Content, Part } from '@google/genai';
 import { Message, MessageRole } from '../entities';
+import { fetchImageAsBase64 } from './image-fetcher.helper';
 
 export const setSystemMessageGemini = (systemPrompt?: string): Content => {
   return {
@@ -12,17 +13,34 @@ export const setSystemMessageGemini = (systemPrompt?: string): Content => {
   };
 };
 
-export const messagesTransformerForGemini = (
+export const messagesTransformerForGemini = async (
   messages: Message[],
-): Content[] => {
-  return messages.map((msg) => ({
-    role: msg.role,
-    parts: [
-      {
-        text: msg.content,
-      },
-    ],
-  }));
+  cdnUrl: string,
+): Promise<Content[]> => {
+  const results: Content[] = [];
+  for (const msg of messages) {
+    const partWithImage: Part[] = [];
+    if (msg.fileKey) {
+      const fullUrl = `${cdnUrl}${msg.fileKey}`;
+      const img = await fetchImageAsBase64(fullUrl);
+      partWithImage.push({
+        inlineData: {
+          mimeType: img?.mimeType || 'image/png',
+          data: img?.dataBase64 || '',
+        },
+      });
+    }
+    results.push({
+      role: msg.role === MessageRole.ASSISTANT ? 'model' : msg.role,
+      parts: [
+        {
+          text: msg.content,
+        },
+        ...partWithImage,
+      ],
+    });
+  }
+  return results;
 };
 
 export const newMessageTransformerForGemini = (

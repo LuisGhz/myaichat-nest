@@ -11,6 +11,7 @@ export class ImageUploadService {
 
   async uploadBase64Image(base64Data: string): Promise<string> {
     const buffer = this.#base64ToBuffer(base64Data);
+    this.#logger.debug(buffer);
     const randomName = this.#generateRandomFileName();
     const key = `myaichat/generated/${randomName}.png`;
 

@@ -7,6 +7,7 @@ import {
 } from '../interfaces';
 import { EnvService } from '@cfg/schema/env.service';
 import {
+  fetchImageAsBase64,
   messagesTransformerForGemini,
   newMessageTransformerForGemini,
   setSystemMessageGemini,
@@ -39,15 +40,16 @@ export class GeminiService implements AIProvider {
       isWebSearch,
       systemPrompt,
     } = params;
-    const transformedMessages = messagesTransformerForGemini(previousMessages);
+    const transformedMessages = await messagesTransformerForGemini(
+      previousMessages,
+      this.envService.cdnDomain,
+    );
 
     const image = fileKey
-      ? await this.#fetchImageAsBase64(`${this.envService.cdnDomain}${fileKey}`)
+      ? await fetchImageAsBase64(`${this.envService.cdnDomain}${fileKey}`)
       : undefined;
 
-    transformedMessages.push(
-      newMessageTransformerForGemini(newMessage, image),
-    );
+    transformedMessages.push(newMessageTransformerForGemini(newMessage, image));
     let fullText = '';
     let inputTokens = 0;
     let outputTokens = 0;
@@ -55,7 +57,7 @@ export class GeminiService implements AIProvider {
     this.logger.debug('Transformed Messages:', transformedMessages);
 
     const res = await this.client.models.generateContentStream({
-      model: model,
+      model: isImageGeneration ? 'gemini-2.5-flash-image' : model,
       contents: [setSystemMessageGemini(systemPrompt), ...transformedMessages],
 
       config: {
@@ -63,9 +65,13 @@ export class GeminiService implements AIProvider {
         maxOutputTokens: maxTokens,
       },
     });
-
+    let imageBase64: string | null = null;
     for await (const chunk of res) {
       const text = chunk.text || '';
+      if (isImageGeneration && chunk.data) {
+        imageBase64 = chunk.data;
+      }
+
       fullText += text;
       onDelta(text);
       if (chunk.usageMetadata) {
@@ -74,27 +80,11 @@ export class GeminiService implements AIProvider {
       }
     }
 
-    // if (params.isImageGeneration) {
-    //   const model = await this.client.models.generateImages({
-    //     model: 'imagen-3.0-generate-002',
-    //     prompt: 'Robot holding a red skateboard',
-    //     config: {
-    //       numberOfImages: 1,
-    //       includeRaiReason: true,
-    //     },
-    //   });
-    // }
-
-    this.logger.debug('Full response:', {
-      content: fullText,
-      inputTokens,
-      outputTokens,
-    });
-
     return {
       content: fullText,
       inputTokens,
       outputTokens,
+      imageKey: imageBase64 ?? undefined,
     };
   }
 
@@ -123,31 +113,5 @@ export class GeminiService implements AIProvider {
       },
     });
     return res.text!.trim();
-  }
-
-  async #fetchImageAsBase64(url: string): Promise<
-    | {
-        mimeType: string;
-        dataBase64: string;
-      }
-    | undefined
-  > {
-    try {
-      const res = await fetch(url);
-      if (!res.ok) {
-        this.logger.warn(`Failed to fetch image: ${res.status} ${res.statusText}`);
-        return undefined;
-      }
-
-      const contentType = res.headers.get('content-type')?.split(';')[0]?.trim();
-      const mimeType = contentType || 'image/png';
-      const arrayBuffer = await res.arrayBuffer();
-      const dataBase64 = Buffer.from(arrayBuffer).toString('base64');
-
-      return { mimeType, dataBase64 };
-    } catch (error) {
-      this.logger.warn(`Failed to fetch image: ${url}`);
-      return undefined;
-    }
   }
 }
