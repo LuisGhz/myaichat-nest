@@ -118,7 +118,16 @@ export class ChatStreamService {
   }
 
   async #getOrCreateChat(params: GetOrCreateChatParams): Promise<Chat> {
-    const { chatId, promptId, userId, model, maxTokens, temperature } = params;
+    const {
+      chatId,
+      promptId,
+      userId,
+      model,
+      maxTokens,
+      temperature,
+      isImageGeneration,
+      isWebSearch,
+    } = params;
 
     if (chatId) return this.chatService.findChatByIdOrFail(chatId, userId);
 
@@ -131,8 +140,8 @@ export class ChatStreamService {
       model,
       maxTokens,
       temperature,
-      isImageGeneration: params.isImageGeneration,
-      isWebSearch: params.isWebSearch,
+      isImageGeneration,
+      isWebSearch,
       prompt,
     });
   }
