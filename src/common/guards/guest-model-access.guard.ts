@@ -2,7 +2,6 @@ import {
   CanActivate,
   ExecutionContext,
   Injectable,
-  BadRequestException,
 } from '@nestjs/common';
 import { ModelsService } from '@mdl/services';
 import type { JwtPayload } from '@cmn/interfaces';
