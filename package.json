@@ -104,6 +104,18 @@
       "**/*.(t|j)s"
     ],
     "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "moduleNameMapper": {
+      "^@cfg/(.*)$": "<rootDir>/config/$1",
+      "^@cmn/(.*)$": "<rootDir>/common/$1",
+      "^@mod/(.*)$": "<rootDir>/modules/$1",
+      "^@auth/(.*)$": "<rootDir>/modules/auth/$1",
+      "^@usr/(.*)$": "<rootDir>/modules/user/$1",
+      "^@chat/(.*)$": "<rootDir>/modules/chat/$1",
+      "^@prompts/(.*)$": "<rootDir>/modules/prompts/$1",
+      "^@models/(.*)$": "<rootDir>/modules/models/$1",
+      "^@mdl/(.*)$": "<rootDir>/modules/models/$1",
+      "^@s3/(.*)$": "<rootDir>/modules/s3/$1"
+    }
   }
 }
