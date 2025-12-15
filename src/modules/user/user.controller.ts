@@ -7,7 +7,7 @@ import {
   ParseUUIDPipe,
   Patch,
 } from '@nestjs/common';
-import { CurrentUser } from '@cmn/decorators';
+import { Admin, CurrentUser } from '@cmn/decorators';
 import type { JwtPayload } from '@cmn/interfaces';
 import { UserService } from './services';
 import {
@@ -18,6 +18,7 @@ import {
 } from './dto';
 
 @Controller('user')
+@Admin()
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
