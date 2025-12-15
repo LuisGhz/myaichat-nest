@@ -6,7 +6,7 @@ import type {
   StreamResponseParams,
   StreamResponseResult,
 } from '../interfaces';
-import { CHAT_TITLE_MODEL, CHAT_TITLE_PROMPT } from '../consts';
+import { OPENAI_CHAT_TITLE_MODEL, CHAT_TITLE_PROMPT } from '../consts';
 import {
   calculateImageGenerationTokens,
   createToolParamsIfEnabled,
@@ -106,7 +106,7 @@ export class OpenAIService implements AIProvider {
   ): Promise<string> {
     try {
       const response = await this.client.responses.create({
-        model: CHAT_TITLE_MODEL,
+        model: OPENAI_CHAT_TITLE_MODEL,
         input: CHAT_TITLE_PROMPT(userMessage, assistantResponse),
         max_output_tokens: 30,
       });

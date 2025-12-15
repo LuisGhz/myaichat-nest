@@ -1,4 +1,5 @@
-export const CHAT_TITLE_MODEL = 'gpt-4o-mini';
+export const OPENAI_CHAT_TITLE_MODEL = 'gpt-4o-mini';
+export const GEMINI_CHAT_TITLE_MODEL = 'gemini-2.0-flash-lite';
 
 export const CHAT_TITLE_PROMPT = (
   userMessage: string,

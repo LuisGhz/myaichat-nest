@@ -12,6 +12,8 @@ import {
   newMessageTransformerForGemini,
   setSystemMessageGemini,
 } from '../helpers';
+import { CHAT_TITLE_PROMPT } from '../consts';
+import { GEMINI_CHAT_TITLE_MODEL } from '../consts/ai-title.const';
 
 @Injectable()
 export class GeminiService implements AIProvider {
@@ -99,16 +101,13 @@ export class GeminiService implements AIProvider {
     assistantResponse: string,
   ): Promise<string> {
     const res = await this.client.models.generateContent({
-      model: 'gemini-2.0-flash-lite',
+      model: GEMINI_CHAT_TITLE_MODEL,
       contents: [
         {
           role: 'user',
           parts: [
             {
-              text: `Generate a very short title (max 6 words) for a conversation that starts with this exchange. Return only the title, no quotes or extra text, Do not utilize special characters like ", neither markdown characters.
-
-              User: ${userMessage}
-              Assistant: ${assistantResponse.slice(0, 500)}`,
+              text: CHAT_TITLE_PROMPT(userMessage, assistantResponse),
             },
           ],
         },
