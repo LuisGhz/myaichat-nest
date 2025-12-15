@@ -9,8 +9,7 @@ export type {
 } from './chatStreamEvent.dto';
 export { ChatMessagesReqDto, ChatMessagesResDto } from './chatMessages.dto';
 export { RenameChatReqDto } from './renameChat.dto';
-export { UpdateWebSearchReqDto } from './updateWebSearch.dto';
-export { UpdateImageGenerationReqDto } from './updateImageGeneration.dto';
+export { UpdateAIFeaturesReqDto } from './updateAIFeatures.dto';
 export { UpdateMaxTokensReqDto } from './updateMaxTokens.dto';
 export { UpdateTemperatureReqDto } from './updateTemperature.dto';
 export {

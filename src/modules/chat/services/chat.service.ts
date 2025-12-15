@@ -1,10 +1,19 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Chat, Message, MessageRole } from '../entities';
 import { User } from '@usr/entities';
 import { Prompt } from '@prompts/entities';
-import { ChatMessagesResDto, UserChatsResDto } from '../dto';
+import {
+  ChatMessagesResDto,
+  UpdateAIFeaturesReqDto,
+  UserChatsResDto,
+} from '../dto';
 import { EnvService } from '@cfg/schema/env.service';
 import { S3Service } from '@s3/services';
 
@@ -93,18 +102,20 @@ export class ChatService {
     await this.chatRepository.update(chatId, { title });
   }
 
-  async updateChatWebSearch(
+  async updateAIFeatures(
     chatId: string,
-    isWebSearch: boolean,
+    { isImageGeneration, isWebSearch }: UpdateAIFeaturesReqDto,
   ): Promise<void> {
-    await this.chatRepository.update(chatId, { isWebSearch });
-  }
+    // Validate that both are not true at the same time
+    if (isWebSearch && isImageGeneration)
+      throw new BadRequestException(
+        'Cannot enable both web search and image generation at the same time',
+      );
 
-  async updateChatImageGeneration(
-    chatId: string,
-    isImageGeneration: boolean,
-  ): Promise<void> {
-    await this.chatRepository.update(chatId, { isImageGeneration });
+    await this.chatRepository.update(chatId, {
+      isImageGeneration,
+      isWebSearch,
+    });
   }
 
   async updateChatMaxTokens(chatId: string, maxTokens: number): Promise<void> {
@@ -125,7 +136,13 @@ export class ChatService {
   ): Promise<ChatMessagesResDto> {
     const chat = await this.chatRepository.findOne({
       where: { id: chatId, user: { id: userId } },
-      select: ['id', 'maxTokens', 'temperature', 'isImageGeneration', 'isWebSearch'],
+      select: [
+        'id',
+        'maxTokens',
+        'temperature',
+        'isImageGeneration',
+        'isWebSearch',
+      ],
     });
 
     if (!chat) {

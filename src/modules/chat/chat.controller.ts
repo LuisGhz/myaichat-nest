@@ -36,8 +36,7 @@ import {
   RenameChatReqDto,
   SendMessageReqDto,
   StreamEventType,
-  UpdateImageGenerationReqDto,
-  UpdateWebSearchReqDto,
+  UpdateAIFeaturesReqDto,
   UpdateMaxTokensReqDto,
   UpdateTemperatureReqDto,
   TranscribeAudioReqDto,
@@ -113,29 +112,15 @@ export class ChatController {
     await this.chatService.updateChatTitle(chatId, dto.title);
   }
 
-  @Patch(':id/update-web-search')
+  @Patch(':id/update-ai-features')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async updateWebSearch(
+  async updateAIFeatures(
     @Param('id', ParseUUIDPipe) chatId: string,
-    @Body() dto: UpdateWebSearchReqDto,
+    @Body() dto: UpdateAIFeaturesReqDto,
     @CurrentUser() user: JwtPayload,
   ): Promise<void> {
     await this.chatService.findChatByIdOrFail(chatId, user.sub);
-    await this.chatService.updateChatWebSearch(chatId, dto.isWebSearch);
-  }
-
-  @Patch(':id/update-image-generation')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  async updateImageGeneration(
-    @Param('id', ParseUUIDPipe) chatId: string,
-    @Body() dto: UpdateImageGenerationReqDto,
-    @CurrentUser() user: JwtPayload,
-  ): Promise<void> {
-    await this.chatService.findChatByIdOrFail(chatId, user.sub);
-    await this.chatService.updateChatImageGeneration(
-      chatId,
-      dto.isImageGeneration,
-    );
+    await this.chatService.updateAIFeatures(chatId, dto);
   }
 
   @Patch(':id/update-max-tokens')
