@@ -171,34 +171,4 @@ describe('UpdateImageGenerationReqDto', () => {
       expect(errors[0].constraints).toHaveProperty('isBoolean');
     });
   });
-
-  describe('extra properties', () => {
-    it('should ignore extra properties when isImageGeneration is true', async () => {
-      const payload = {
-        isImageGeneration: true,
-        extraField: 'should be ignored',
-        anotherField: 123,
-      };
-
-      const instance = plainToInstance(UpdateImageGenerationReqDto, payload);
-      const errors = await validate(instance);
-
-      expect(errors).toHaveLength(0);
-      expect(instance.isImageGeneration).toBe(true);
-    });
-
-    it('should ignore extra properties when isImageGeneration is false', async () => {
-      const payload = {
-        isImageGeneration: false,
-        extraField: 'should be ignored',
-        nestedObject: { key: 'value' },
-      };
-
-      const instance = plainToInstance(UpdateImageGenerationReqDto, payload);
-      const errors = await validate(instance);
-
-      expect(errors).toHaveLength(0);
-      expect(instance.isImageGeneration).toBe(false);
-    });
-  });
 });

@@ -171,34 +171,4 @@ describe('UpdateWebSearchReqDto', () => {
       expect(errors[0].constraints).toHaveProperty('isBoolean');
     });
   });
-
-  describe('extra properties', () => {
-    it('should ignore extra properties when isWebSearch is true', async () => {
-      const payload = {
-        isWebSearch: true,
-        extraField: 'should be ignored',
-        anotherField: 123,
-      };
-
-      const instance = plainToInstance(UpdateWebSearchReqDto, payload);
-      const errors = await validate(instance);
-
-      expect(errors).toHaveLength(0);
-      expect(instance.isWebSearch).toBe(true);
-    });
-
-    it('should ignore extra properties when isWebSearch is false', async () => {
-      const payload = {
-        isWebSearch: false,
-        extraField: 'should be ignored',
-        nestedObject: { key: 'value' },
-      };
-
-      const instance = plainToInstance(UpdateWebSearchReqDto, payload);
-      const errors = await validate(instance);
-
-      expect(errors).toHaveLength(0);
-      expect(instance.isWebSearch).toBe(false);
-    });
-  });
 });

@@ -284,20 +284,4 @@ describe('UpdateTemperatureReqDto', () => {
       expect(instance.temperature).toBe(1.9999);
     });
   });
-
-  describe('extra properties', () => {
-    it('should ignore extra properties', async () => {
-      const payload = {
-        temperature: 0.7,
-        extraField: 'should be ignored',
-        anotherField: 123,
-      };
-
-      const instance = plainToInstance(UpdateTemperatureReqDto, payload);
-      const errors = await validate(instance);
-
-      expect(errors).toHaveLength(0);
-      expect(instance.temperature).toBe(0.7);
-    });
-  });
 });

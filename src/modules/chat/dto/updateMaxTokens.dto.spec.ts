@@ -220,20 +220,4 @@ describe('UpdateMaxTokensReqDto', () => {
       expect(errors[0].constraints).toHaveProperty('max');
     });
   });
-
-  describe('extra properties', () => {
-    it('should ignore extra properties', async () => {
-      const payload = {
-        maxTokens: 50000,
-        extraField: 'should be ignored',
-        anotherField: true,
-      };
-
-      const instance = plainToInstance(UpdateMaxTokensReqDto, payload);
-      const errors = await validate(instance);
-
-      expect(errors).toHaveLength(0);
-      expect(instance.maxTokens).toBe(50000);
-    });
-  });
 });

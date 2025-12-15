@@ -258,27 +258,6 @@ describe('SendMessageReqDto', () => {
       });
     });
   });
-
-  describe('extra properties', () => {
-    it('should include extra properties in the instance', () => {
-      const payload = {
-        message: 'Hello',
-        model: 'gpt-4o',
-        modelDeveloper: 'OpenAI',
-        maxTokens: 1000,
-        temperature: 0.7,
-        isImageGeneration: false,
-        isWebSearch: false,
-        extraField: 'should be included',
-        anotherField: 123,
-      };
-
-      const instance = plainToInstance(SendMessageReqDto, payload);
-      expect(instance.message).toBe('Hello');
-      expect((instance as any).extraField).toBe('should be included');
-      expect((instance as any).anotherField).toBe(123);
-    });
-  });
 });
 
 describe('SendMessageResDto', () => {

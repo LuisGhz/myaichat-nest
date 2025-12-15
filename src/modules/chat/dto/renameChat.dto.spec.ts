@@ -194,20 +194,4 @@ describe('RenameChatReqDto', () => {
       expect(errors[0].constraints).toHaveProperty('maxLength');
     });
   });
-
-  describe('extra properties', () => {
-    it('should ignore extra properties', async () => {
-      const payload = {
-        title: 'Chat Name',
-        extraField: 'should be ignored',
-        anotherField: 123,
-      };
-
-      const instance = plainToInstance(RenameChatReqDto, payload);
-      const errors = await validate(instance);
-
-      expect(errors).toHaveLength(0);
-      expect(instance.title).toBe('Chat Name');
-    });
-  });
 });

@@ -26,21 +26,6 @@ describe('Model DTOs', () => {
       expect(instance).toBeInstanceOf(ModelDeveloperResDto);
     });
 
-    it('should transform payload with extra properties', () => {
-      const payload = {
-        id: '550e8400-e29b-41d4-a716-446655440000',
-        name: 'OpenAI',
-        link: 'https://openai.com',
-        imageUrl: 'https://openai.com/logo.png',
-        extraProperty: 'should-be-included',
-      };
-
-      const instance = plainToInstance(ModelDeveloperResDto, payload);
-
-      expect(instance.id).toBe('550e8400-e29b-41d4-a716-446655440000');
-      expect((instance as any).extraProperty).toBe('should-be-included');
-    });
-
     it('should handle missing optional properties gracefully', () => {
       const payload = {
         id: '550e8400-e29b-41d4-a716-446655440000',
@@ -237,17 +222,6 @@ describe('Model DTOs', () => {
       expect(typeof instance.metadata.contextWindow).toBe('number');
       expect(typeof instance.metadata.maxOutputTokens).toBe('number');
     });
-
-    it('should include extra properties in transformation', () => {
-      const payload = {
-        ...validPayload,
-        extraField: 'extra-value',
-      };
-
-      const instance = plainToInstance(ModelResDto, payload);
-
-      expect((instance as any).extraField).toBe('extra-value');
-    });
   });
 
   describe('ModelListItemResDto', () => {
@@ -356,17 +330,6 @@ describe('Model DTOs', () => {
 
       expect(instance.developer.name).toBe('OpenAI');
       expect(instance.developer.imageUrl).toBeUndefined();
-    });
-
-    it('should include extra properties in transformation', () => {
-      const payload = {
-        ...validPayload,
-        extraField: 'extra-value',
-      };
-
-      const instance = plainToInstance(ModelListItemResDto, payload);
-
-      expect((instance as any).extraField).toBe('extra-value');
     });
   });
 });

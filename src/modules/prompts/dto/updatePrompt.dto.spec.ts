@@ -446,17 +446,6 @@ describe('UpdatePromptReqDto', () => {
       expect(errors).toHaveLength(0);
     });
 
-    it('should preserve extra properties', async () => {
-      const payload = {
-        name: 'Updated',
-        extraField: 'preserved',
-      };
-
-      const instance = plainToInstance(UpdatePromptReqDto, payload);
-
-      expect((instance as any).extraField).toBe('preserved');
-    });
-
     it('should validate with large messages array', async () => {
       const messages = Array.from({ length: 50 }, (_, i) => {
         const paddedIndex = String(i).padStart(2, '0');

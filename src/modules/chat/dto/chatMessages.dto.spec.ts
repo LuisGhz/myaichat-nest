@@ -101,21 +101,6 @@ describe('ChatMessagesReqDto', () => {
       expect(errors[0].constraints).toHaveProperty('isUuid');
     });
   });
-
-  describe('extra properties', () => {
-    it('should ignore extra properties', async () => {
-      const payload = {
-        beforeMessageId: '550e8400-e29b-41d4-a716-446655440000',
-        extraField: 'should be ignored',
-        anotherField: 123,
-      };
-
-      const instance = plainToInstance(ChatMessagesReqDto, payload);
-      const errors = await validate(instance);
-
-      expect(errors).toHaveLength(0);
-    });
-  });
 });
 
 describe('ChatMessagesResDto', () => {

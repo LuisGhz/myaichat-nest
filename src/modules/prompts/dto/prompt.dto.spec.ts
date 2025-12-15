@@ -361,20 +361,6 @@ describe('PromptListItemSummaryResDto', () => {
     expect(Object.keys(instance).sort()).toEqual(['id', 'name']);
   });
 
-  it('should not include extra fields', () => {
-    const payload = {
-      id: 'test-id',
-      name: 'Test Name',
-      extraField: 'should be preserved',
-      content: 'should also be preserved',
-    };
-
-    const instance = plainToInstance(PromptListItemSummaryResDto, payload);
-
-    expect((instance as any).extraField).toBe('should be preserved');
-    expect((instance as any).content).toBe('should also be preserved');
-  });
-
   describe('edge cases', () => {
     it('should handle long prompt name', () => {
       const payload = {

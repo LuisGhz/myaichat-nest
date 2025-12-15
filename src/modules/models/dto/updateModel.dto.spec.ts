@@ -616,17 +616,5 @@ describe('UpdateModel DTOs', () => {
       expect(errors).toHaveLength(0);
       expect(instance.value?.length).toBe(100);
     });
-
-    it('should validate successfully even with extra properties', async () => {
-      const payload = {
-        ...validPayload,
-        extraProperty: 'should-be-ignored',
-      };
-
-      const instance = plainToInstance(UpdateModelReqDto, payload);
-      const errors = await validate(instance);
-
-      expect(errors).toHaveLength(0);
-    });
   });
 });

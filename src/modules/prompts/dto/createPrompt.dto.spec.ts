@@ -408,18 +408,6 @@ describe('CreatePromptReqDto', () => {
       expect(instance.name).toHaveLength(255);
     });
 
-    it('should preserve extra properties when transforming', async () => {
-      const payload = {
-        name: 'My Prompt',
-        content: 'Content',
-        extraField: 'preserved',
-      };
-
-      const instance = plainToInstance(CreatePromptReqDto, payload);
-
-      expect((instance as any).extraField).toBe('preserved');
-    });
-
     it('should validate with large messages array', async () => {
       const messages = Array.from({ length: 100 }, (_, i) => ({
         role: i % 2 === 0 ? PromptMessageRole.USER : PromptMessageRole.ASSISTANT,

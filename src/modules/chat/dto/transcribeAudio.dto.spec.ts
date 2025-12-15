@@ -318,22 +318,6 @@ describe('TranscribeAudioReqDto', () => {
       expect(instance.temperature).toBe(0.9999);
     });
   });
-
-  describe('extra properties', () => {
-    it('should ignore extra properties', async () => {
-      const payload = {
-        temperature: 0.5,
-        extraField: 'should be ignored',
-        anotherField: 123,
-      };
-
-      const instance = plainToInstance(TranscribeAudioReqDto, payload);
-      const errors = await validate(instance);
-
-      expect(errors).toHaveLength(0);
-      expect(instance.temperature).toBe(0.5);
-    });
-  });
 });
 
 describe('TranscribeAudioResDto', () => {

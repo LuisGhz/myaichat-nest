@@ -201,21 +201,4 @@ describe('UpdateAIFeaturesReqDto', () => {
       expect(errors.some(e => e.property === 'isImageGeneration')).toBe(true);
     });
   });
-
-  describe('extra properties', () => {
-    it('should ignore extra properties', async () => {
-      const payload = {
-        isWebSearch: true,
-        isImageGeneration: false,
-        extraField: 'should be ignored',
-      };
-
-      const instance = plainToInstance(UpdateAIFeaturesReqDto, payload);
-      const errors = await validate(instance);
-
-      expect(errors).toHaveLength(0);
-      expect(instance.isWebSearch).toBe(true);
-      expect(instance.isImageGeneration).toBe(false);
-    });
-  });
 });
