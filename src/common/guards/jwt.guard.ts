@@ -10,9 +10,8 @@ import { JwtService } from '@auth/services';
 import { RefreshTokenService } from '@auth/services/refresh-token.service';
 import { COOKIE_REFRESH_TOKEN } from '@auth/const/cookies.const';
 import { TokenExpiredError } from '@nestjs/jwt';
-import { PUBLIC_KEY } from '@cmn/decorators/public.decorator';
+import { PUBLIC_KEY, ADMIN_ROLE_KEY } from '@cmn/decorators';
 import { Reflector } from '@nestjs/core';
-import { ADMIN_ROLE_KEY } from '@cmn/decorators/admin.decorator';
 import { JwtPayload } from '@cmn/interfaces';
 
 const NEW_ACCESS_TOKEN_HEADER = 'x-new-access-token';
