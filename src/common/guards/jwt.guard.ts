@@ -1,6 +1,7 @@
 import {
   CanActivate,
   ExecutionContext,
+  ForbiddenException,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -11,6 +12,8 @@ import { COOKIE_REFRESH_TOKEN } from '@auth/const/cookies.const';
 import { TokenExpiredError } from '@nestjs/jwt';
 import { PUBLIC_KEY } from '@cmn/decorators/public.decorator';
 import { Reflector } from '@nestjs/core';
+import { ADMIN_ROLE_KEY } from '@cmn/decorators/admin.decorator';
+import { JwtPayload } from '@cmn/interfaces';
 
 const NEW_ACCESS_TOKEN_HEADER = 'x-new-access-token';
 
@@ -30,6 +33,11 @@ export class JwtGuard implements CanActivate {
 
     if (isPublic) return true;
 
+    const shouldBeAdmin = this.reflector.getAllAndOverride<boolean>(
+      ADMIN_ROLE_KEY,
+      [context.getHandler(), context.getClass()],
+    );
+
     const request: Request = context.switchToHttp().getRequest();
     const response: Response = context.switchToHttp().getResponse();
     const authHeader = request.headers['authorization'];
@@ -43,16 +51,17 @@ export class JwtGuard implements CanActivate {
 
     try {
       const payload = this.jwtService.verify(token);
+      if (shouldBeAdmin) this.#validateAdminRole(payload);
       request['user'] = payload;
       return true;
     } catch (error) {
       if (!(error instanceof TokenExpiredError)) return false;
-
-      return await this.handleExpiredToken(token, request, response);
+      if (shouldBeAdmin) this.#validateAdminRole(this.jwtService.decode(token));
+      return await this.#handleExpiredToken(token, request, response);
     }
   }
 
-  private async handleExpiredToken(
+  async #handleExpiredToken(
     token: string,
     request: Request,
     response: Response,
@@ -83,6 +92,12 @@ export class JwtGuard implements CanActivate {
       return true;
     } catch (error) {
       throw new UnauthorizedException('Failed to refresh token');
+    }
+  }
+
+  #validateAdminRole(payload: JwtPayload) {
+    if (payload.role !== 'admin') {
+      throw new ForbiddenException('Insufficient permissions');
     }
   }
 }
