@@ -19,3 +19,4 @@ docs
 .github
 .gitignore
 docker-compose.yaml
+scripts
