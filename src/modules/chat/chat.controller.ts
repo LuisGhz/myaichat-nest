@@ -61,7 +61,7 @@ export class ChatController {
     return this.chatService.getUserChats(user.sub);
   }
 
-  @Post('openai')
+  @Post('send-message')
   @UseGuards(GuestModelAccessGuard)
   @UseInterceptors(FileInterceptor('file'))
   async sendMessageOpenAI(
