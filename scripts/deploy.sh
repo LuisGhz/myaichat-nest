@@ -135,5 +135,6 @@ docker run -d \
     -e CACHE_LONG_TTL=${CACHE_LONG_TTL} \
     -p ${LOCALPORT}:${DOCKERPORT} \
     --network dbs \
+    --network redis \
     --name ${CONTAINER_NAME} \
     ${IMAGE_NAME}
