@@ -8,6 +8,13 @@ import {
   UnauthorizedException,
   Logger,
 } from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiQuery,
+  ApiExcludeEndpoint,
+} from '@nestjs/swagger';
 import type { Request, Response } from 'express';
 import { EnvService } from '@cfg/schema/env.service';
 import { AuthService } from './services';
@@ -18,6 +25,7 @@ import {
 } from './const/cookies.const';
 import { Public } from '@cmn/decorators';
 
+@ApiTags('auth')
 @Controller('auth')
 export class AuthController {
   private readonly logger = new Logger(AuthController.name);
@@ -29,6 +37,12 @@ export class AuthController {
 
   @Public()
   @Get('login')
+  @ApiOperation({ summary: 'Initiate OAuth login flow with GitHub' })
+  @ApiResponse({
+    status: 302,
+    description: 'Redirects to GitHub OAuth authorization page',
+  })
+  @ApiExcludeEndpoint()
   async login(@Res() res: Response): Promise<void> {
     const pkceData = await this.authService.generatePkceData();
     const authorizeUrl = this.authService.getGithubAuthorizeUrl(
@@ -50,6 +64,16 @@ export class AuthController {
 
   @Public()
   @Get('callback')
+  @ApiOperation({ summary: 'Handle OAuth callback from GitHub' })
+  @ApiQuery({ name: 'code', required: false, description: 'OAuth authorization code' })
+  @ApiQuery({ name: 'state', required: false, description: 'OAuth state parameter' })
+  @ApiQuery({ name: 'error', required: false, description: 'OAuth error' })
+  @ApiQuery({ name: 'error_description', required: false, description: 'OAuth error description' })
+  @ApiResponse({
+    status: 302,
+    description: 'Redirects to frontend with access token or error',
+  })
+  @ApiExcludeEndpoint()
   async callback(
     @Query('code') code: string,
     @Query('state') state: string,
@@ -112,6 +136,17 @@ export class AuthController {
   }
 
   @Post('logout')
+  @ApiOperation({ summary: 'Logout user and invalidate refresh token' })
+  @ApiResponse({
+    status: 200,
+    description: 'Logged out successfully',
+    schema: {
+      type: 'object',
+      properties: {
+        message: { type: 'string', example: 'Logged out successfully' },
+      },
+    },
+  })
   async logout(@Req() req: Request, @Res() res: Response): Promise<void> {
     const refreshToken = req.cookies[COOKIE_REFRESH_TOKEN];
 

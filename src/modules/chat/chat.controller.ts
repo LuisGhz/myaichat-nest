@@ -17,6 +17,15 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+  ApiParam,
+  ApiConsumes,
+  ApiBody,
+} from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import type { Response } from 'express';
 import { CurrentUser } from '@cmn/decorators';
@@ -45,6 +54,8 @@ import {
 } from './dto';
 import type { HandleStreamRequestParams } from './interfaces';
 
+@ApiTags('chat')
+@ApiBearerAuth()
 @Controller('chat')
 export class ChatController {
   private readonly logger = new Logger(ChatController.name);
@@ -57,6 +68,11 @@ export class ChatController {
   ) {}
 
   @Get()
+  @ApiOperation({ summary: 'Get all user chats' })
+  @ApiResponse({
+    status: 200,
+    description: 'Returns list of user chats',
+  })
   async getUserChats(@CurrentUser() user: JwtPayload) {
     return this.chatService.getUserChats(user.sub);
   }
@@ -64,6 +80,13 @@ export class ChatController {
   @Post('send-message')
   @UseGuards(GuestModelAccessGuard)
   @UseInterceptors(FileInterceptor('file'))
+  @ApiOperation({ summary: 'Send a message and get AI response (SSE stream)' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({ type: SendMessageReqDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Returns Server-Sent Events stream with AI response',
+  })
   async sendMessageOpenAI(
     @Body() dto: SendMessageReqDto,
     @UploadedFile() file: Express.Multer.File | undefined,
@@ -89,6 +112,13 @@ export class ChatController {
   }
 
   @Get(':id/messages')
+  @ApiOperation({ summary: 'Get chat messages' })
+  @ApiParam({ name: 'id', description: 'Chat ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Returns chat messages',
+    type: ChatMessagesResDto,
+  })
   async getChatMessages(
     @Param('id', ParseUUIDPipe) chatId: string,
     @Query() dto: ChatMessagesReqDto,
@@ -103,6 +133,12 @@ export class ChatController {
 
   @Patch(':id/rename')
   @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Rename a chat' })
+  @ApiParam({ name: 'id', description: 'Chat ID' })
+  @ApiResponse({
+    status: 204,
+    description: 'Chat renamed successfully',
+  })
   async renameChat(
     @Param('id', ParseUUIDPipe) chatId: string,
     @Body() dto: RenameChatReqDto,
@@ -114,6 +150,12 @@ export class ChatController {
 
   @Patch(':id/update-ai-features')
   @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Update AI features for a chat' })
+  @ApiParam({ name: 'id', description: 'Chat ID' })
+  @ApiResponse({
+    status: 204,
+    description: 'AI features updated successfully',
+  })
   async updateAIFeatures(
     @Param('id', ParseUUIDPipe) chatId: string,
     @Body() dto: UpdateAIFeaturesReqDto,
@@ -125,6 +167,12 @@ export class ChatController {
 
   @Patch(':id/update-max-tokens')
   @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Update max tokens for a chat' })
+  @ApiParam({ name: 'id', description: 'Chat ID' })
+  @ApiResponse({
+    status: 204,
+    description: 'Max tokens updated successfully',
+  })
   async updateMaxTokens(
     @Param('id', ParseUUIDPipe) chatId: string,
     @Body() dto: UpdateMaxTokensReqDto,
@@ -136,6 +184,12 @@ export class ChatController {
 
   @Patch(':id/update-temperature')
   @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Update temperature for a chat' })
+  @ApiParam({ name: 'id', description: 'Chat ID' })
+  @ApiResponse({
+    status: 204,
+    description: 'Temperature updated successfully',
+  })
   async updateTemperature(
     @Param('id', ParseUUIDPipe) chatId: string,
     @Body() dto: UpdateTemperatureReqDto,
@@ -147,6 +201,12 @@ export class ChatController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Delete a chat' })
+  @ApiParam({ name: 'id', description: 'Chat ID' })
+  @ApiResponse({
+    status: 204,
+    description: 'Chat deleted successfully',
+  })
   async deleteChat(
     @Param('id', ParseUUIDPipe) chatId: string,
     @CurrentUser() user: JwtPayload,
@@ -156,6 +216,23 @@ export class ChatController {
 
   @Post('transcribe')
   @UseInterceptors(FileInterceptor('audio'))
+  @ApiOperation({ summary: 'Transcribe audio file' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        audio: { type: 'string', format: 'binary' },
+        temperature: { type: 'number', minimum: 0, maximum: 1, default: 0 },
+      },
+      required: ['audio'],
+    },
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Returns transcribed text',
+    type: TranscribeAudioResDto,
+  })
   async transcribeAudio(
     @UploadedFile() audio: Express.Multer.File | undefined,
     @Body() dto: TranscribeAudioReqDto,
