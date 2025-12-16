@@ -1,3 +1,4 @@
+````markdown
 # MyAIChat
 
 A scalable AI chat application built with NestJS that enables users to interact with multiple AI models (OpenAI, Google Gemini) through a RESTful API. The application features real-time streaming responses, audio transcription, custom prompts, and comprehensive authentication.
@@ -208,3 +209,85 @@ npm run migration:chat:create --name=MigrationName
 - **Chat**: `/api/chat/*` - Create chats, send messages, stream responses, transcribe audio
 - **Prompts**: `/api/prompts/*` - Manage custom system prompts
 - **Models**: `/api/models/*` - List and manage AI models (admin)
+
+## Deployment
+
+This project includes a `Dockerfile` and a GitHub Actions workflow that build and publish a Docker image, then deploy it to a remote server using an SSH action and the `scripts/deploy.sh` helper script.
+
+- **Dockerfile**: `Dockerfile` — builds the app and produces a production image (`node:22-alpine`).
+- **CI Workflow**: `.github/workflows/deploy.yaml` — builds and pushes the Docker image, then SSHs to the server and runs `scripts/deploy.sh`.
+- **Deploy Script**: `scripts/deploy.sh` — validates environment variables, pulls the new image, runs migrations inside the new image, and only replaces the running container after migrations succeed (safe rollback behavior).
+
+Required repository Variables and Secrets
+
+- **Repository Variables (`Settings → Variables`)**: set non-sensitive configuration values here. Example names used by the workflow:
+   - `NODE_ENV` (e.g., `production`)
+   - `PORT` (e.g., `3000`)
+   - `FRONTEND_URL`
+   - `DOCKERHUB_USERNAME` (the workflow maps this to `DOCKERHUB_USER` at deploy time)
+   - `JWT_EXPIRES_IN`
+   - `REFRESH_TOKEN_LENGTH`
+   - `REFRESH_TOKEN_EXPIRES_IN`
+   - `CALLBACK_URL` (used as `GITHUB_CALLBACK_URL` in the workflow)
+   - `MAX_SESSIONS_PER_USER`
+   - `CDN_DOMAIN`
+   - `THROTTLE_TTL`
+   - `THROTTLE_LIMIT`
+   - `REDIS_HOST`
+   - `CACHE_SHORT_TTL`
+   - `CACHE_TTL`
+   - `CACHE_LONG_TTL`
+
+- **Repository Secrets (`Settings → Secrets and variables → Actions → Secrets`)**: set sensitive credentials here. Example names used by the workflow:
+   - `DB_HOST`, `DB_PORT`, `DB_USERNAME`, `DB_PASSWORD`, `DB_NAME`
+   - `JWT_SECRET`
+   - `DOCKERHUB_ACCESS_TOKEN` (the workflow maps this to `DOCKERHUB_TOKEN` at deploy time)
+   - `OPENAI_API_KEY`
+   - `GEMINI_API_KEY`
+   - `GITHUB_CLIENT_ID`
+   - `GITHUB_CLIENT_SECRET`
+   - `S3_ACCESS_KEY`
+   - `S3_SECRET_KEY`
+   - `S3_BUCKET_NAME`
+   - `SERVER_IP` (SSH host for deployment)
+   - `SERVER_USER` (SSH user for deployment)
+   - `SSH_PRIVATE_KEY` (SSH private key used by the action)
+   - `SSH_PASSPHRASE` (if your SSH key is encrypted)
+
+Note: `.github/workflows/deploy.yaml` reads some values from repository `vars` and others from `secrets`. The deploy step exports a set of env variables to the remote `scripts/deploy.sh` (for example, `vars.DOCKERHUB_USERNAME` becomes the remote env `DOCKERHUB_USER`, and `secrets.DOCKERHUB_ACCESS_TOKEN` becomes `DOCKERHUB_TOKEN`). Ensure both the Variables and Secrets shown above are configured in your GitHub repository settings before running the workflow.
+
+Note: `scripts/deploy.sh` includes a complete list of validated variables; ensure all required variables are set as repository `secrets` or `variables` in GitHub prior to using the workflow.
+
+How the GitHub Action works (high-level)
+- Checkout code, build multi-platform image via `docker/build-push-action`, push to Docker Hub.
+- SSH to the remote server and execute `scripts/deploy.sh` which:
+  - Validates env vars
+  - Pulls the new Docker image
+  - Runs migrations in a temporary container: `npm run migration:run:prod`
+  - If migrations succeed, stops/removes the old container and starts the new one.
+
+Local quick deploy (example)
+```bash
+# Build image locally
+docker build -t yourdockeruser/myaichat-nest:local .
+
+# Run migrations in the image (adjust envs as needed)
+docker run --rm -e NODE_ENV=production -e DB_HOST=... -e DB_USERNAME=... -e DB_PASSWORD=... yourdockeruser/myaichat-nest:local npm run migration:run:prod
+
+# Run the container
+docker run -d \
+  -e NODE_ENV=production \
+  -e PORT=3000 \
+  -e DB_HOST=... -e DB_PORT=5432 -e DB_USERNAME=... -e DB_PASSWORD=... -e DB_NAME=... \
+  -p 3000:3000 \
+  --name myaichat-nest \
+  yourdockeruser/myaichat-nest:local
+```
+
+Deployment notes and tips
+- `scripts/deploy.sh` expects Docker networks named `dbs` and `redis` when running on the remote host (the script uses `--network dbs` and `--network redis`). Ensure those networks exist or remove the flags if not using them.
+- The script logs and aborts if migrations fail; this preserves the previous container for safe rollback.
+- Ensure GitHub repository `Secrets` and `Variables` include all the values referenced by `.github/workflows/deploy.yaml` (Docker Hub credentials, server SSH key, DB credentials, API keys, etc.).
+- If you prefer not to run migrations automatically, modify `scripts/deploy.sh` to skip `npm run migration:run:prod`.
+
+If you need help customizing the deployment for your environment (e.g., different Docker registry, Kubernetes, or a managed host), open an issue or request a tailored guide.
