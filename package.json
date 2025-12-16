@@ -34,7 +34,10 @@
     "migration:prompts:generate": "cross-var npm run typeorm migration:generate -- -d src/config/db/db.datasource.ts src/modules/prompts/migrations/$npm_config_name",
     "migration:prompts:create": "cross-var npm run typeorm migration:create -- src/modules/prompts/migrations/$npm_config_name",
     "migration:models:generate": "cross-var npm run typeorm migration:generate -- -d src/config/db/db.datasource.ts src/modules/models/migrations/$npm_config_name",
-    "migration:models:create": "cross-var npm run typeorm migration:create -- src/modules/models/migrations/$npm_config_name"
+    "migration:models:create": "cross-var npm run typeorm migration:create -- src/modules/models/migrations/$npm_config_name",
+    "migration:run:prod": "node typeorm-cli.js migration:run",
+    "migration:revert:prod": "node typeorm-cli.js migration:revert",
+    "migration:show:prod": "node typeorm-cli.js migration:show"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.943.0",
