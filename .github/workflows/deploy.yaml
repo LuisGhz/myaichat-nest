@@ -29,6 +29,8 @@ jobs:
     needs: build-and-push
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
       - name: Execute Remote SSH Commands
         uses: appleboy/ssh-action@v1.2.1
         env:
