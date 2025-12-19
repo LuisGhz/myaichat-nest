@@ -2,7 +2,7 @@ import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import { Model, ModelDeveloper } from '../entities';
-import { MODELS } from '../../../../models';
+import { MODELS } from '../models';
 
 @Injectable()
 export class ModelSeedService implements OnModuleInit {
