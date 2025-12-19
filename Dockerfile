@@ -20,5 +20,5 @@ COPY --from=build /app/dist /app/dist
 # Copy TypeORM CLI wrapper for running migrations with compiled JS
 COPY typeorm-cli.js ./
 
-CMD ["node", "dist/main"]
+CMD ["node", "--input-type=module", "dist/main.js"]
 EXPOSE 3000
