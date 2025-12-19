@@ -52,7 +52,7 @@ echo "✓ All environment variables are set"
 
 IMAGE_NAME="luisghtz/personalwebapss:myaichat-nest"
 CONTAINER_NAME="myaichat-nest"
-LOCALPORT=3000
+LOCALPORT=3001
 DOCKERPORT=3000
 # Login to Docker Hub using the access token from the OS environment variable
 echo "$DOCKERHUB_TOKEN" | docker login --username "$DOCKERHUB_USER" --password-stdin
