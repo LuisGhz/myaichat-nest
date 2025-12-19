@@ -23,7 +23,6 @@ if (!command) {
 const datasourcePath = path.join(
   __dirname,
   'dist',
-  'src',
   'config',
   'db',
   'db.datasource.js',
