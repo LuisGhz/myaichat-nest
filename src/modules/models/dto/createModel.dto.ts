@@ -11,7 +11,7 @@ import {
   Min,
   ValidateNested,
 } from 'class-validator';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateModelDeveloperDto {
@@ -145,6 +145,14 @@ export class CreateModelReqDto {
   price: CreateModelPriceDto;
 
   @ApiProperty({
+    description: 'Indicates if the model supports temperature parameter',
+    example: true,
+  })
+  @Transform(({ value }) => (value === 'true' || value === true ? true : false))
+  @IsBoolean()
+  supportsTemperature: boolean;
+
+  @ApiProperty({
     description: 'Model metadata',
     type: CreateModelMetadataDto,
   })
@@ -201,6 +209,9 @@ export class CreateModelResDto {
     input: number;
     output: number;
   };
+
+  @ApiProperty({ description: 'Supports temperature parameter' })
+  supportsTemperature: boolean;
 
   @ApiProperty({
     description: 'Model metadata',

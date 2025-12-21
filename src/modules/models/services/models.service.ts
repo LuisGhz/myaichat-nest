@@ -82,6 +82,7 @@ export class ModelsService {
       guestAccess: dto.guestAccess ?? false,
       priceInput: dto.price.input,
       priceOutput: dto.price.output,
+      supportsTemperature: dto.supportsTemperature,
       contextWindow: dto.metadata.contextWindow,
       maxOutputTokens: dto.metadata.maxOutputTokens,
       knowledgeCutoff: dto.metadata.knowledgeCutoff,
@@ -196,6 +197,10 @@ export class ModelsService {
       if (dto.price.output !== undefined) {
         model.priceOutput = dto.price.output;
       }
+    }
+
+    if (dto.supportsTemperature !== undefined) {
+      model.supportsTemperature = dto.supportsTemperature;
     }
 
     if (dto.metadata !== undefined) {
@@ -319,6 +324,7 @@ export class ModelsService {
         input: Number(model.priceInput),
         output: Number(model.priceOutput),
       },
+      supportsTemperature: model.supportsTemperature,
       metadata: {
         contextWindow: model.contextWindow,
         maxOutputTokens: model.maxOutputTokens,

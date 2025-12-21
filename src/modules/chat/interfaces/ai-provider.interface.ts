@@ -7,6 +7,7 @@ export interface StreamResponseParams {
   model: string;
   maxTokens: number;
   temperature: number;
+  supportsTemperature: boolean;
   fileKey?: string;
   isImageGeneration: boolean;
   isWebSearch: boolean;

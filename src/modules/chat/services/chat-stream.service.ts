@@ -6,6 +6,7 @@ import { AIProviderRegistry } from './ai-provider-registry.service';
 import { ImageUploadService } from '@s3/services';
 import { EnvService } from '@cfg/schema/env.service';
 import { PromptsService } from '@prompts/services';
+import { ModelsService } from '@models/services';
 import {
   StreamEventType,
   type ChatStreamEvent,
@@ -27,6 +28,7 @@ export class ChatStreamService {
     private readonly imageUploadService: ImageUploadService,
     private readonly envService: EnvService,
     private readonly promptsService: PromptsService,
+    private readonly modelsService: ModelsService,
   ) {}
 
   async handleStreamMessage(params: HandleStreamMessageParams): Promise<void> {
@@ -57,6 +59,8 @@ export class ChatStreamService {
       isImageGeneration,
       isWebSearch,
     });
+
+    const modelData = await this.modelsService.findByValue(model);
     const isNewChat = !chatId;
     let fullContent = '';
     const messages = chat.messages || [];
@@ -74,6 +78,7 @@ export class ChatStreamService {
         model: chat.model,
         maxTokens: chat.maxTokens,
         temperature: chat.temperature,
+        supportsTemperature: modelData.supportsTemperature,
         fileKey,
         isImageGeneration: isImageGeneration,
         isWebSearch: isWebSearch,

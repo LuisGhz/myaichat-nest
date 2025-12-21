@@ -10,7 +10,6 @@ import { OPENAI_CHAT_TITLE_MODEL, CHAT_TITLE_PROMPT } from '../consts';
 import {
   calculateImageGenerationTokens,
   createToolParamsIfEnabled,
-  setSystemMessage,
   transformMessagesToOpenAIFormat,
   transformNewMessageToOpenAIFormat,
 } from '../helpers';
@@ -35,19 +34,17 @@ export class OpenAIService implements AIProvider {
       previousMessages,
       newMessage,
       model,
-      maxTokens,
       temperature,
+      supportsTemperature,
       fileKey,
       isImageGeneration,
       isWebSearch,
       systemPrompt,
     } = params;
-    const systemMessage = setSystemMessage(systemPrompt);
     const transformedMessages = transformMessagesToOpenAIFormat(
       previousMessages,
       this.envService.cdnDomain,
     );
-    transformedMessages.unshift(...systemMessage);
     transformedMessages.push(
       ...transformNewMessageToOpenAIFormat(
         newMessage,
@@ -56,22 +53,39 @@ export class OpenAIService implements AIProvider {
         fileKey,
       ),
     );
-    this.logger.debug('Transformed Messages:', transformedMessages);
     const tools = createToolParamsIfEnabled(isWebSearch, isImageGeneration);
     try {
+      this.logger.debug('Starting stream with model:', model);
       const stream = this.client.responses.stream({
-        model,
+        model: model,
         input: transformedMessages,
-        max_output_tokens: maxTokens,
-        tools,
-        temperature,
+        instructions: systemPrompt,
+        // TODO: Adjust based on model context length
+        // max_output_tokens: maxTokens + 6000,
+        ...(supportsTemperature && { temperature: temperature }),
+        tools: tools,
+        // reasoning: { effort: 'high' },
       });
 
-      stream.on('response.output_text.delta', (event) => {
-        onDelta(event.delta);
-      });
+      let finalResponse;
+      for await (const event of stream) {
+        if (event.type === 'response.output_text.delta') {
+          onDelta(event.delta);
+        } else if (event.type === 'response.completed') {
+          finalResponse = event.response;
+        } else if (event.type === 'response.incomplete') {
+          this.logger.warn(
+            'Response incomplete:',
+            event.response.incomplete_details,
+          );
+          finalResponse = event.response;
+        } else if (event.type === 'response.failed') {
+          this.logger.error('Response failed:', event.response.error);
+          finalResponse = event.response;
+        }
+      }
 
-      const response = await stream.finalResponse();
+      const response = finalResponse || (await stream.finalResponse());
 
       let imageBase64: string | null = null;
       let imageTokens = 0;

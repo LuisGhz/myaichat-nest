@@ -60,6 +60,9 @@ export class ModelResDto {
     output: number;
   };
 
+  @ApiProperty({ description: 'Indicates if the model supports temperature parameter' })
+  supportsTemperature: boolean;
+
   @ApiProperty({
     description: 'Model metadata',
     type: 'object',

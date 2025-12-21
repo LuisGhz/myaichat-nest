@@ -148,6 +148,14 @@ export class UpdateModelReqDto {
   price?: UpdateModelPriceDto;
 
   @ApiPropertyOptional({
+    description: 'Updated model temperature support',
+    example: true,
+  })
+  @IsOptional()
+  @IsBoolean()
+  supportsTemperature?: boolean;
+
+  @ApiPropertyOptional({
     description: 'Updated model metadata',
     type: UpdateModelMetadataDto,
   })
@@ -196,6 +204,12 @@ export class UpdateModelResDto {
     input: number;
     output: number;
   };
+
+  @ApiProperty({
+    description: 'Indicates if the model supports temperature parameter',
+    example: true,
+  })
+  supportsTemperature: boolean;
 
   @ApiProperty({
     description: 'Model metadata',

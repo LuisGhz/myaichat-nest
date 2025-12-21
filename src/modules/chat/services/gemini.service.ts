@@ -37,6 +37,7 @@ export class GeminiService implements AIProvider {
       model,
       maxTokens,
       temperature,
+      supportsTemperature,
       fileKey,
       isImageGeneration,
       isWebSearch,
@@ -63,15 +64,17 @@ export class GeminiService implements AIProvider {
       tools.push({ googleSearch: {} });
     }
 
+    const configObject: any = {
+      maxOutputTokens: maxTokens,
+      tools,
+    };
+    
+    if (supportsTemperature) configObject.temperature = temperature;
+
     const res = await this.client.models.generateContentStream({
       model: isImageGeneration ? 'gemini-2.5-flash-image' : model,
       contents: [setSystemMessageGemini(systemPrompt), ...transformedMessages],
-
-      config: {
-        temperature: temperature,
-        maxOutputTokens: maxTokens,
-        tools,
-      },
+      config: configObject,
     });
     let imageBase64: string | null = null;
     for await (const chunk of res) {

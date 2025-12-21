@@ -37,6 +37,9 @@ export class Model {
   @Column({ type: 'int' })
   maxOutputTokens: number;
 
+  @Column({  type: 'boolean', default: true })
+  supportsTemperature: boolean;
+
   @Column()
   knowledgeCutoff: string;
 
