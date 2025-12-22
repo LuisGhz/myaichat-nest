@@ -616,5 +616,118 @@ describe('UpdateModel DTOs', () => {
       expect(errors).toHaveLength(0);
       expect(instance.value?.length).toBe(100);
     });
+
+    it('should require reasoningLevel when isReasoning is true', async () => {
+      const payload = {
+        isReasoning: true,
+        reasoningLevel: undefined,
+      };
+
+      const instance = plainToInstance(UpdateModelReqDto, payload);
+      const errors = await validate(instance);
+
+      expect(errors.length).toBeGreaterThan(0);
+      const reasoningLevelError = errors.find(
+        (e) => e.property === 'reasoningLevel',
+      );
+      expect(reasoningLevelError).toBeDefined();
+      expect(reasoningLevelError?.constraints).toHaveProperty(
+        'isReasoningLevelRequired',
+      );
+    });
+
+    it('should require reasoningLevel to be non-empty when isReasoning is true', async () => {
+      const payload = {
+        isReasoning: true,
+        reasoningLevel: '',
+      };
+
+      const instance = plainToInstance(UpdateModelReqDto, payload);
+      const errors = await validate(instance);
+
+      expect(errors.length).toBeGreaterThan(0);
+      const reasoningLevelError = errors.find(
+        (e) => e.property === 'reasoningLevel',
+      );
+      expect(reasoningLevelError).toBeDefined();
+    });
+
+    it('should require reasoningLevel to be non-whitespace when isReasoning is true', async () => {
+      const payload = {
+        isReasoning: true,
+        reasoningLevel: '   ',
+      };
+
+      const instance = plainToInstance(UpdateModelReqDto, payload);
+      const errors = await validate(instance);
+
+      expect(errors.length).toBeGreaterThan(0);
+      const reasoningLevelError = errors.find(
+        (e) => e.property === 'reasoningLevel',
+      );
+      expect(reasoningLevelError).toBeDefined();
+    });
+
+    it('should allow reasoningLevel to be undefined when isReasoning is false', async () => {
+      const payload = {
+        isReasoning: false,
+        reasoningLevel: undefined,
+      };
+
+      const instance = plainToInstance(UpdateModelReqDto, payload);
+      const errors = await validate(instance);
+
+      expect(errors).toHaveLength(0);
+    });
+
+    it('should allow reasoningLevel to be null when isReasoning is false', async () => {
+      const payload = {
+        isReasoning: false,
+        reasoningLevel: null,
+      };
+
+      const instance = plainToInstance(UpdateModelReqDto, payload);
+      const errors = await validate(instance);
+
+      expect(errors).toHaveLength(0);
+    });
+
+    it('should allow reasoningLevel to be undefined when isReasoning is undefined', async () => {
+      const payload = {};
+
+      const instance = plainToInstance(UpdateModelReqDto, payload);
+      const errors = await validate(instance);
+
+      expect(errors).toHaveLength(0);
+    });
+
+    it('should validate successfully with valid reasoningLevel when isReasoning is true', async () => {
+      const payload = {
+        isReasoning: true,
+        reasoningLevel: 'advanced',
+      };
+
+      const instance = plainToInstance(UpdateModelReqDto, payload);
+      const errors = await validate(instance);
+
+      expect(errors).toHaveLength(0);
+      expect(instance.isReasoning).toBe(true);
+      expect(instance.reasoningLevel).toBe('advanced');
+    });
+
+    it('should validate successfully with isReasoning and reasoningLevel together', async () => {
+      const payload = {
+        isReasoning: true,
+        reasoningLevel: 'high',
+        name: 'GPT-4 Turbo',
+      };
+
+      const instance = plainToInstance(UpdateModelReqDto, payload);
+      const errors = await validate(instance);
+
+      expect(errors).toHaveLength(0);
+      expect(instance.isReasoning).toBe(true);
+      expect(instance.reasoningLevel).toBe('high');
+    });
   });
 });
