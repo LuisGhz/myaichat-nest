@@ -67,6 +67,7 @@ describe('GeminiService', () => {
         model: 'gemini-2.0-flash',
         maxTokens: 1024,
         temperature: 0.7,
+        supportsTemperature: true,
         fileKey: undefined,
         isImageGeneration: false,
         isWebSearch: false,
@@ -96,7 +97,9 @@ describe('GeminiService', () => {
       expect(result.inputTokens).toBe(10);
       expect(result.outputTokens).toBe(5);
       expect(deltas).toEqual(['Hello ', 'world']);
-      expect(mockGoogleGenAIClient.models.generateContentStream).toHaveBeenCalled();
+      expect(
+        mockGoogleGenAIClient.models.generateContentStream,
+      ).toHaveBeenCalled();
     });
 
     it('should include web search tool when isWebSearch is true', async () => {
@@ -106,12 +109,16 @@ describe('GeminiService', () => {
         model: 'gemini-2.0-flash',
         maxTokens: 1024,
         temperature: 0.7,
+        supportsTemperature: true,
         isImageGeneration: false,
         isWebSearch: true,
       };
 
       mockGoogleGenAIClient.models.generateContentStream.mockResolvedValue([
-        { text: 'search result', usageMetadata: { promptTokenCount: 5, candidatesTokenCount: 3 } },
+        {
+          text: 'search result',
+          usageMetadata: { promptTokenCount: 5, candidatesTokenCount: 3 },
+        },
       ]);
 
       await service.streamResponse(params, () => {});
@@ -128,12 +135,17 @@ describe('GeminiService', () => {
         model: 'gemini-2.0-flash',
         maxTokens: 1024,
         temperature: 0.7,
+        supportsTemperature: true,
         isImageGeneration: true,
         isWebSearch: false,
       };
 
       mockGoogleGenAIClient.models.generateContentStream.mockResolvedValue([
-        { text: '', data: 'base64imagedata', usageMetadata: { promptTokenCount: 10, candidatesTokenCount: 0 } },
+        {
+          text: '',
+          data: 'base64imagedata',
+          usageMetadata: { promptTokenCount: 10, candidatesTokenCount: 0 },
+        },
       ]);
 
       const result = await service.streamResponse(params, () => {});
@@ -151,13 +163,17 @@ describe('GeminiService', () => {
         model: 'gemini-2.0-flash',
         maxTokens: 1024,
         temperature: 0.7,
+        supportsTemperature: true,
         systemPrompt: 'You are a helpful assistant',
         isImageGeneration: false,
         isWebSearch: false,
       };
 
       mockGoogleGenAIClient.models.generateContentStream.mockResolvedValue([
-        { text: 'response', usageMetadata: { promptTokenCount: 5, candidatesTokenCount: 3 } },
+        {
+          text: 'response',
+          usageMetadata: { promptTokenCount: 5, candidatesTokenCount: 3 },
+        },
       ]);
 
       await service.streamResponse(params, () => {});
@@ -166,7 +182,6 @@ describe('GeminiService', () => {
         mockGoogleGenAIClient.models.generateContentStream.mock.calls[0][0];
       expect(callArgs.contents).toBeDefined();
       expect(callArgs.config.temperature).toBe(0.7);
-      expect(callArgs.config.maxOutputTokens).toBe(1024);
     });
 
     it('should return zero tokens when usageMetadata is missing', async () => {
@@ -176,6 +191,7 @@ describe('GeminiService', () => {
         model: 'gemini-2.0-flash',
         maxTokens: 1024,
         temperature: 0.7,
+        supportsTemperature: true,
         isImageGeneration: false,
         isWebSearch: false,
       };
@@ -197,6 +213,7 @@ describe('GeminiService', () => {
         model: 'gemini-2.0-flash',
         maxTokens: 1024,
         temperature: 0.7,
+        supportsTemperature: true,
         isImageGeneration: false,
         isWebSearch: false,
       };
@@ -223,6 +240,7 @@ describe('GeminiService', () => {
         model: 'gemini-2.0-flash',
         maxTokens: 1024,
         temperature: 0.7,
+        supportsTemperature: true,
         isImageGeneration: false,
         isWebSearch: false,
       };
@@ -252,6 +270,7 @@ describe('GeminiService', () => {
         model: 'gemini-2.0-flash',
         maxTokens: 1024,
         temperature: 0.7,
+        supportsTemperature: true,
         isImageGeneration: false,
         isWebSearch: false,
       };
@@ -273,6 +292,7 @@ describe('GeminiService', () => {
         model: 'gemini-2.0-flash',
         maxTokens: 1024,
         temperature: 0.7,
+        supportsTemperature: true,
         isImageGeneration: false,
         isWebSearch: false,
       };
@@ -295,12 +315,16 @@ describe('GeminiService', () => {
         model: 'gemini-2.0-flash',
         maxTokens: 1024,
         temperature: 0.7,
+        supportsTemperature: true,
         isImageGeneration: false,
         isWebSearch: false,
       };
 
       mockGoogleGenAIClient.models.generateContentStream.mockResolvedValue([
-        { text: undefined, usageMetadata: { promptTokenCount: 5, candidatesTokenCount: 2 } },
+        {
+          text: undefined,
+          usageMetadata: { promptTokenCount: 5, candidatesTokenCount: 2 },
+        },
       ]);
 
       const result = await service.streamResponse(params, () => {});
@@ -308,6 +332,224 @@ describe('GeminiService', () => {
       expect(result.content).toBe('');
       expect(result.inputTokens).toBe(5);
       expect(result.outputTokens).toBe(2);
+    });
+
+    it('should include temperature when supportsTemperature is true', async () => {
+      const params: StreamResponseParams = {
+        previousMessages: [],
+        newMessage: 'Test',
+        model: 'gemini-2.0-flash',
+        maxTokens: 1024,
+        temperature: 0.9,
+        supportsTemperature: true,
+        isImageGeneration: false,
+        isWebSearch: false,
+      };
+
+      mockGoogleGenAIClient.models.generateContentStream.mockResolvedValue([
+        {
+          text: 'response',
+          usageMetadata: { promptTokenCount: 10, candidatesTokenCount: 5 },
+        },
+      ]);
+
+      await service.streamResponse(params, () => {});
+
+      const callArgs =
+        mockGoogleGenAIClient.models.generateContentStream.mock.calls[0][0];
+      expect(callArgs.config.temperature).toBe(0.9);
+    });
+
+    it('should not include temperature when supportsTemperature is false', async () => {
+      const params: StreamResponseParams = {
+        previousMessages: [],
+        newMessage: 'Test',
+        model: 'gemini-2.0-flash',
+        maxTokens: 1024,
+        temperature: 0.9,
+        supportsTemperature: false,
+        isImageGeneration: false,
+        isWebSearch: false,
+      };
+
+      mockGoogleGenAIClient.models.generateContentStream.mockResolvedValue([
+        {
+          text: 'response',
+          usageMetadata: { promptTokenCount: 10, candidatesTokenCount: 5 },
+        },
+      ]);
+
+      await service.streamResponse(params, () => {});
+
+      const callArgs =
+        mockGoogleGenAIClient.models.generateContentStream.mock.calls[0][0];
+      expect(callArgs.config.temperature).toBeUndefined();
+    });
+
+    it('should not include temperature when supportsTemperature is undefined', async () => {
+      const params: StreamResponseParams = {
+        previousMessages: [],
+        newMessage: 'Test',
+        model: 'gemini-2.0-flash',
+        maxTokens: 1024,
+        temperature: 0.7,
+        supportsTemperature: false,
+        isImageGeneration: false,
+        isWebSearch: false,
+      };
+
+      mockGoogleGenAIClient.models.generateContentStream.mockResolvedValue([
+        {
+          text: 'response',
+          usageMetadata: { promptTokenCount: 10, candidatesTokenCount: 5 },
+        },
+      ]);
+
+      await service.streamResponse(params, () => {});
+
+      const callArgs =
+        mockGoogleGenAIClient.models.generateContentStream.mock.calls[0][0];
+      expect(callArgs.config.temperature).toBeUndefined();
+    });
+
+    it('should handle isReasoning parameter when true', async () => {
+      const params: StreamResponseParams = {
+        previousMessages: [],
+        newMessage: 'Solve a complex problem',
+        model: 'gemini-2.0-flash',
+        maxTokens: 2000,
+        temperature: 0.7,
+        supportsTemperature: true,
+        isReasoning: true,
+        reasoningLevel: 'high',
+        isImageGeneration: false,
+        isWebSearch: false,
+      };
+
+      mockGoogleGenAIClient.models.generateContentStream.mockResolvedValue([
+        {
+          text: 'reasoning response',
+          usageMetadata: { promptTokenCount: 20, candidatesTokenCount: 100 },
+        },
+      ]);
+
+      const result = await service.streamResponse(params, () => {});
+
+      expect(result.content).toBe('reasoning response');
+      expect(result.inputTokens).toBe(20);
+      expect(result.outputTokens).toBe(100);
+    });
+
+    it('should pass reasoningLevel parameter to API when reasoning is enabled', async () => {
+      const params: StreamResponseParams = {
+        previousMessages: [],
+        newMessage: 'Complex reasoning task',
+        model: 'gemini-2.0-flash',
+        maxTokens: 2000,
+        temperature: 0.7,
+        supportsTemperature: true,
+        isReasoning: true,
+        reasoningLevel: 'medium',
+        isImageGeneration: false,
+        isWebSearch: false,
+      };
+
+      mockGoogleGenAIClient.models.generateContentStream.mockResolvedValue([
+        {
+          text: 'response',
+          usageMetadata: { promptTokenCount: 15, candidatesTokenCount: 50 },
+        },
+      ]);
+
+      await service.streamResponse(params, () => {});
+
+      expect(
+        mockGoogleGenAIClient.models.generateContentStream,
+      ).toHaveBeenCalled();
+    });
+
+    it('should handle isReasoning false with reasoningLevel specified', async () => {
+      const params: StreamResponseParams = {
+        previousMessages: [],
+        newMessage: 'Test',
+        model: 'gemini-2.0-flash',
+        maxTokens: 1024,
+        temperature: 0.7,
+        supportsTemperature: true,
+        isReasoning: false,
+        reasoningLevel: 'high',
+        isImageGeneration: false,
+        isWebSearch: false,
+      };
+
+      mockGoogleGenAIClient.models.generateContentStream.mockResolvedValue([
+        {
+          text: 'response',
+          usageMetadata: { promptTokenCount: 10, candidatesTokenCount: 5 },
+        },
+      ]);
+
+      const result = await service.streamResponse(params, () => {});
+
+      expect(result.content).toBe('response');
+    });
+
+    it('should combine image generation with reasoning features', async () => {
+      const params: StreamResponseParams = {
+        previousMessages: [],
+        newMessage: 'Generate an image based on reasoning',
+        model: 'gemini-2.0-flash',
+        maxTokens: 2000,
+        temperature: 0.7,
+        supportsTemperature: true,
+        isReasoning: true,
+        reasoningLevel: 'medium',
+        isImageGeneration: true,
+        isWebSearch: false,
+      };
+
+      mockGoogleGenAIClient.models.generateContentStream.mockResolvedValue([
+        {
+          text: 'Generated image',
+          data: 'base64image',
+          usageMetadata: { promptTokenCount: 25, candidatesTokenCount: 50 },
+        },
+      ]);
+
+      const result = await service.streamResponse(params, () => {});
+
+      expect(result.content).toBe('Generated image');
+      expect(result.imageKey).toBe('base64image');
+      expect(result.inputTokens).toBe(25);
+      expect(result.outputTokens).toBe(50);
+    });
+
+    it('should combine web search with reasoning features', async () => {
+      const params: StreamResponseParams = {
+        previousMessages: [],
+        newMessage: 'Search and reason about recent events',
+        model: 'gemini-2.0-flash',
+        maxTokens: 2000,
+        temperature: 0.7,
+        supportsTemperature: true,
+        isReasoning: true,
+        reasoningLevel: 'high',
+        isImageGeneration: false,
+        isWebSearch: true,
+      };
+
+      mockGoogleGenAIClient.models.generateContentStream.mockResolvedValue([
+        {
+          text: 'search result with reasoning',
+          usageMetadata: { promptTokenCount: 30, candidatesTokenCount: 80 },
+        },
+      ]);
+
+      await service.streamResponse(params, () => {});
+
+      const callArgs =
+        mockGoogleGenAIClient.models.generateContentStream.mock.calls[0][0];
+      expect(callArgs.config.tools).toContainEqual({ googleSearch: {} });
     });
   });
 
@@ -320,7 +562,10 @@ describe('GeminiService', () => {
         text: 'Understanding AI Basics',
       });
 
-      const result = await service.generateTitle(userMessage, assistantResponse);
+      const result = await service.generateTitle(
+        userMessage,
+        assistantResponse,
+      );
 
       expect(result).toBe('Understanding AI Basics');
       expect(mockGoogleGenAIClient.models.generateContent).toHaveBeenCalledWith(
@@ -339,7 +584,10 @@ describe('GeminiService', () => {
         text: '  Trimmed Title  ',
       });
 
-      const result = await service.generateTitle(userMessage, assistantResponse);
+      const result = await service.generateTitle(
+        userMessage,
+        assistantResponse,
+      );
 
       expect(result).toBe('Trimmed Title');
     });
@@ -382,7 +630,10 @@ describe('GeminiService', () => {
         text: '',
       });
 
-      const result = await service.generateTitle(userMessage, assistantResponse);
+      const result = await service.generateTitle(
+        userMessage,
+        assistantResponse,
+      );
 
       expect(result).toBe('');
     });

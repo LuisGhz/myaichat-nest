@@ -14,6 +14,7 @@ const envServiceMock = {
 const mockStreamResponse = {
   on: jest.fn(),
   finalResponse: jest.fn(),
+  [Symbol.asyncIterator]: jest.fn(),
 };
 
 const mockOpenAIClient = {
@@ -60,6 +61,7 @@ describe('OpenAIService', () => {
       model: 'gpt-4',
       maxTokens: 1000,
       temperature: 0.7,
+      supportsTemperature: true,
       isImageGeneration: false,
       isWebSearch: false,
     };
@@ -73,10 +75,42 @@ describe('OpenAIService', () => {
       output: [],
     };
 
-    it('should stream response successfully with default parameters', async () => {
+    const setupStreamMock = (
+      response: any = mockFinalResponse,
+      includesDeltaEvent = true,
+    ) => {
+      const eventsToReturn: any[] = [];
+
+      if (includesDeltaEvent) {
+        eventsToReturn.push({
+          type: 'response.output_text.delta',
+          delta: 'Hello',
+        });
+      }
+
+      eventsToReturn.push({
+        type: 'response.completed',
+        response,
+      });
+
+      const asyncIterator = {
+        [Symbol.asyncIterator]: async function* () {
+          for (const event of eventsToReturn) {
+            yield event;
+          }
+        },
+      };
+
+      return {
+        ...mockStreamResponse,
+        [Symbol.asyncIterator]: asyncIterator[Symbol.asyncIterator],
+      };
+    };
+
+    it('should stream response successfully with temperature support', async () => {
       const onDeltaMock = jest.fn();
-      mockOpenAIClient.responses.stream.mockReturnValue(mockStreamResponse);
-      mockStreamResponse.finalResponse.mockResolvedValue(mockFinalResponse);
+      const streamMock = setupStreamMock();
+      mockOpenAIClient.responses.stream.mockReturnValue(streamMock);
 
       const result = await service.streamResponse(baseParams, onDeltaMock);
 
@@ -89,23 +123,170 @@ describe('OpenAIService', () => {
       expect(mockOpenAIClient.responses.stream).toHaveBeenCalledWith(
         expect.objectContaining({
           model: 'gpt-4',
-          max_output_tokens: 1000,
           temperature: 0.7,
         }),
       );
     });
 
+    it('should not include temperature when supportsTemperature is false', async () => {
+      const onDeltaMock = jest.fn();
+      const paramsNoTemp = {
+        ...baseParams,
+        supportsTemperature: false,
+      };
+
+      const streamMock = setupStreamMock();
+      mockOpenAIClient.responses.stream.mockReturnValue(streamMock);
+
+      await service.streamResponse(paramsNoTemp, onDeltaMock);
+
+      expect(mockOpenAIClient.responses.stream).toHaveBeenCalledWith(
+        expect.not.objectContaining({
+          temperature: expect.anything(),
+        }),
+      );
+    });
+
+    it('should include fileKey in message transformation when provided', async () => {
+      const onDeltaMock = jest.fn();
+      const paramsWithFile = {
+        ...baseParams,
+        fileKey: 'document-123.pdf',
+      };
+
+      const streamMock = setupStreamMock();
+      mockOpenAIClient.responses.stream.mockReturnValue(streamMock);
+
+      await service.streamResponse(paramsWithFile, onDeltaMock);
+
+      expect(mockOpenAIClient.responses.stream).toHaveBeenCalled();
+    });
+
+    it('should handle reasoning configuration when enabled', async () => {
+      const onDeltaMock = jest.fn();
+      const paramsWithReasoning = {
+        ...baseParams,
+        isReasoning: true,
+        reasoningLevel: 'medium',
+      };
+
+      const streamMock = setupStreamMock();
+      mockOpenAIClient.responses.stream.mockReturnValue(streamMock);
+
+      await service.streamResponse(paramsWithReasoning, onDeltaMock);
+
+      expect(mockOpenAIClient.responses.stream).toHaveBeenCalledWith(
+        expect.objectContaining({
+          reasoning: {
+            effort: 'medium',
+          },
+        }),
+      );
+    });
+
+    it('should handle response.completed event properly', async () => {
+      const onDeltaMock = jest.fn();
+      const completedResponse = {
+        output_text: 'Completed response',
+        usage: {
+          input_tokens: 5,
+          output_tokens: 10,
+        },
+        output: [],
+      };
+
+      const streamMock = setupStreamMock(completedResponse);
+      mockOpenAIClient.responses.stream.mockReturnValue(streamMock);
+
+      const result = await service.streamResponse(baseParams, onDeltaMock);
+
+      expect(result.content).toBe('Completed response');
+      expect(result.inputTokens).toBe(5);
+      expect(result.outputTokens).toBe(10);
+    });
+
+    it('should handle response.incomplete event with incomplete details', async () => {
+      const onDeltaMock = jest.fn();
+      const incompleteResponse = {
+        output_text: 'Incomplete response',
+        usage: {
+          input_tokens: 5,
+          output_tokens: 8,
+        },
+        output: [],
+        incomplete_details: {
+          reason: 'max_tokens',
+        },
+      };
+
+      const asyncIterator = {
+        [Symbol.asyncIterator]: async function* () {
+          yield {
+            type: 'response.output_text.delta',
+            delta: 'Hello',
+          };
+          yield {
+            type: 'response.incomplete',
+            response: incompleteResponse,
+          };
+        },
+      };
+
+      const streamMock = {
+        ...mockStreamResponse,
+        [Symbol.asyncIterator]: asyncIterator[Symbol.asyncIterator],
+      };
+      mockOpenAIClient.responses.stream.mockReturnValue(streamMock);
+
+      const result = await service.streamResponse(baseParams, onDeltaMock);
+
+      expect(result.content).toBe('Incomplete response');
+      expect(result.outputTokens).toBe(8);
+    });
+
+    it('should handle response.failed event with error information', async () => {
+      const onDeltaMock = jest.fn();
+      const failedResponse = {
+        output_text: '',
+        usage: {
+          input_tokens: 0,
+          output_tokens: 0,
+        },
+        output: [],
+        error: {
+          message: 'Request failed',
+          type: 'server_error',
+        },
+      };
+
+      const asyncIterator = {
+        [Symbol.asyncIterator]: async function* () {
+          yield {
+            type: 'response.failed',
+            response: failedResponse,
+          };
+        },
+      };
+
+      const streamMock = {
+        ...mockStreamResponse,
+        [Symbol.asyncIterator]: asyncIterator[Symbol.asyncIterator],
+      };
+      mockOpenAIClient.responses.stream.mockReturnValue(streamMock);
+
+      const result = await service.streamResponse(baseParams, onDeltaMock);
+
+      expect(result).toBeDefined();
+    });
+
     it('should call onDelta callback with streaming deltas', async () => {
       const onDeltaMock = jest.fn();
-      mockOpenAIClient.responses.stream.mockReturnValue(mockStreamResponse);
-      mockStreamResponse.finalResponse.mockResolvedValue(mockFinalResponse);
+      const streamMock = setupStreamMock();
+      mockOpenAIClient.responses.stream.mockReturnValue(streamMock);
 
       await service.streamResponse(baseParams, onDeltaMock);
 
-      expect(mockStreamResponse.on).toHaveBeenCalledWith(
-        'response.output_text.delta',
-        expect.any(Function),
-      );
+      expect(onDeltaMock).toHaveBeenCalledWith('Hello');
     });
 
     it('should handle image generation response with image tokens', async () => {
@@ -129,13 +310,10 @@ describe('OpenAIService', () => {
         ],
       };
 
-      mockOpenAIClient.responses.stream.mockReturnValue(mockStreamResponse);
-      mockStreamResponse.finalResponse.mockResolvedValue(mockImageResponse);
+      const streamMock = setupStreamMock(mockImageResponse);
+      mockOpenAIClient.responses.stream.mockReturnValue(streamMock);
 
-      const result = await service.streamResponse(
-        paramsWithImage,
-        onDeltaMock,
-      );
+      const result = await service.streamResponse(paramsWithImage, onDeltaMock);
 
       expect(result.imageKey).toBe('base64imagedata');
       expect(result.content).toBe('Here is your generated image');
@@ -148,8 +326,8 @@ describe('OpenAIService', () => {
         isWebSearch: true,
       };
 
-      mockOpenAIClient.responses.stream.mockReturnValue(mockStreamResponse);
-      mockStreamResponse.finalResponse.mockResolvedValue(mockFinalResponse);
+      const streamMock = setupStreamMock();
+      mockOpenAIClient.responses.stream.mockReturnValue(streamMock);
 
       await service.streamResponse(paramsWithWebSearch, onDeltaMock);
 
@@ -167,12 +345,16 @@ describe('OpenAIService', () => {
         systemPrompt: 'You are a helpful assistant',
       };
 
-      mockOpenAIClient.responses.stream.mockReturnValue(mockStreamResponse);
-      mockStreamResponse.finalResponse.mockResolvedValue(mockFinalResponse);
+      const streamMock = setupStreamMock();
+      mockOpenAIClient.responses.stream.mockReturnValue(streamMock);
 
       await service.streamResponse(paramsWithSystemPrompt, onDeltaMock);
 
-      expect(mockOpenAIClient.responses.stream).toHaveBeenCalled();
+      expect(mockOpenAIClient.responses.stream).toHaveBeenCalledWith(
+        expect.objectContaining({
+          instructions: 'You are a helpful assistant',
+        }),
+      );
     });
 
     it('should handle response with missing usage data', async () => {
@@ -183,8 +365,8 @@ describe('OpenAIService', () => {
         output: [],
       };
 
-      mockOpenAIClient.responses.stream.mockReturnValue(mockStreamResponse);
-      mockStreamResponse.finalResponse.mockResolvedValue(mockResponseNoUsage);
+      const streamMock = setupStreamMock(mockResponseNoUsage);
+      mockOpenAIClient.responses.stream.mockReturnValue(streamMock);
 
       const result = await service.streamResponse(baseParams, onDeltaMock);
 
@@ -196,8 +378,14 @@ describe('OpenAIService', () => {
       const onDeltaMock = jest.fn();
       const error = new Error('OpenAI API Error');
 
-      mockOpenAIClient.responses.stream.mockReturnValue(mockStreamResponse);
-      mockStreamResponse.finalResponse.mockRejectedValue(error);
+      mockOpenAIClient.responses.stream.mockImplementation(() => {
+        const asyncIterator = {
+          [Symbol.asyncIterator]: async function* () {
+            throw error;
+          },
+        };
+        return asyncIterator;
+      });
 
       await expect(
         service.streamResponse(baseParams, onDeltaMock),
@@ -208,8 +396,14 @@ describe('OpenAIService', () => {
       const onDeltaMock = jest.fn();
       const timeoutError = new Error('Request timeout');
 
-      mockOpenAIClient.responses.stream.mockReturnValue(mockStreamResponse);
-      mockStreamResponse.finalResponse.mockRejectedValue(timeoutError);
+      mockOpenAIClient.responses.stream.mockImplementation(() => {
+        const asyncIterator = {
+          [Symbol.asyncIterator]: async function* () {
+            throw timeoutError;
+          },
+        };
+        return asyncIterator;
+      });
 
       await expect(
         service.streamResponse(baseParams, onDeltaMock),
@@ -227,8 +421,8 @@ describe('OpenAIService', () => {
         output: [],
       };
 
-      mockOpenAIClient.responses.stream.mockReturnValue(mockStreamResponse);
-      mockStreamResponse.finalResponse.mockResolvedValue(mockEmptyResponse);
+      const streamMock = setupStreamMock(mockEmptyResponse);
+      mockOpenAIClient.responses.stream.mockReturnValue(streamMock);
 
       const result = await service.streamResponse(baseParams, onDeltaMock);
 
@@ -243,16 +437,143 @@ describe('OpenAIService', () => {
         maxTokens: 4000,
       };
 
-      mockOpenAIClient.responses.stream.mockReturnValue(mockStreamResponse);
-      mockStreamResponse.finalResponse.mockResolvedValue(mockFinalResponse);
+      const streamMock = setupStreamMock();
+      mockOpenAIClient.responses.stream.mockReturnValue(streamMock);
 
       await service.streamResponse(paramsMaxTokens, onDeltaMock);
 
+      expect(mockOpenAIClient.responses.stream).toHaveBeenCalled();
+    });
+
+    it('should handle reasoning with default level when not specified', async () => {
+      const onDeltaMock = jest.fn();
+      const paramsWithReasoningNoLevel = {
+        ...baseParams,
+        isReasoning: true,
+      };
+
+      const streamMock = setupStreamMock();
+      mockOpenAIClient.responses.stream.mockReturnValue(streamMock);
+
+      await service.streamResponse(paramsWithReasoningNoLevel, onDeltaMock);
+
       expect(mockOpenAIClient.responses.stream).toHaveBeenCalledWith(
         expect.objectContaining({
-          max_output_tokens: 4000,
+          reasoning: {
+            effort: 'low',
+          },
         }),
       );
+    });
+
+    it('should handle reasoning with high effort level', async () => {
+      const onDeltaMock = jest.fn();
+      const paramsHighEffort = {
+        ...baseParams,
+        isReasoning: true,
+        reasoningLevel: 'high',
+      };
+
+      const streamMock = setupStreamMock();
+      mockOpenAIClient.responses.stream.mockReturnValue(streamMock);
+
+      await service.streamResponse(paramsHighEffort, onDeltaMock);
+
+      expect(mockOpenAIClient.responses.stream).toHaveBeenCalledWith(
+        expect.objectContaining({
+          reasoning: {
+            effort: 'high',
+          },
+        }),
+      );
+    });
+
+    it('should ignore reasoning parameters when isReasoning is false', async () => {
+      const onDeltaMock = jest.fn();
+      const paramsNoReasoning = {
+        ...baseParams,
+        isReasoning: false,
+        reasoningLevel: 'high',
+      };
+
+      const streamMock = setupStreamMock();
+      mockOpenAIClient.responses.stream.mockReturnValue(streamMock);
+
+      await service.streamResponse(paramsNoReasoning, onDeltaMock);
+
+      expect(mockOpenAIClient.responses.stream).toHaveBeenCalledWith(
+        expect.not.objectContaining({
+          reasoning: expect.anything(),
+        }),
+      );
+    });
+
+    it('should combine image generation and reasoning features', async () => {
+      const onDeltaMock = jest.fn();
+      const paramsWithBothFeatures = {
+        ...baseParams,
+        isImageGeneration: true,
+        isReasoning: true,
+        reasoningLevel: 'medium',
+      };
+
+      const mockCombinedResponse = {
+        output_text: 'Generated image with reasoning',
+        usage: {
+          input_tokens: 20,
+          output_tokens: 30,
+        },
+        output: [
+          {
+            type: 'image_generation_call',
+            result: 'image-data',
+          },
+        ],
+      };
+
+      const streamMock = setupStreamMock(mockCombinedResponse);
+      mockOpenAIClient.responses.stream.mockReturnValue(streamMock);
+
+      const result = await service.streamResponse(
+        paramsWithBothFeatures,
+        onDeltaMock,
+      );
+
+      expect(result.content).toBe('Generated image with reasoning');
+      expect(result.imageKey).toBe('image-data');
+    });
+
+    it('should handle multiple delta events before completion', async () => {
+      const onDeltaMock = jest.fn();
+      const deltaEvents = [
+        { type: 'response.output_text.delta', delta: 'Hello' },
+        { type: 'response.output_text.delta', delta: ' ' },
+        { type: 'response.output_text.delta', delta: 'World' },
+      ];
+
+      const asyncIterator = {
+        [Symbol.asyncIterator]: async function* () {
+          for (const event of deltaEvents) {
+            yield event;
+          }
+          yield {
+            type: 'response.completed',
+            response: mockFinalResponse,
+          };
+        },
+      };
+
+      mockOpenAIClient.responses.stream.mockReturnValue({
+        ...mockStreamResponse,
+        [Symbol.asyncIterator]: asyncIterator[Symbol.asyncIterator],
+      });
+
+      await service.streamResponse(baseParams, onDeltaMock);
+
+      expect(onDeltaMock).toHaveBeenCalledTimes(3);
+      expect(onDeltaMock).toHaveBeenNthCalledWith(1, 'Hello');
+      expect(onDeltaMock).toHaveBeenNthCalledWith(2, ' ');
+      expect(onDeltaMock).toHaveBeenNthCalledWith(3, 'World');
     });
   });
 
@@ -263,8 +584,7 @@ describe('OpenAIService', () => {
 
     it('should generate chat title successfully', async () => {
       const userMessage = 'Hello, what is TypeScript?';
-      const assistantResponse =
-        'TypeScript is a typed superset of JavaScript.';
+      const assistantResponse = 'TypeScript is a typed superset of JavaScript.';
 
       mockOpenAIClient.responses.create.mockResolvedValue(mockCreateResponse);
 

@@ -5,6 +5,7 @@ import { AIProviderRegistry } from './ai-provider-registry.service';
 import { ImageUploadService } from '@s3/services';
 import { EnvService } from '@cfg/schema/env.service';
 import { PromptsService } from '@prompts/services';
+import { ModelsService } from '@models/services';
 import { Chat, Message, MessageRole } from '../entities';
 import { User } from '@usr/entities';
 import { Prompt } from '@prompts/entities';
@@ -37,6 +38,10 @@ const promptsServiceMock = {
   findOneForChat: jest.fn(),
 };
 
+const modelsServiceMock = {
+  findByValue: jest.fn(),
+};
+
 const mockAIProvider: Partial<AIProvider> = {
   providerName: 'openai',
   streamResponse: jest.fn(),
@@ -50,6 +55,7 @@ describe('ChatStreamService', () => {
   let imageUploadServiceInstance: ImageUploadService;
   let envServiceInstance: EnvService;
   let promptsServiceInstance: PromptsService;
+  let modelsServiceInstance: ModelsService;
 
   beforeEach(async () => {
     jest.clearAllMocks();
@@ -77,15 +83,30 @@ describe('ChatStreamService', () => {
           provide: PromptsService,
           useValue: promptsServiceMock,
         },
+        {
+          provide: ModelsService,
+          useValue: modelsServiceMock,
+        },
       ],
     }).compile();
 
     service = module.get<ChatStreamService>(ChatStreamService);
     chatServiceInstance = module.get<ChatService>(ChatService);
-    aiProviderRegistryInstance = module.get<AIProviderRegistry>(AIProviderRegistry);
-    imageUploadServiceInstance = module.get<ImageUploadService>(ImageUploadService);
+    aiProviderRegistryInstance =
+      module.get<AIProviderRegistry>(AIProviderRegistry);
+    imageUploadServiceInstance =
+      module.get<ImageUploadService>(ImageUploadService);
     envServiceInstance = module.get<EnvService>(EnvService);
     promptsServiceInstance = module.get<PromptsService>(PromptsService);
+    modelsServiceInstance = module.get<ModelsService>(ModelsService);
+
+    modelsServiceMock.findByValue.mockResolvedValue({
+      id: 'default-model',
+      value: 'gpt-4',
+      supportsTemperature: true,
+      isReasoning: false,
+      reasoningLevel: undefined,
+    });
   });
 
   it('should be defined', () => {
@@ -137,7 +158,10 @@ describe('ChatStreamService', () => {
     });
 
     expect(aiProviderRegistryMock.getProvider).toHaveBeenCalledWith(provider);
-    expect(chatServiceMock.findChatByIdOrFail).toHaveBeenCalledWith(chatId, userId);
+    expect(chatServiceMock.findChatByIdOrFail).toHaveBeenCalledWith(
+      chatId,
+      userId,
+    );
     expect(chatServiceMock.saveMessage).toHaveBeenCalledTimes(2);
     expect(chatServiceMock.saveMessage).toHaveBeenCalledWith({
       chat: existingChat,
@@ -227,8 +251,14 @@ describe('ChatStreamService', () => {
       isWebSearch: false,
       prompt: undefined,
     });
-    expect(providerInstance.generateTitle).toHaveBeenCalledWith(message, 'AI is amazing!');
-    expect(chatServiceMock.updateChatTitle).toHaveBeenCalledWith(newChat.id, generatedTitle);
+    expect(providerInstance.generateTitle).toHaveBeenCalledWith(
+      message,
+      'AI is amazing!',
+    );
+    expect(chatServiceMock.updateChatTitle).toHaveBeenCalledWith(
+      newChat.id,
+      generatedTitle,
+    );
     expect(onEvent).toHaveBeenCalledWith({
       type: StreamEventType.DONE,
       data: {
@@ -335,7 +365,9 @@ describe('ChatStreamService', () => {
         return { inputTokens: 20, outputTokens: 5, imageKey: imageBase64 };
       }),
     });
-    imageUploadServiceMock.uploadBase64Image.mockResolvedValue(uploadedImageKey);
+    imageUploadServiceMock.uploadBase64Image.mockResolvedValue(
+      uploadedImageKey,
+    );
 
     await service.handleStreamMessage({
       chatId,
@@ -350,7 +382,9 @@ describe('ChatStreamService', () => {
       onEvent,
     });
 
-    expect(imageUploadServiceMock.uploadBase64Image).toHaveBeenCalledWith(imageBase64);
+    expect(imageUploadServiceMock.uploadBase64Image).toHaveBeenCalledWith(
+      imageBase64,
+    );
     expect(chatServiceMock.saveMessage).toHaveBeenCalledWith({
       chat: existingChat,
       content: 'Image generated',
@@ -403,13 +437,17 @@ describe('ChatStreamService', () => {
     } as Chat;
 
     chatServiceMock.findChatByIdOrFail.mockResolvedValue(existingChat);
-    const streamResponseMock = jest.fn().mockImplementation(async (params, onDelta) => {
-      expect(params.previousMessages).toHaveLength(3);
-      expect(params.previousMessages[0].role).toBe('system');
-      expect(params.previousMessages[0].content).toBe('You are a helpful assistant');
-      onDelta('Response');
-      return { inputTokens: 10, outputTokens: 5 };
-    });
+    const streamResponseMock = jest
+      .fn()
+      .mockImplementation(async (params, onDelta) => {
+        expect(params.previousMessages).toHaveLength(3);
+        expect(params.previousMessages[0].role).toBe('system');
+        expect(params.previousMessages[0].content).toBe(
+          'You are a helpful assistant',
+        );
+        onDelta('Response');
+        return { inputTokens: 10, outputTokens: 5 };
+      });
     aiProviderRegistryMock.getProvider.mockReturnValue({
       ...mockAIProvider,
       streamResponse: streamResponseMock,
@@ -491,7 +529,10 @@ describe('ChatStreamService', () => {
       onEvent,
     });
 
-    expect(promptsServiceMock.findOneForChat).toHaveBeenCalledWith(promptId, userId);
+    expect(promptsServiceMock.findOneForChat).toHaveBeenCalledWith(
+      promptId,
+      userId,
+    );
     expect(chatServiceMock.createChat).toHaveBeenCalledWith({
       user: { id: userId },
       model,
@@ -584,7 +625,10 @@ describe('ChatStreamService', () => {
       }),
     ).rejects.toThrow('Chat not found');
 
-    expect(chatServiceMock.findChatByIdOrFail).toHaveBeenCalledWith(chatId, userId);
+    expect(chatServiceMock.findChatByIdOrFail).toHaveBeenCalledWith(
+      chatId,
+      userId,
+    );
     expect(onEvent).not.toHaveBeenCalled();
     expect(chatServiceMock.saveMessage).not.toHaveBeenCalled();
   });
@@ -613,7 +657,9 @@ describe('ChatStreamService', () => {
     chatServiceMock.findChatByIdOrFail.mockResolvedValue(existingChat);
     aiProviderRegistryMock.getProvider.mockReturnValue({
       ...mockAIProvider,
-      streamResponse: jest.fn().mockRejectedValue(new Error('API rate limit exceeded')),
+      streamResponse: jest
+        .fn()
+        .mockRejectedValue(new Error('API rate limit exceeded')),
     });
 
     await expect(
@@ -684,7 +730,9 @@ describe('ChatStreamService', () => {
       }),
     ).rejects.toThrow('S3 upload failed');
 
-    expect(imageUploadServiceMock.uploadBase64Image).toHaveBeenCalledWith(imageBase64);
+    expect(imageUploadServiceMock.uploadBase64Image).toHaveBeenCalledWith(
+      imageBase64,
+    );
   });
 
   it('should handle title generation failures without breaking the flow', async () => {
@@ -714,7 +762,9 @@ describe('ChatStreamService', () => {
         onDelta('Response');
         return { inputTokens: 10, outputTokens: 5 };
       }),
-      generateTitle: jest.fn().mockRejectedValue(new Error('Title generation failed')),
+      generateTitle: jest
+        .fn()
+        .mockRejectedValue(new Error('Title generation failed')),
     };
     aiProviderRegistryMock.getProvider.mockReturnValue(providerInstance);
 
@@ -732,7 +782,10 @@ describe('ChatStreamService', () => {
       }),
     ).rejects.toThrow('Title generation failed');
 
-    expect(providerInstance.generateTitle).toHaveBeenCalledWith(message, 'Response');
+    expect(providerInstance.generateTitle).toHaveBeenCalledWith(
+      message,
+      'Response',
+    );
     expect(chatServiceMock.updateChatTitle).not.toHaveBeenCalled();
   });
 
@@ -831,8 +884,248 @@ describe('ChatStreamService', () => {
       }),
     ).rejects.toThrow('Prompt not found');
 
-    expect(promptsServiceMock.findOneForChat).toHaveBeenCalledWith(promptId, userId);
+    expect(promptsServiceMock.findOneForChat).toHaveBeenCalledWith(
+      promptId,
+      userId,
+    );
     expect(chatServiceMock.createChat).not.toHaveBeenCalled();
+  });
+
+  it('should fetch model data and pass to AI provider', async () => {
+    const userId = 'user-123';
+    const chatId = 'chat-123';
+    const message = 'Hello';
+    const model = 'gpt-4';
+    const provider = 'openai';
+    const onEvent = jest.fn();
+
+    const modelData = {
+      id: 'model-123',
+      value: model,
+      supportsTemperature: true,
+      isReasoning: false,
+      reasoningLevel: undefined,
+    };
+
+    const existingChat: Chat = {
+      id: chatId,
+      model,
+      maxTokens: 1000,
+      temperature: 0.7,
+      messages: [],
+      isImageGeneration: false,
+      isWebSearch: false,
+      user: { id: userId } as User,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    } as Chat;
+
+    chatServiceMock.findChatByIdOrFail.mockResolvedValue(existingChat);
+    modelsServiceMock.findByValue.mockResolvedValue(modelData);
+    const streamResponseMock = jest
+      .fn()
+      .mockImplementation(async (params, onDelta) => {
+        expect(params.supportsTemperature).toBe(true);
+        expect(params.isReasoning).toBe(false);
+        expect(params.reasoningLevel).toBeUndefined();
+        onDelta('Response');
+        return { inputTokens: 10, outputTokens: 5 };
+      });
+    aiProviderRegistryMock.getProvider.mockReturnValue({
+      ...mockAIProvider,
+      streamResponse: streamResponseMock,
+    });
+
+    await service.handleStreamMessage({
+      chatId,
+      message,
+      model,
+      maxTokens: 1000,
+      temperature: 0.7,
+      userId,
+      provider,
+      isImageGeneration: false,
+      isWebSearch: false,
+      onEvent,
+    });
+
+    expect(modelsServiceMock.findByValue).toHaveBeenCalledWith(model);
+    expect(streamResponseMock).toHaveBeenCalled();
+  });
+
+  it('should handle models with reasoning enabled', async () => {
+    const userId = 'user-123';
+    const chatId = 'chat-123';
+    const message = 'Solve this complex problem';
+    const model = 'o1';
+    const provider = 'openai';
+    const onEvent = jest.fn();
+
+    const modelData = {
+      id: 'model-456',
+      value: model,
+      supportsTemperature: false,
+      isReasoning: true,
+      reasoningLevel: 'high',
+    };
+
+    const existingChat: Chat = {
+      id: chatId,
+      model,
+      maxTokens: 2000,
+      temperature: 1.0,
+      messages: [],
+      isImageGeneration: false,
+      isWebSearch: false,
+      user: { id: userId } as User,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    } as Chat;
+
+    chatServiceMock.findChatByIdOrFail.mockResolvedValue(existingChat);
+    modelsServiceMock.findByValue.mockResolvedValue(modelData);
+    const streamResponseMock = jest
+      .fn()
+      .mockImplementation(async (params, onDelta) => {
+        expect(params.isReasoning).toBe(true);
+        expect(params.reasoningLevel).toBe('high');
+        expect(params.supportsTemperature).toBe(false);
+        onDelta('Reasoning step 1: ');
+        onDelta('Therefore, the answer is...');
+        return { inputTokens: 100, outputTokens: 200 };
+      });
+    aiProviderRegistryMock.getProvider.mockReturnValue({
+      ...mockAIProvider,
+      streamResponse: streamResponseMock,
+    });
+
+    await service.handleStreamMessage({
+      chatId,
+      message,
+      model,
+      maxTokens: 2000,
+      temperature: 1.0,
+      userId,
+      provider,
+      isImageGeneration: false,
+      isWebSearch: false,
+      onEvent,
+    });
+
+    expect(modelsServiceMock.findByValue).toHaveBeenCalledWith(model);
+    expect(streamResponseMock).toHaveBeenCalled();
+    const callArgs = streamResponseMock.mock.calls[0][0];
+    expect(callArgs.isReasoning).toBe(true);
+    expect(callArgs.reasoningLevel).toBe('high');
+  });
+
+  it('should handle model not found error', async () => {
+    const userId = 'user-123';
+    const chatId = 'chat-123';
+    const message = 'Hello';
+    const model = 'unknown-model';
+    const provider = 'openai';
+    const onEvent = jest.fn();
+
+    const existingChat: Chat = {
+      id: chatId,
+      model,
+      maxTokens: 1000,
+      temperature: 0.7,
+      messages: [],
+      isImageGeneration: false,
+      isWebSearch: false,
+      user: { id: userId } as User,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    } as Chat;
+
+    chatServiceMock.findChatByIdOrFail.mockResolvedValue(existingChat);
+    modelsServiceMock.findByValue.mockRejectedValue(
+      new Error('Model not found'),
+    );
+
+    await expect(
+      service.handleStreamMessage({
+        chatId,
+        message,
+        model,
+        maxTokens: 1000,
+        temperature: 0.7,
+        userId,
+        provider,
+        isImageGeneration: false,
+        isWebSearch: false,
+        onEvent,
+      }),
+    ).rejects.toThrow('Model not found');
+
+    expect(modelsServiceMock.findByValue).toHaveBeenCalledWith(model);
+    expect(onEvent).not.toHaveBeenCalled();
+  });
+
+  it('should pass model temperature support to AI provider', async () => {
+    const userId = 'user-123';
+    const chatId = 'chat-123';
+    const message = 'Creative task';
+    const model = 'gpt-4-turbo';
+    const provider = 'openai';
+    const temperature = 0.9;
+    const onEvent = jest.fn();
+
+    const modelData = {
+      id: 'model-789',
+      value: model,
+      supportsTemperature: true,
+      isReasoning: false,
+      reasoningLevel: undefined,
+    };
+
+    const existingChat: Chat = {
+      id: chatId,
+      model,
+      maxTokens: 1000,
+      temperature,
+      messages: [],
+      isImageGeneration: false,
+      isWebSearch: false,
+      user: { id: userId } as User,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    } as Chat;
+
+    chatServiceMock.findChatByIdOrFail.mockResolvedValue(existingChat);
+    modelsServiceMock.findByValue.mockResolvedValue(modelData);
+    const streamResponseMock = jest
+      .fn()
+      .mockImplementation(async (params, onDelta) => {
+        expect(params.temperature).toBe(temperature);
+        expect(params.supportsTemperature).toBe(true);
+        onDelta('Creative response');
+        return { inputTokens: 20, outputTokens: 30 };
+      });
+    aiProviderRegistryMock.getProvider.mockReturnValue({
+      ...mockAIProvider,
+      streamResponse: streamResponseMock,
+    });
+
+    await service.handleStreamMessage({
+      chatId,
+      message,
+      model,
+      maxTokens: 1000,
+      temperature,
+      userId,
+      provider,
+      isImageGeneration: false,
+      isWebSearch: false,
+      onEvent,
+    });
+
+    expect(streamResponseMock).toHaveBeenCalled();
+    const callArgs = streamResponseMock.mock.calls[0][0];
+    expect(callArgs.supportsTemperature).toBe(true);
+    expect(callArgs.temperature).toBe(temperature);
   });
 
   it('should handle message saving failures', async () => {

@@ -504,6 +504,34 @@ describe('UpdateModel DTOs', () => {
       expect(errors[0].constraints).toHaveProperty('isBoolean');
     });
 
+    it('should validate partial update with supportsTemperature only', async () => {
+      const payload = { supportsTemperature: true };
+      const instance = plainToInstance(UpdateModelReqDto, payload);
+      const errors = await validate(instance);
+
+      expect(errors).toHaveLength(0);
+      expect(instance.supportsTemperature).toBe(true);
+    });
+
+    it('should validate supportsTemperature as false', async () => {
+      const payload = { supportsTemperature: false };
+      const instance = plainToInstance(UpdateModelReqDto, payload);
+      const errors = await validate(instance);
+
+      expect(errors).toHaveLength(0);
+      expect(instance.supportsTemperature).toBe(false);
+    });
+
+    it('should fail when supportsTemperature is not a boolean', async () => {
+      const payload = { supportsTemperature: 'true' };
+      const instance = plainToInstance(UpdateModelReqDto, payload);
+      const errors = await validate(instance);
+
+      expect(errors.length).toBeGreaterThan(0);
+      expect(errors[0].property).toBe('supportsTemperature');
+      expect(errors[0].constraints).toHaveProperty('isBoolean');
+    });
+
     it('should fail when price is invalid', async () => {
       const payload = {
         price: {
@@ -668,6 +696,23 @@ describe('UpdateModel DTOs', () => {
       expect(reasoningLevelError).toBeDefined();
     });
 
+    it('should fail when reasoningLevel is not in allowed values when isReasoning is true', async () => {
+      const payload = {
+        isReasoning: true,
+        reasoningLevel: 'invalid',
+      };
+
+      const instance = plainToInstance(UpdateModelReqDto, payload);
+      const errors = await validate(instance);
+
+      expect(errors.length).toBeGreaterThan(0);
+      const reasoningLevelError = errors.find(
+        (e) => e.property === 'reasoningLevel',
+      );
+      expect(reasoningLevelError).toBeDefined();
+      expect(reasoningLevelError?.constraints).toHaveProperty('isIn');
+    });
+
     it('should allow reasoningLevel to be undefined when isReasoning is false', async () => {
       const payload = {
         isReasoning: false,
@@ -701,10 +746,10 @@ describe('UpdateModel DTOs', () => {
       expect(errors).toHaveLength(0);
     });
 
-    it('should validate successfully with valid reasoningLevel when isReasoning is true', async () => {
+    it('should validate successfully with minimal reasoningLevel when isReasoning is true', async () => {
       const payload = {
         isReasoning: true,
-        reasoningLevel: 'advanced',
+        reasoningLevel: 'minimal',
       };
 
       const instance = plainToInstance(UpdateModelReqDto, payload);
@@ -712,7 +757,49 @@ describe('UpdateModel DTOs', () => {
 
       expect(errors).toHaveLength(0);
       expect(instance.isReasoning).toBe(true);
-      expect(instance.reasoningLevel).toBe('advanced');
+      expect(instance.reasoningLevel).toBe('minimal');
+    });
+
+    it('should validate successfully with low reasoningLevel when isReasoning is true', async () => {
+      const payload = {
+        isReasoning: true,
+        reasoningLevel: 'low',
+      };
+
+      const instance = plainToInstance(UpdateModelReqDto, payload);
+      const errors = await validate(instance);
+
+      expect(errors).toHaveLength(0);
+      expect(instance.isReasoning).toBe(true);
+      expect(instance.reasoningLevel).toBe('low');
+    });
+
+    it('should validate successfully with medium reasoningLevel when isReasoning is true', async () => {
+      const payload = {
+        isReasoning: true,
+        reasoningLevel: 'medium',
+      };
+
+      const instance = plainToInstance(UpdateModelReqDto, payload);
+      const errors = await validate(instance);
+
+      expect(errors).toHaveLength(0);
+      expect(instance.isReasoning).toBe(true);
+      expect(instance.reasoningLevel).toBe('medium');
+    });
+
+    it('should validate successfully with high reasoningLevel when isReasoning is true', async () => {
+      const payload = {
+        isReasoning: true,
+        reasoningLevel: 'high',
+      };
+
+      const instance = plainToInstance(UpdateModelReqDto, payload);
+      const errors = await validate(instance);
+
+      expect(errors).toHaveLength(0);
+      expect(instance.isReasoning).toBe(true);
+      expect(instance.reasoningLevel).toBe('high');
     });
 
     it('should validate successfully with isReasoning and reasoningLevel together', async () => {

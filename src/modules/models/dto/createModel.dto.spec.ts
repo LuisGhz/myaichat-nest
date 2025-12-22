@@ -370,6 +370,7 @@ describe('CreateModel DTOs', () => {
       shortName: 'gpt-4',
       value: 'gpt-4-turbo',
       link: 'https://openai.com/gpt-4',
+      supportsTemperature: true,
       price: {
         input: 0.03,
         output: 0.06,
@@ -429,9 +430,10 @@ describe('CreateModel DTOs', () => {
       const instance = plainToInstance(CreateModelReqDto, payload);
       const errors = await validate(instance);
 
-      expect(errors).toHaveLength(1);
-      expect(errors[0].property).toBe('name');
-      expect(errors[0].constraints).toHaveProperty('maxLength');
+      expect(errors.length).toBeGreaterThan(0);
+      const nameError = errors.find((e) => e.property === 'name');
+      expect(nameError).toBeDefined();
+      expect(nameError?.constraints).toHaveProperty('maxLength');
     });
 
     it('should fail when name is not a string', async () => {
@@ -457,9 +459,10 @@ describe('CreateModel DTOs', () => {
       const instance = plainToInstance(CreateModelReqDto, payload);
       const errors = await validate(instance);
 
-      expect(errors).toHaveLength(1);
-      expect(errors[0].property).toBe('shortName');
-      expect(errors[0].constraints).toHaveProperty('maxLength');
+      expect(errors.length).toBeGreaterThan(0);
+      const shortNameError = errors.find((e) => e.property === 'shortName');
+      expect(shortNameError).toBeDefined();
+      expect(shortNameError?.constraints).toHaveProperty('maxLength');
     });
 
     it('should fail when shortName is not a string', async () => {
@@ -485,9 +488,10 @@ describe('CreateModel DTOs', () => {
       const instance = plainToInstance(CreateModelReqDto, payload);
       const errors = await validate(instance);
 
-      expect(errors).toHaveLength(1);
-      expect(errors[0].property).toBe('value');
-      expect(errors[0].constraints).toHaveProperty('maxLength');
+      expect(errors.length).toBeGreaterThan(0);
+      const valueError = errors.find((e) => e.property === 'value');
+      expect(valueError).toBeDefined();
+      expect(valueError?.constraints).toHaveProperty('maxLength');
     });
 
     it('should fail when value is not a string', async () => {
@@ -504,9 +508,10 @@ describe('CreateModel DTOs', () => {
       const instance = plainToInstance(CreateModelReqDto, payload);
       const errors = await validate(instance);
 
-      expect(errors).toHaveLength(1);
-      expect(errors[0].property).toBe('link');
-      expect(errors[0].constraints).toHaveProperty('isUrl');
+      expect(errors.length).toBeGreaterThan(0);
+      const linkError = errors.find((e) => e.property === 'link');
+      expect(linkError).toBeDefined();
+      expect(linkError?.constraints).toHaveProperty('isUrl');
     });
 
     it('should fail when link is empty', async () => {
@@ -573,8 +578,9 @@ describe('CreateModel DTOs', () => {
       const errors = await validate(instance);
 
       expect(errors.length).toBeGreaterThan(0);
-      expect(errors[0].property).toBe('developerId');
-      expect(errors[0].constraints).toHaveProperty('isUuid');
+      const devIdError = errors.find((e) => e.property === 'developerId');
+      expect(devIdError).toBeDefined();
+      expect(devIdError?.constraints).toHaveProperty('isUuid');
     });
 
     it('should fail when developer is invalid', async () => {
