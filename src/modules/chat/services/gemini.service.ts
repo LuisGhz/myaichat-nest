@@ -65,10 +65,11 @@ export class GeminiService implements AIProvider {
     }
 
     const configObject: any = {
-      maxOutputTokens: maxTokens,
+      // TODO: Adjust based on model context length
+      // maxOutputTokens: maxTokens,
       tools,
     };
-    
+
     if (supportsTemperature) configObject.temperature = temperature;
 
     const res = await this.client.models.generateContentStream({
