@@ -40,6 +40,12 @@ export class Model {
   @Column({  type: 'boolean', default: true })
   supportsTemperature: boolean;
 
+  @Column({ type: 'boolean', default: false })
+  isReasoning: boolean;
+
+  @Column({ type: 'varchar', nullable: true })
+  reasoningLevel: string | null;
+
   @Column()
   knowledgeCutoff: string;
 
