@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import OpenAI from 'openai';
+import { ReasoningEffort } from 'openai/resources/shared';
 import { EnvService } from '@cfg/schema/env.service';
 import type {
   AIProvider,
@@ -40,6 +41,8 @@ export class OpenAIService implements AIProvider {
       isImageGeneration,
       isWebSearch,
       systemPrompt,
+      isReasoning,
+      reasoningLevel,
     } = params;
     const transformedMessages = transformMessagesToOpenAIFormat(
       previousMessages,
@@ -55,7 +58,6 @@ export class OpenAIService implements AIProvider {
     );
     const tools = createToolParamsIfEnabled(isWebSearch, isImageGeneration);
     try {
-      this.logger.debug('Starting stream with model:', model);
       const stream = this.client.responses.stream({
         model: model,
         input: transformedMessages,
@@ -64,7 +66,9 @@ export class OpenAIService implements AIProvider {
         // max_output_tokens: maxTokens + 6000,
         ...(supportsTemperature && { temperature: temperature }),
         tools: tools,
-        // reasoning: { effort: 'high' },
+        ...(isReasoning && {
+          reasoning: { effort: (reasoningLevel as ReasoningEffort) || 'low' },
+        }),
       });
 
       let finalResponse;

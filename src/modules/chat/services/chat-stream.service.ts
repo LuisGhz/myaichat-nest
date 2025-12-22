@@ -83,6 +83,8 @@ export class ChatStreamService {
         isImageGeneration: isImageGeneration,
         isWebSearch: isWebSearch,
         systemPrompt: chat.prompt?.content || undefined,
+        isReasoning: modelData.isReasoning,
+        reasoningLevel: modelData.reasoningLevel || undefined,
       },
       (delta) => {
         fullContent += delta;

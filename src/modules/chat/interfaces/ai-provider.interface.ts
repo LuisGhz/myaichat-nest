@@ -11,6 +11,8 @@ export interface StreamResponseParams {
   fileKey?: string;
   isImageGeneration: boolean;
   isWebSearch: boolean;
+  isReasoning?: boolean;
+  reasoningLevel?: string;
 }
 
 export interface StreamResponseResult {
