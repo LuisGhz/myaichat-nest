@@ -1,5 +1,6 @@
 import {
   IsBoolean,
+  IsIn,
   IsNotEmpty,
   IsNumber,
   IsOptional,
@@ -9,10 +10,12 @@ import {
   IsUUID,
   MaxLength,
   Min,
+  ValidateIf,
   ValidateNested,
 } from 'class-validator';
 import { Transform, Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ReasoningLevelRequired } from '../validators';
 
 export class CreateModelDeveloperDto {
   @ApiProperty({
@@ -152,6 +155,28 @@ export class CreateModelReqDto {
   @IsBoolean()
   supportsTemperature: boolean;
 
+  @ApiPropertyOptional({
+    description: 'Update reasoning capability',
+    example: true,
+  })
+  @IsOptional()
+  @IsBoolean()
+  isReasoning?: boolean;
+
+  @ApiPropertyOptional({
+    description: 'Update reasoning capability level',
+    example: 'low',
+  })
+  @ValidateIf(
+    (o) =>
+      o.isReasoning === true ||
+      (o.reasoningLevel !== undefined && o.reasoningLevel !== null),
+  )
+  @IsString()
+  @IsIn(['minimal', 'low', 'medium', 'high'])
+  @ReasoningLevelRequired()
+  reasoningLevel?: string | null;
+
   @ApiProperty({
     description: 'Model metadata',
     type: CreateModelMetadataDto,
@@ -212,6 +237,17 @@ export class CreateModelResDto {
 
   @ApiProperty({ description: 'Supports temperature parameter' })
   supportsTemperature: boolean;
+
+  @ApiProperty({ description: 'Is reasoning model', example: false })
+  isReasoning: boolean;
+
+  @ApiProperty({ description: 'Reasoning level', nullable: true })
+  @ValidateIf(
+    (o) =>
+      o.isReasoning === true ||
+      (o.reasoningLevel !== undefined && o.reasoningLevel !== null),
+  )
+  reasoningLevel: string | null;
 
   @ApiProperty({
     description: 'Model metadata',

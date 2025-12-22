@@ -63,6 +63,12 @@ export class ModelResDto {
   @ApiProperty({ description: 'Indicates if the model supports temperature parameter' })
   supportsTemperature: boolean;
 
+  @ApiProperty({ description: 'Indicates if the model has reasoning capabilities' })
+  isReasoning: boolean;
+  
+  @ApiProperty({ description: 'Reasoning level of the model', nullable: true })
+  reasoningLevel: string | null;
+
   @ApiProperty({
     description: 'Model metadata',
     type: 'object',

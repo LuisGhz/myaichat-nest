@@ -203,6 +203,14 @@ export class ModelsService {
       model.supportsTemperature = dto.supportsTemperature;
     }
 
+    if (dto.isReasoning !== undefined) {
+      model.isReasoning = dto.isReasoning;
+    }
+
+    if (dto.reasoningLevel !== undefined) {
+      model.reasoningLevel = dto.reasoningLevel;
+    }
+
     if (dto.metadata !== undefined) {
       if (dto.metadata.contextWindow !== undefined) {
         model.contextWindow = dto.metadata.contextWindow;
@@ -325,6 +333,8 @@ export class ModelsService {
         output: Number(model.priceOutput),
       },
       supportsTemperature: model.supportsTemperature,
+      isReasoning: model.isReasoning,
+      reasoningLevel: model.reasoningLevel,
       metadata: {
         contextWindow: model.contextWindow,
         maxOutputTokens: model.maxOutputTokens,
