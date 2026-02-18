@@ -265,6 +265,13 @@ export class ModelsService {
     return count > 0;
   }
 
+  async existsById(id: string): Promise<boolean> {
+    const count = await this.modelRepository.count({
+      where: { id },
+    });
+    return count > 0;
+  }
+
   async validateGuestAccess(
     modelValue: string,
     userRole: string,
@@ -305,6 +312,44 @@ export class ModelsService {
         guestAccess: model.guestAccess,
       },
     );
+  }
+
+  async validateGuestAccessById(
+    modelId: string,
+    userRole: string,
+  ): Promise<void> {
+    if (userRole !== 'guest') return;
+
+    const cache = await this.appCacheService.get<ModelResDto>(
+      `${CACHE_KEYS.GET_BY_ID_FOR_GUEST}:${modelId}`,
+    );
+
+    if (cache) {
+      if (!cache.guestAccess)
+        throw new BadRequestException(
+          `Access denied. Model "${cache.name}" is not available for guest users.`,
+        );
+      return;
+    }
+
+    const model = await this.modelRepository.findOne({
+      where: { id: modelId },
+      select: ['id', 'name', 'guestAccess'],
+    });
+
+    if (!model)
+      throw new NotFoundException(`Model with id "${modelId}" not found`);
+
+    if (!model.guestAccess)
+      throw new BadRequestException(
+        `Access denied. Model "${model.name}" is not available for guest users.`,
+      );
+
+    this.appCacheService.setLong(`${CACHE_KEYS.GET_BY_ID_FOR_GUEST}:${modelId}`, {
+      id: model.id,
+      name: model.name,
+      guestAccess: model.guestAccess,
+    });
   }
 
   private async findByIdOrFail(id: string): Promise<Model> {

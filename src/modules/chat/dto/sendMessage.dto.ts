@@ -11,7 +11,7 @@ import {
   Min,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsValidModel } from '@mdl/validators';
+import { IsValidModelId } from '@mdl/validators';
 
 export class SendMessageReqDto {
   @ApiPropertyOptional({
@@ -39,15 +39,14 @@ export class SendMessageReqDto {
   message: string;
 
   @ApiProperty({
-    description: 'AI model to use',
-    example: 'gpt-4o',
+    description: 'AI model ID to use',
+    example: '123e4567-e89b-12d3-a456-426614174000',
   })
-  @IsNotEmpty()
-  @IsString()
-  @IsValidModel({
-    message: 'Invalid model. Please use a registered model value.',
+  @IsUUID()
+  @IsValidModelId({
+    message: 'Invalid model ID. Please use a registered model ID.',
   })
-  model: string;
+  modelId: string;
 
   @ApiProperty({
     description: 'Model developer/provider',

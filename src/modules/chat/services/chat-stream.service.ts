@@ -36,7 +36,7 @@ export class ChatStreamService {
       chatId,
       promptId,
       message,
-      model,
+      modelId,
       maxTokens,
       temperature,
       fileKey,
@@ -49,18 +49,19 @@ export class ChatStreamService {
 
     const aiProvider = this.aiProviderRegistry.getProvider(provider);
 
+    const modelData = await this.modelsService.findOne(modelId);
+
     const chat = await this.#getOrCreateChat({
       chatId,
       promptId,
       userId,
-      model,
+      model: modelData.value,
       maxTokens,
       temperature,
       isImageGeneration,
       isWebSearch,
     });
 
-    const modelData = await this.modelsService.findByValue(model);
     const isNewChat = !chatId;
     let fullContent = '';
     const messages = chat.messages || [];

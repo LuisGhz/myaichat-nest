@@ -6,7 +6,7 @@ describe('SendMessageReqDto', () => {
     it('should transform maxTokens from string to number', () => {
       const payload = {
         message: 'Hello',
-        model: 'gpt-4o',
+        modelId: '550e8400-e29b-41d4-a716-446655440000',
         modelDeveloper: 'OpenAI',
         maxTokens: '1000',
         temperature: 0.7,
@@ -22,7 +22,7 @@ describe('SendMessageReqDto', () => {
     it('should transform temperature from string to number', () => {
       const payload = {
         message: 'Hello',
-        model: 'gpt-4o',
+        modelId: '550e8400-e29b-41d4-a716-446655440000',
         modelDeveloper: 'OpenAI',
         maxTokens: 1000,
         temperature: '0.7',
@@ -38,7 +38,7 @@ describe('SendMessageReqDto', () => {
     it('should transform isImageGeneration from string "true" to boolean', () => {
       const payload = {
         message: 'Hello',
-        model: 'gpt-4o',
+        modelId: '550e8400-e29b-41d4-a716-446655440000',
         modelDeveloper: 'OpenAI',
         maxTokens: 1000,
         temperature: 0.7,
@@ -54,7 +54,7 @@ describe('SendMessageReqDto', () => {
     it('should transform isImageGeneration from string "false" to boolean false', () => {
       const payload = {
         message: 'Hello',
-        model: 'gpt-4o',
+        modelId: '550e8400-e29b-41d4-a716-446655440000',
         modelDeveloper: 'OpenAI',
         maxTokens: 1000,
         temperature: 0.7,
@@ -69,7 +69,7 @@ describe('SendMessageReqDto', () => {
     it('should transform isWebSearch from string "true" to boolean', () => {
       const payload = {
         message: 'Hello',
-        model: 'gpt-4o',
+        modelId: '550e8400-e29b-41d4-a716-446655440000',
         modelDeveloper: 'OpenAI',
         maxTokens: 1000,
         temperature: 0.7,
@@ -87,7 +87,7 @@ describe('SendMessageReqDto', () => {
     it('should create instance with all required fields', () => {
       const payload = {
         message: 'Hello, how are you?',
-        model: 'gpt-4o',
+        modelId: '550e8400-e29b-41d4-a716-446655440000',
         modelDeveloper: 'OpenAI',
         maxTokens: 1000,
         temperature: 0.7,
@@ -97,7 +97,7 @@ describe('SendMessageReqDto', () => {
 
       const instance = plainToInstance(SendMessageReqDto, payload);
       expect(instance.message).toBe(payload.message);
-      expect(instance.model).toBe(payload.model);
+      expect(instance.modelId).toBe(payload.modelId);
       expect(instance.modelDeveloper).toBe(payload.modelDeveloper);
       expect(instance.maxTokens).toBe(payload.maxTokens);
       expect(instance.temperature).toBe(payload.temperature);
@@ -110,7 +110,7 @@ describe('SendMessageReqDto', () => {
         chatId: '550e8400-e29b-41d4-a716-446655440000',
         promptId: '550e8400-e29b-41d4-a716-446655440001',
         message: 'Test message',
-        model: 'gpt-4o-mini',
+        modelId: '550e8400-e29b-41d4-a716-446655440000',
         modelDeveloper: 'OpenAI',
         maxTokens: 512,
         temperature: 0.5,
@@ -126,7 +126,7 @@ describe('SendMessageReqDto', () => {
     it('should set optional fields as undefined when not provided', () => {
       const payload = {
         message: 'Hello',
-        model: 'gpt-4o',
+        modelId: '550e8400-e29b-41d4-a716-446655440000',
         modelDeveloper: 'OpenAI',
         maxTokens: 1000,
         temperature: 0.7,
@@ -144,7 +144,7 @@ describe('SendMessageReqDto', () => {
     it('should accept maxTokens at minimum boundary (1)', () => {
       const payload = {
         message: 'Hello',
-        model: 'gpt-4o',
+        modelId: '550e8400-e29b-41d4-a716-446655440000',
         modelDeveloper: 'OpenAI',
         maxTokens: 1,
         temperature: 0.7,
@@ -159,7 +159,7 @@ describe('SendMessageReqDto', () => {
     it('should accept maxTokens at maximum boundary (16384)', () => {
       const payload = {
         message: 'Hello',
-        model: 'gpt-4o',
+        modelId: '550e8400-e29b-41d4-a716-446655440000',
         modelDeveloper: 'OpenAI',
         maxTokens: 16384,
         temperature: 0.7,
@@ -174,7 +174,7 @@ describe('SendMessageReqDto', () => {
     it('should accept temperature at minimum boundary (0)', () => {
       const payload = {
         message: 'Hello',
-        model: 'gpt-4o',
+        modelId: '550e8400-e29b-41d4-a716-446655440000',
         modelDeveloper: 'OpenAI',
         maxTokens: 1000,
         temperature: 0,
@@ -189,7 +189,7 @@ describe('SendMessageReqDto', () => {
     it('should accept temperature at maximum boundary (1)', () => {
       const payload = {
         message: 'Hello',
-        model: 'gpt-4o',
+        modelId: '550e8400-e29b-41d4-a716-446655440000',
         modelDeveloper: 'OpenAI',
         maxTokens: 1000,
         temperature: 1,
@@ -204,7 +204,7 @@ describe('SendMessageReqDto', () => {
     it('should handle decimal temperatures', () => {
       const payload = {
         message: 'Hello',
-        model: 'gpt-4o',
+        modelId: '550e8400-e29b-41d4-a716-446655440000',
         modelDeveloper: 'OpenAI',
         maxTokens: 1000,
         temperature: 0.75,
@@ -220,7 +220,7 @@ describe('SendMessageReqDto', () => {
       const longMessage = 'A'.repeat(5000);
       const payload = {
         message: longMessage,
-        model: 'gpt-4o',
+        modelId: '550e8400-e29b-41d4-a716-446655440000',
         modelDeveloper: 'OpenAI',
         maxTokens: 1000,
         temperature: 0.7,
@@ -245,7 +245,7 @@ describe('SendMessageReqDto', () => {
       models.forEach(model => {
         const payload = {
           message: 'Hello',
-          model,
+          modelId: '550e8400-e29b-41d4-a716-446655440000',
           modelDeveloper: 'OpenAI',
           maxTokens: 1000,
           temperature: 0.7,
@@ -254,7 +254,7 @@ describe('SendMessageReqDto', () => {
         };
 
         const instance = plainToInstance(SendMessageReqDto, payload);
-        expect(instance.model).toBe(model);
+        expect(instance.modelId).toBe('550e8400-e29b-41d4-a716-446655440000');
       });
     });
   });

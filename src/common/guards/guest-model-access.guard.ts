@@ -17,10 +17,10 @@ export class GuestModelAccessGuard implements CanActivate {
 
     if (!user || user.role !== 'guest') return true;
 
-    const modelValue = body.model;
-    if (!modelValue) return true;
+    const modelId = body.modelId;
+    if (!modelId) return true;
 
-    await this.modelsService.validateGuestAccess(modelValue, user.role);
+    await this.modelsService.validateGuestAccessById(modelId, user.role);
 
     return true;
   }

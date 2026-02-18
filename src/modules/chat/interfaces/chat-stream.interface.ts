@@ -4,7 +4,7 @@ export interface HandleStreamMessageParams {
   chatId?: string;
   promptId?: string;
   message: string;
-  model: string;
+  modelId: string;
   maxTokens: number;
   temperature: number;
   userId: string;

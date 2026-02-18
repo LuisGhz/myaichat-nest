@@ -283,7 +283,7 @@ export class ChatController {
         chatId: dto.chatId,
         promptId: dto.promptId,
         message: dto.message,
-        model: dto.model,
+        modelId: dto.modelId,
         maxTokens: dto.maxTokens,
         temperature: dto.temperature,
         userId,

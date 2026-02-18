@@ -39,7 +39,7 @@ const promptsServiceMock = {
 };
 
 const modelsServiceMock = {
-  findByValue: jest.fn(),
+  findOne: jest.fn(),
 };
 
 const mockAIProvider: Partial<AIProvider> = {
@@ -100,7 +100,7 @@ describe('ChatStreamService', () => {
     promptsServiceInstance = module.get<PromptsService>(PromptsService);
     modelsServiceInstance = module.get<ModelsService>(ModelsService);
 
-    modelsServiceMock.findByValue.mockResolvedValue({
+    modelsServiceMock.findOne.mockResolvedValue({
       id: 'default-model',
       value: 'gpt-4',
       supportsTemperature: true,
@@ -147,7 +147,7 @@ describe('ChatStreamService', () => {
     await service.handleStreamMessage({
       chatId,
       message,
-      model,
+      modelId: '550e8400-e29b-41d4-a716-446655440000',
       maxTokens: 1000,
       temperature: 0.7,
       userId,
@@ -232,7 +232,7 @@ describe('ChatStreamService', () => {
 
     await service.handleStreamMessage({
       message,
-      model,
+      modelId: '550e8400-e29b-41d4-a716-446655440000',
       maxTokens: 1000,
       temperature: 0.7,
       userId,
@@ -306,7 +306,7 @@ describe('ChatStreamService', () => {
     await service.handleStreamMessage({
       chatId,
       message,
-      model,
+      modelId: '550e8400-e29b-41d4-a716-446655440000',
       maxTokens: 1000,
       temperature: 0.7,
       userId,
@@ -372,7 +372,7 @@ describe('ChatStreamService', () => {
     await service.handleStreamMessage({
       chatId,
       message,
-      model,
+      modelId: '550e8400-e29b-41d4-a716-446655440000',
       maxTokens: 1000,
       temperature: 0.7,
       userId,
@@ -456,7 +456,7 @@ describe('ChatStreamService', () => {
     await service.handleStreamMessage({
       chatId,
       message,
-      model,
+      modelId: '550e8400-e29b-41d4-a716-446655440000',
       maxTokens: 1000,
       temperature: 0.7,
       userId,
@@ -519,7 +519,7 @@ describe('ChatStreamService', () => {
     await service.handleStreamMessage({
       promptId,
       message,
-      model,
+      modelId: '550e8400-e29b-41d4-a716-446655440000',
       maxTokens: 1000,
       temperature: 0.7,
       userId,
@@ -577,7 +577,7 @@ describe('ChatStreamService', () => {
 
     await service.handleStreamMessage({
       message,
-      model,
+      modelId: '550e8400-e29b-41d4-a716-446655440000',
       maxTokens: 1000,
       temperature: 0.7,
       userId,
@@ -614,7 +614,7 @@ describe('ChatStreamService', () => {
       service.handleStreamMessage({
         chatId,
         message,
-        model,
+        modelId: '550e8400-e29b-41d4-a716-446655440000',
         maxTokens: 1000,
         temperature: 0.7,
         userId,
@@ -666,7 +666,7 @@ describe('ChatStreamService', () => {
       service.handleStreamMessage({
         chatId,
         message,
-        model,
+        modelId: '550e8400-e29b-41d4-a716-446655440000',
         maxTokens: 1000,
         temperature: 0.7,
         userId,
@@ -719,7 +719,7 @@ describe('ChatStreamService', () => {
       service.handleStreamMessage({
         chatId,
         message,
-        model,
+        modelId: '550e8400-e29b-41d4-a716-446655440000',
         maxTokens: 1000,
         temperature: 0.7,
         userId,
@@ -771,7 +771,7 @@ describe('ChatStreamService', () => {
     await expect(
       service.handleStreamMessage({
         message,
-        model,
+        modelId: '550e8400-e29b-41d4-a716-446655440000',
         maxTokens: 1000,
         temperature: 0.7,
         userId,
@@ -821,7 +821,7 @@ describe('ChatStreamService', () => {
     await service.handleStreamMessage({
       chatId,
       message,
-      model,
+      modelId: '550e8400-e29b-41d4-a716-446655440000',
       maxTokens: 1000,
       temperature: 0.7,
       userId,
@@ -873,7 +873,7 @@ describe('ChatStreamService', () => {
       service.handleStreamMessage({
         promptId,
         message,
-        model,
+        modelId: '550e8400-e29b-41d4-a716-446655440000',
         maxTokens: 1000,
         temperature: 0.7,
         userId,
@@ -921,7 +921,7 @@ describe('ChatStreamService', () => {
     } as Chat;
 
     chatServiceMock.findChatByIdOrFail.mockResolvedValue(existingChat);
-    modelsServiceMock.findByValue.mockResolvedValue(modelData);
+    modelsServiceMock.findOne.mockResolvedValue(modelData);
     const streamResponseMock = jest
       .fn()
       .mockImplementation(async (params, onDelta) => {
@@ -939,7 +939,7 @@ describe('ChatStreamService', () => {
     await service.handleStreamMessage({
       chatId,
       message,
-      model,
+      modelId: '550e8400-e29b-41d4-a716-446655440000',
       maxTokens: 1000,
       temperature: 0.7,
       userId,
@@ -949,7 +949,7 @@ describe('ChatStreamService', () => {
       onEvent,
     });
 
-    expect(modelsServiceMock.findByValue).toHaveBeenCalledWith(model);
+    expect(modelsServiceMock.findOne).toHaveBeenCalledWith('550e8400-e29b-41d4-a716-446655440000');
     expect(streamResponseMock).toHaveBeenCalled();
   });
 
@@ -983,7 +983,7 @@ describe('ChatStreamService', () => {
     } as Chat;
 
     chatServiceMock.findChatByIdOrFail.mockResolvedValue(existingChat);
-    modelsServiceMock.findByValue.mockResolvedValue(modelData);
+    modelsServiceMock.findOne.mockResolvedValue(modelData);
     const streamResponseMock = jest
       .fn()
       .mockImplementation(async (params, onDelta) => {
@@ -1002,7 +1002,7 @@ describe('ChatStreamService', () => {
     await service.handleStreamMessage({
       chatId,
       message,
-      model,
+      modelId: '550e8400-e29b-41d4-a716-446655440000',
       maxTokens: 2000,
       temperature: 1.0,
       userId,
@@ -1012,7 +1012,7 @@ describe('ChatStreamService', () => {
       onEvent,
     });
 
-    expect(modelsServiceMock.findByValue).toHaveBeenCalledWith(model);
+    expect(modelsServiceMock.findOne).toHaveBeenCalledWith('550e8400-e29b-41d4-a716-446655440000');
     expect(streamResponseMock).toHaveBeenCalled();
     const callArgs = streamResponseMock.mock.calls[0][0];
     expect(callArgs.isReasoning).toBe(true);
@@ -1041,7 +1041,7 @@ describe('ChatStreamService', () => {
     } as Chat;
 
     chatServiceMock.findChatByIdOrFail.mockResolvedValue(existingChat);
-    modelsServiceMock.findByValue.mockRejectedValue(
+    modelsServiceMock.findOne.mockRejectedValue(
       new Error('Model not found'),
     );
 
@@ -1049,7 +1049,7 @@ describe('ChatStreamService', () => {
       service.handleStreamMessage({
         chatId,
         message,
-        model,
+        modelId: '550e8400-e29b-41d4-a716-446655440000',
         maxTokens: 1000,
         temperature: 0.7,
         userId,
@@ -1060,7 +1060,7 @@ describe('ChatStreamService', () => {
       }),
     ).rejects.toThrow('Model not found');
 
-    expect(modelsServiceMock.findByValue).toHaveBeenCalledWith(model);
+    expect(modelsServiceMock.findOne).toHaveBeenCalledWith('550e8400-e29b-41d4-a716-446655440000');
     expect(onEvent).not.toHaveBeenCalled();
   });
 
@@ -1095,7 +1095,7 @@ describe('ChatStreamService', () => {
     } as Chat;
 
     chatServiceMock.findChatByIdOrFail.mockResolvedValue(existingChat);
-    modelsServiceMock.findByValue.mockResolvedValue(modelData);
+    modelsServiceMock.findOne.mockResolvedValue(modelData);
     const streamResponseMock = jest
       .fn()
       .mockImplementation(async (params, onDelta) => {
@@ -1112,7 +1112,7 @@ describe('ChatStreamService', () => {
     await service.handleStreamMessage({
       chatId,
       message,
-      model,
+      modelId: '550e8400-e29b-41d4-a716-446655440000',
       maxTokens: 1000,
       temperature,
       userId,
@@ -1165,7 +1165,7 @@ describe('ChatStreamService', () => {
       service.handleStreamMessage({
         chatId,
         message,
-        model,
+        modelId: '550e8400-e29b-41d4-a716-446655440000',
         maxTokens: 1000,
         temperature: 0.7,
         userId,
