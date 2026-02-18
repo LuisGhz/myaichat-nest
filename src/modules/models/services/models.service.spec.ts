@@ -655,32 +655,6 @@ describe('ModelsService', () => {
       expect(appCacheServiceMock.del).toHaveBeenCalled();
     });
 
-    it('should not check if new value exists when value is not being updated', async () => {
-      const updateDto = {
-        name: 'Updated Name',
-      };
-
-      const updatedModel = { ...mockModel, name: 'Updated Name' };
-
-      modelRepositoryMock.findOne.mockResolvedValue(mockModel as any);
-      modelRepositoryMock.save.mockResolvedValue(updatedModel as any);
-      appCacheServiceMock.get.mockResolvedValue(null);
-      appCacheServiceMock.del.mockResolvedValue(undefined);
-
-      await service.update('1', updateDto as any);
-
-      const findOneCalls = modelRepositoryMock.findOne.mock.calls;
-      const valueCheckCall = findOneCalls.find(
-        (call) =>
-          typeof call[0] === 'object' &&
-          call[0] !== null &&
-          'where' in call[0] &&
-          (call[0].where as any)?.value,
-      );
-
-      expect(valueCheckCall).toBeUndefined();
-    });
-
     it('should update supportsTemperature', async () => {
       const updateDto = { supportsTemperature: false };
       const updatedModel = { ...mockModel, supportsTemperature: false };

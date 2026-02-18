@@ -159,16 +159,6 @@ export class ModelsService {
     }
 
     if (dto.value !== undefined) {
-      const existingModel = await this.modelRepository.findOne({
-        where: { value: dto.value },
-      });
-
-      if (existingModel && existingModel.id !== id) {
-        throw new BadRequestException(
-          `Model with value "${dto.value}" already exists`,
-        );
-      }
-
       model.value = dto.value;
     }
 
