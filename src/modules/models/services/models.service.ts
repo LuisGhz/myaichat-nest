@@ -28,16 +28,6 @@ export class ModelsService {
   ) {}
 
   async create(dto: CreateModelReqDto): Promise<CreateModelResDto> {
-    const existingModel = await this.modelRepository.findOne({
-      where: { value: dto.value },
-    });
-
-    if (existingModel) {
-      throw new BadRequestException(
-        `Model with value "${dto.value}" already exists`,
-      );
-    }
-
     let developer: ModelDeveloper;
 
     if (dto.developerId) {
@@ -345,11 +335,14 @@ export class ModelsService {
         `Access denied. Model "${model.name}" is not available for guest users.`,
       );
 
-    this.appCacheService.setLong(`${CACHE_KEYS.GET_BY_ID_FOR_GUEST}:${modelId}`, {
-      id: model.id,
-      name: model.name,
-      guestAccess: model.guestAccess,
-    });
+    this.appCacheService.setLong(
+      `${CACHE_KEYS.GET_BY_ID_FOR_GUEST}:${modelId}`,
+      {
+        id: model.id,
+        name: model.name,
+        guestAccess: model.guestAccess,
+      },
+    );
   }
 
   private async findByIdOrFail(id: string): Promise<Model> {

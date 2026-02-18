@@ -19,7 +19,7 @@ export class Model {
   @Column()
   shortName: string;
 
-  @Column({ unique: true })
+  @Column()
   value: string;
 
   @Column()
