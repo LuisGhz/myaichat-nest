@@ -25,6 +25,9 @@ describe('ModelsService', () => {
     maxOutputTokens: 2048,
     knowledgeCutoff: '2024-01-01',
     guestAccess: false,
+    supportsTemperature: true,
+    isReasoning: false,
+    reasoningLevel: null,
     developer: {
       id: 'dev-1',
       name: 'OpenAI',
@@ -107,6 +110,9 @@ describe('ModelsService', () => {
         link: 'https://openai.com/gpt4',
         guestAccess: true,
         price: { input: 0.003, output: 0.006 },
+        supportsTemperature: true,
+        isReasoning: false,
+        reasoningLevel: null,
         metadata: {
           contextWindow: 8192,
           maxOutputTokens: 4096,
@@ -125,9 +131,6 @@ describe('ModelsService', () => {
 
       const result = await service.create(createDto as any);
 
-      expect(modelRepositoryMock.findOne).toHaveBeenCalledWith({
-        where: { value: 'gpt-4' },
-      });
       expect(developerRepositoryMock.findOne).toHaveBeenCalledWith({
         where: { id: 'dev-1' },
       });
@@ -148,6 +151,9 @@ describe('ModelsService', () => {
         link: 'https://anthropic.com/claude3',
         guestAccess: false,
         price: { input: 0.0015, output: 0.0075 },
+        supportsTemperature: true,
+        isReasoning: false,
+        reasoningLevel: null,
         metadata: {
           contextWindow: 200000,
           maxOutputTokens: 4096,
@@ -201,6 +207,9 @@ describe('ModelsService', () => {
         link: 'https://anthropic.com/claude3',
         guestAccess: false,
         price: { input: 0.0015, output: 0.0075 },
+        supportsTemperature: true,
+        isReasoning: false,
+        reasoningLevel: null,
         metadata: {
           contextWindow: 200000,
           maxOutputTokens: 4096,
@@ -251,6 +260,9 @@ describe('ModelsService', () => {
         value: 'test-model',
         link: 'https://example.com',
         price: { input: 0.001, output: 0.002 },
+        supportsTemperature: true,
+        isReasoning: false,
+        reasoningLevel: null,
         metadata: {
           contextWindow: 4096,
           maxOutputTokens: 2048,
@@ -387,6 +399,9 @@ describe('ModelsService', () => {
       expect(result).toHaveProperty('link');
       expect(result).toHaveProperty('guestAccess');
       expect(result).toHaveProperty('price');
+      expect(result).toHaveProperty('supportsTemperature');
+      expect(result).toHaveProperty('isReasoning');
+      expect(result).toHaveProperty('reasoningLevel');
       expect(result).toHaveProperty('metadata');
       expect(result).toHaveProperty('developer');
       expect(result).toHaveProperty('createdAt');
@@ -476,6 +491,9 @@ describe('ModelsService', () => {
       expect(result).toHaveProperty('id');
       expect(result).toHaveProperty('name');
       expect(result).toHaveProperty('value');
+      expect(result).toHaveProperty('supportsTemperature');
+      expect(result).toHaveProperty('isReasoning');
+      expect(result).toHaveProperty('reasoningLevel');
       expect(result).toHaveProperty('developer');
     });
   });
@@ -662,6 +680,54 @@ describe('ModelsService', () => {
 
       expect(valueCheckCall).toBeUndefined();
     });
+
+    it('should update supportsTemperature', async () => {
+      const updateDto = { supportsTemperature: false };
+      const updatedModel = { ...mockModel, supportsTemperature: false };
+
+      modelRepositoryMock.findOne.mockResolvedValue(mockModel as any);
+      modelRepositoryMock.save.mockResolvedValue(updatedModel as any);
+      appCacheServiceMock.get.mockResolvedValue(null);
+      appCacheServiceMock.del.mockResolvedValue(undefined);
+
+      const result = await service.update('1', updateDto as any);
+
+      expect(result.supportsTemperature).toBe(false);
+      expect(modelRepositoryMock.save).toHaveBeenCalled();
+    });
+
+    it('should update isReasoning and reasoningLevel', async () => {
+      const updateDto = { isReasoning: true, reasoningLevel: 'high' };
+      const updatedModel = { ...mockModel, isReasoning: true, reasoningLevel: 'high' };
+
+      modelRepositoryMock.findOne.mockResolvedValue(mockModel as any);
+      modelRepositoryMock.save.mockResolvedValue(updatedModel as any);
+      appCacheServiceMock.get.mockResolvedValue(null);
+      appCacheServiceMock.del.mockResolvedValue(undefined);
+
+      const result = await service.update('1', updateDto as any);
+
+      expect(result.isReasoning).toBe(true);
+      expect(result.reasoningLevel).toBe('high');
+      expect(modelRepositoryMock.save).toHaveBeenCalled();
+    });
+
+    it('should set reasoningLevel to null when isReasoning is set to false', async () => {
+      const reasoningModel = { ...mockModel, isReasoning: true, reasoningLevel: 'high' };
+      const updateDto = { isReasoning: false, reasoningLevel: null };
+      const updatedModel = { ...reasoningModel, isReasoning: false, reasoningLevel: null };
+
+      modelRepositoryMock.findOne.mockResolvedValue(reasoningModel as any);
+      modelRepositoryMock.save.mockResolvedValue(updatedModel as any);
+      appCacheServiceMock.get.mockResolvedValue(null);
+      appCacheServiceMock.del.mockResolvedValue(undefined);
+
+      const result = await service.update('1', updateDto as any);
+
+      expect(result.isReasoning).toBe(false);
+      expect(result.reasoningLevel).toBeNull();
+      expect(modelRepositoryMock.save).toHaveBeenCalled();
+    });
   });
 
   describe('remove', () => {
@@ -753,6 +819,30 @@ describe('ModelsService', () => {
       const result = await service.getDevelopers();
 
       expect(result).toEqual([]);
+    });
+  });
+
+  describe('existsById', () => {
+    it('should return true when model exists by id', async () => {
+      modelRepositoryMock.count.mockResolvedValue(1);
+
+      const result = await service.existsById('1');
+
+      expect(modelRepositoryMock.count).toHaveBeenCalledWith({
+        where: { id: '1' },
+      });
+      expect(result).toBe(true);
+    });
+
+    it('should return false when model does not exist by id', async () => {
+      modelRepositoryMock.count.mockResolvedValue(0);
+
+      const result = await service.existsById('nonexistent-id');
+
+      expect(modelRepositoryMock.count).toHaveBeenCalledWith({
+        where: { id: 'nonexistent-id' },
+      });
+      expect(result).toBe(false);
     });
   });
 
@@ -864,6 +954,115 @@ describe('ModelsService', () => {
       expect(appCacheServiceMock.get).toHaveBeenCalledWith(
         `${CACHE_KEYS.GET_BY_VALUE_FOR_GUEST}:test-model`,
       );
+    });
+  });
+
+  describe('validateGuestAccessById', () => {
+    it('should not throw when user is not guest', async () => {
+      await expect(
+        service.validateGuestAccessById('1', 'user'),
+      ).resolves.toBeUndefined();
+
+      expect(appCacheServiceMock.get).not.toHaveBeenCalled();
+      expect(modelRepositoryMock.findOne).not.toHaveBeenCalled();
+    });
+
+    it('should validate guest access using cache by id', async () => {
+      const cachedModel = {
+        id: '1',
+        name: 'Test Model',
+        guestAccess: true,
+      };
+
+      appCacheServiceMock.get.mockResolvedValue(cachedModel);
+
+      await expect(
+        service.validateGuestAccessById('1', 'guest'),
+      ).resolves.toBeUndefined();
+
+      expect(appCacheServiceMock.get).toHaveBeenCalledWith(
+        `${CACHE_KEYS.GET_BY_ID_FOR_GUEST}:1`,
+      );
+      expect(modelRepositoryMock.findOne).not.toHaveBeenCalled();
+    });
+
+    it('should fetch model from database and cache it when not in cache', async () => {
+      appCacheServiceMock.get.mockResolvedValue(null);
+      modelRepositoryMock.findOne.mockResolvedValue({
+        id: '1',
+        name: 'Test Model',
+        guestAccess: true,
+      } as any);
+
+      await expect(
+        service.validateGuestAccessById('1', 'guest'),
+      ).resolves.toBeUndefined();
+
+      expect(modelRepositoryMock.findOne).toHaveBeenCalledWith({
+        where: { id: '1' },
+        select: ['id', 'name', 'guestAccess'],
+      });
+      expect(appCacheServiceMock.setLong).toHaveBeenCalled();
+    });
+
+    it('should cache guest access by id check result', async () => {
+      appCacheServiceMock.get.mockResolvedValue(null);
+      modelRepositoryMock.findOne.mockResolvedValue({
+        id: '1',
+        name: 'Test Model',
+        guestAccess: true,
+      } as any);
+
+      await service.validateGuestAccessById('1', 'guest');
+
+      expect(appCacheServiceMock.setLong).toHaveBeenCalledWith(
+        `${CACHE_KEYS.GET_BY_ID_FOR_GUEST}:1`,
+        {
+          id: '1',
+          name: 'Test Model',
+          guestAccess: true,
+        },
+      );
+    });
+
+    it('should throw when cached model has guestAccess false', async () => {
+      const cachedModel = {
+        id: '1',
+        name: 'Test Model',
+        guestAccess: false,
+      };
+
+      appCacheServiceMock.get.mockResolvedValue(cachedModel);
+
+      await expect(
+        service.validateGuestAccessById('1', 'guest'),
+      ).rejects.toThrow();
+
+      expect(appCacheServiceMock.get).toHaveBeenCalledWith(
+        `${CACHE_KEYS.GET_BY_ID_FOR_GUEST}:1`,
+      );
+    });
+
+    it('should throw when model from database has guestAccess false', async () => {
+      appCacheServiceMock.get.mockResolvedValue(null);
+      modelRepositoryMock.findOne.mockResolvedValue({
+        id: '1',
+        name: 'Restricted Model',
+        guestAccess: false,
+      } as any);
+
+      await expect(
+        service.validateGuestAccessById('1', 'guest'),
+      ).rejects.toThrow();
+    });
+
+    it('should throw NotFoundException when model does not exist', async () => {
+      appCacheServiceMock.get.mockResolvedValue(null);
+      modelRepositoryMock.findOne.mockResolvedValue(null);
+
+      await expect(
+        service.validateGuestAccessById('nonexistent-id', 'guest'),
+      ).rejects.toThrow(NotFoundException);
     });
   });
 });
