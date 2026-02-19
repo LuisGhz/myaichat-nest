@@ -21,10 +21,8 @@ export type ModelsValues =
   | 'gpt-4.1-2025-04-14'
   | 'gpt-4.1-mini-2025-04-14'
   | 'o4-mini'
-  | 'gemini-2.0-flash-lite'
-  | 'gemini-2.0-flash'
-  | 'gemini-2.5-flash'
-  | 'gemini-2.5-pro';
+  | 'gemini-3-flash-preview'
+  | 'gemini-3-pro-preview';
 
 export type ModelInfo = {
   name: string;
@@ -98,101 +96,19 @@ export const MODELS: ModelInfo[] = [
     },
   },
   {
-    name: "GPT 4.1 Mini",
-    shortName: "4.1m",
-    value: "gpt-4.1-mini-2025-04-14",
-    developBy: {
-      name: "OpenAI",
-      link: "https://openai.com",
-      imageUrl: "https://openai.com/favicon.ico",
-    },
-    link: "https://platform.openai.com/docs/models/gpt-4.1-mini",
-    price: {
-      input: 0.4,
-      output: 1.6,
-    },
-    metadata: {
-      contextWindow: 1_047_576,
-      maxOutputTokens: 32_768,
-      knowledgeCutoff: "May 2024",
-    },
-  },
-  {
-    name: "o4 Mini",
-    shortName: "o4m",
-    value: "o4-mini",
-    developBy: {
-      name: "OpenAI",
-      link: "https://openai.com",
-      imageUrl: "https://openai.com/favicon.ico",
-    },
-    link: "https://platform.openai.com/docs/models/o4-mini",
-    price: {
-      input: 1.1,
-      output: 4.4,
-    },
-    metadata: {
-      contextWindow: 200_000,
-      maxOutputTokens: 100_000,
-      knowledgeCutoff: "May 2024",
-    },
-  },
-  {
-    name: "Gemini 2.0 Flash Lite",
-    shortName: "2.0FL",
-    value: "gemini-2.0-flash-lite",
+    name: "Gemini 3 Flash",
+    shortName: "3F",
+    value: "gemini-3-flash-preview",
     developBy: {
       name: "Google",
       link: "https://gemini.google.com/",
       imageUrl:
         "https://www.gstatic.com/lamda/images/gemini_favicon_f069958c85030456e93de685481c559f160ea06b.png",
     },
-    link: "https://cloud.google.com/vertex-ai/generative-ai/docs/models/gemini/2-0-flash-lite?hl=es-419",
+    link: "https://docs.cloud.google.com/vertex-ai/generative-ai/docs/models/gemini/3-flash",
     price: {
-      input: 0.075,
-      output: 0.3,
-    },
-    metadata: {
-      contextWindow: 1_048_576,
-      maxOutputTokens: 8_192,
-      knowledgeCutoff: "Jun 2024",
-    },
-  },
-  {
-    name: "Gemini 2.0 Flash",
-    shortName: "2.0F",
-    value: "gemini-2.0-flash",
-    developBy: {
-      name: "Google",
-      link: "https://gemini.google.com/",
-      imageUrl:
-        "https://www.gstatic.com/lamda/images/gemini_favicon_f069958c85030456e93de685481c559f160ea06b.png",
-    },
-    link: "https://cloud.google.com/vertex-ai/generative-ai/docs/models/gemini/2-0-flash?hl=es-419",
-    price: {
-      input: 0.1,
-      output: 0.4,
-    },
-    metadata: {
-      contextWindow: 1_048_576,
-      maxOutputTokens: 8_192,
-      knowledgeCutoff: "Jun 2024",
-    },
-  },
-  {
-    name: "Gemini 2.5 Flash",
-    shortName: "2.5FP",
-    value: "gemini-2.5-flash",
-    developBy: {
-      name: "Google",
-      link: "https://gemini.google.com/",
-      imageUrl:
-        "https://www.gstatic.com/lamda/images/gemini_favicon_f069958c85030456e93de685481c559f160ea06b.png",
-    },
-    link: "https://cloud.google.com/vertex-ai/generative-ai/docs/models/gemini/2-5-flash?hl=es-419",
-    price: {
-      input: 0.15,
-      output: 2.5,
+      input: 0.5,
+      output: 3,
     },
     metadata: {
       contextWindow: 1_048_576,
@@ -201,19 +117,19 @@ export const MODELS: ModelInfo[] = [
     },
   },
   {
-    name: "Gemini 2.5 Pro",
-    shortName: "2.5PP",
-    value: "gemini-2.5-pro",
+    name: "Gemini 3 Pro",
+    shortName: "3P",
+    value: "gemini-3-pro-preview",
     developBy: {
       name: "Google",
       link: "https://gemini.google.com/",
       imageUrl:
         "https://www.gstatic.com/lamda/images/gemini_favicon_f069958c85030456e93de685481c559f160ea06b.png",
     },
-    link: "https://cloud.google.com/vertex-ai/generative-ai/docs/models/gemini/2-5-pro?hl=es-419",
+    link: "https://docs.cloud.google.com/vertex-ai/generative-ai/docs/models/gemini/3-pro",
     price: {
-      input: 1.25,
-      output: 10,
+      input: 2,
+      output: 12,
     },
     metadata: {
       contextWindow: 1_048_576,
@@ -223,4 +139,4 @@ export const MODELS: ModelInfo[] = [
   },
 ] as const;
 
-export const DEFAULT_MODEL: ModelsValues = "gemini-2.0-flash";
+export const DEFAULT_MODEL: ModelsValues = "gemini-3-flash-preview";
