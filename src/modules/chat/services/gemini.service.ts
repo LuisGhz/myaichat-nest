@@ -1,5 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { GoogleGenAI, ToolListUnion } from '@google/genai';
+import {
+  GenerateContentConfig,
+  GoogleGenAI,
+  ThinkingLevel,
+  ToolListUnion,
+} from '@google/genai';
 import {
   AIProvider,
   StreamResponseParams,
@@ -35,13 +40,13 @@ export class GeminiService implements AIProvider {
       previousMessages,
       newMessage,
       model,
-      maxTokens,
       temperature,
       supportsTemperature,
       fileKey,
       isImageGeneration,
       isWebSearch,
       systemPrompt,
+      reasoningLevel,
     } = params;
     const transformedMessages = await messagesTransformerForGemini(
       previousMessages,
@@ -64,11 +69,18 @@ export class GeminiService implements AIProvider {
       tools.push({ googleSearch: {} });
     }
 
-    const configObject: any = {
+    const configObject: GenerateContentConfig = {
       // TODO: Adjust based on model context length
       // maxOutputTokens: maxTokens,
       tools,
+      thinkingConfig: {
+        thinkingLevel: reasoningLevel
+          ? (reasoningLevel.toUpperCase() as ThinkingLevel)
+          : ('HIGH' as ThinkingLevel),
+      },
     };
+
+    this.logger.debug('Config Object:', configObject);
 
     if (supportsTemperature) configObject.temperature = temperature;
 
@@ -77,6 +89,7 @@ export class GeminiService implements AIProvider {
       contents: [setSystemMessageGemini(systemPrompt), ...transformedMessages],
       config: configObject,
     });
+
     let imageBase64: string | null = null;
     for await (const chunk of res) {
       const text = chunk.text || '';

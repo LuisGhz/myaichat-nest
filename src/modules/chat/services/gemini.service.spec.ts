@@ -438,6 +438,11 @@ describe('GeminiService', () => {
       expect(result.content).toBe('reasoning response');
       expect(result.inputTokens).toBe(20);
       expect(result.outputTokens).toBe(100);
+
+      const callArgs =
+        mockGoogleGenAIClient.models.generateContentStream.mock.calls[0][0];
+      expect(callArgs.config.thinkingConfig).toBeDefined();
+      expect(callArgs.config.thinkingConfig.thinkingLevel).toBe('HIGH');
     });
 
     it('should pass reasoningLevel parameter to API when reasoning is enabled', async () => {
@@ -466,6 +471,11 @@ describe('GeminiService', () => {
       expect(
         mockGoogleGenAIClient.models.generateContentStream,
       ).toHaveBeenCalled();
+
+      const callArgs =
+        mockGoogleGenAIClient.models.generateContentStream.mock.calls[0][0];
+      expect(callArgs.config.thinkingConfig).toBeDefined();
+      expect(callArgs.config.thinkingConfig.thinkingLevel).toBe('MEDIUM');
     });
 
     it('should handle isReasoning false with reasoningLevel specified', async () => {
@@ -492,6 +502,11 @@ describe('GeminiService', () => {
       const result = await service.streamResponse(params, () => {});
 
       expect(result.content).toBe('response');
+
+      const callArgs =
+        mockGoogleGenAIClient.models.generateContentStream.mock.calls[0][0];
+      expect(callArgs.config.thinkingConfig).toBeDefined();
+      expect(callArgs.config.thinkingConfig.thinkingLevel).toBe('HIGH');
     });
 
     it('should combine image generation with reasoning features', async () => {
@@ -522,6 +537,11 @@ describe('GeminiService', () => {
       expect(result.imageKey).toBe('base64image');
       expect(result.inputTokens).toBe(25);
       expect(result.outputTokens).toBe(50);
+
+      const callArgs =
+        mockGoogleGenAIClient.models.generateContentStream.mock.calls[0][0];
+      expect(callArgs.config.thinkingConfig.thinkingLevel).toBe('MEDIUM');
+      expect(callArgs.model).toBe('gemini-2.5-flash-image');
     });
 
     it('should combine web search with reasoning features', async () => {
@@ -550,6 +570,61 @@ describe('GeminiService', () => {
       const callArgs =
         mockGoogleGenAIClient.models.generateContentStream.mock.calls[0][0];
       expect(callArgs.config.tools).toContainEqual({ googleSearch: {} });
+      expect(callArgs.config.thinkingConfig.thinkingLevel).toBe('HIGH');
+    });
+
+    it('should default to HIGH thinking level when reasoningLevel is not provided', async () => {
+      const params: StreamResponseParams = {
+        previousMessages: [],
+        newMessage: 'Test without reasoning level',
+        model: 'gemini-2.0-flash',
+        maxTokens: 1024,
+        temperature: 0.7,
+        supportsTemperature: true,
+        isImageGeneration: false,
+        isWebSearch: false,
+      };
+
+      mockGoogleGenAIClient.models.generateContentStream.mockResolvedValue([
+        {
+          text: 'response',
+          usageMetadata: { promptTokenCount: 10, candidatesTokenCount: 5 },
+        },
+      ]);
+
+      await service.streamResponse(params, () => {});
+
+      const callArgs =
+        mockGoogleGenAIClient.models.generateContentStream.mock.calls[0][0];
+      expect(callArgs.config.thinkingConfig).toBeDefined();
+      expect(callArgs.config.thinkingConfig.thinkingLevel).toBe('HIGH');
+    });
+
+    it('should convert lowercase reasoningLevel to uppercase', async () => {
+      const params: StreamResponseParams = {
+        previousMessages: [],
+        newMessage: 'Test case conversion',
+        model: 'gemini-2.0-flash',
+        maxTokens: 2000,
+        temperature: 0.7,
+        supportsTemperature: true,
+        reasoningLevel: 'low',
+        isImageGeneration: false,
+        isWebSearch: false,
+      };
+
+      mockGoogleGenAIClient.models.generateContentStream.mockResolvedValue([
+        {
+          text: 'response',
+          usageMetadata: { promptTokenCount: 10, candidatesTokenCount: 5 },
+        },
+      ]);
+
+      await service.streamResponse(params, () => {});
+
+      const callArgs =
+        mockGoogleGenAIClient.models.generateContentStream.mock.calls[0][0];
+      expect(callArgs.config.thinkingConfig.thinkingLevel).toBe('LOW');
     });
   });
 
