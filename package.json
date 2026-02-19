@@ -25,16 +25,16 @@
     "migration:show": "npm run typeorm migration:show -- -d src/config/db/db.datasource.ts",
     "migration:create": "npm run typeorm migration:create --",
     "migration:generate": "npm run typeorm migration:generate -- -d src/config/db/db.datasource.ts",
-    "migration:user:generate": "cross-var npm run typeorm migration:generate -- -d src/config/db/db.datasource.ts src/modules/user/migrations/$npm_config_name",
-    "migration:user:create": "cross-var npm run typeorm migration:create -- src/modules/user/migrations/$npm_config_name",
-    "migration:auth:generate": "cross-var npm run typeorm migration:generate -- -d src/config/db/db.datasource.ts src/modules/auth/migrations/$npm_config_name",
-    "migration:auth:create": "cross-var npm run typeorm migration:create -- src/modules/auth/migrations/$npm_config_name",
-    "migration:chat:generate": "cross-var npm run typeorm migration:generate -- -d src/config/db/db.datasource.ts src/modules/chat/migrations/$npm_config_name",
-    "migration:chat:create": "cross-var npm run typeorm migration:create -- src/modules/chat/migrations/$npm_config_name",
-    "migration:prompts:generate": "cross-var npm run typeorm migration:generate -- -d src/config/db/db.datasource.ts src/modules/prompts/migrations/$npm_config_name",
-    "migration:prompts:create": "cross-var npm run typeorm migration:create -- src/modules/prompts/migrations/$npm_config_name",
-    "migration:models:generate": "cross-var npm run typeorm migration:generate -- -d src/config/db/db.datasource.ts src/modules/models/migrations/$npm_config_name",
-    "migration:models:create": "cross-var npm run typeorm migration:create -- src/modules/models/migrations/$npm_config_name",
+    "migration:user:generate": "node scripts/migration-run.js user generate",
+    "migration:user:create": "node scripts/migration-run.js user create",
+    "migration:auth:generate": "node scripts/migration-run.js auth generate",
+    "migration:auth:create": "node scripts/migration-run.js auth create",
+    "migration:chat:generate": "node scripts/migration-run.js chat generate",
+    "migration:chat:create": "node scripts/migration-run.js chat create",
+    "migration:prompts:generate": "node scripts/migration-run.js prompts generate",
+    "migration:prompts:create": "node scripts/migration-run.js prompts create",
+    "migration:models:generate": "node scripts/migration-run.js models generate",
+    "migration:models:create": "node scripts/migration-run.js models create",
     "migration:run:prod": "node typeorm-cli.js migration:run",
     "migration:revert:prod": "node typeorm-cli.js migration:revert",
     "migration:show:prod": "node typeorm-cli.js migration:show"
@@ -49,7 +49,7 @@
     "@nestjs/core": "^11.0.1",
     "@nestjs/jwt": "^11.0.1",
     "@nestjs/platform-express": "^11.0.1",
-    "@nestjs/swagger": "11.2.3",
+    "@nestjs/swagger": "^11.2.6",
     "@nestjs/throttler": "^6.5.0",
     "@nestjs/typeorm": "^11.0.0",
     "cache-manager": "^7.2.7",
@@ -77,7 +77,7 @@
     "@types/multer": "^2.0.0",
     "@types/node": "^22.10.7",
     "@types/supertest": "^6.0.2",
-    "cross-var": "^1.1.0",
+
     "eslint": "^9.18.0",
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-prettier": "^5.2.2",
@@ -93,6 +93,10 @@
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.20.0"
   },
+  "overrides": {
+    "minimatch": "^10.2.1",
+    "ajv": "^8.18.0"
+  },
   "jest": {
     "moduleFileExtensions": [
       "js",
@@ -104,6 +108,9 @@
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
     },
+    "transformIgnorePatterns": [
+      "/node_modules/(?!(p-retry|is-network-error)/)"
+    ],
     "collectCoverageFrom": [
       "**/*.(t|j)s",
       "!**/migrations/**",

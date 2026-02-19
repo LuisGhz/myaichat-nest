@@ -29,7 +29,7 @@ describe('GuestModelAccessGuard', () => {
 
   beforeEach(() => {
     modelsService = {
-      validateGuestAccess: jest.fn(),
+      validateGuestAccessById: jest.fn(),
     } as unknown as jest.Mocked<ModelsService>;
 
     guard = new GuestModelAccessGuard(modelsService);
@@ -49,28 +49,28 @@ describe('GuestModelAccessGuard', () => {
       const context = createMockExecutionContext({
         request: {
           user,
-          body: { model: 'gpt-4' },
+          body: { modelId: 'some-model-id' },
         },
       });
 
       const result = await guard.canActivate(context);
 
       expect(result).toBe(true);
-      expect(modelsService.validateGuestAccess).not.toHaveBeenCalled();
+      expect(modelsService.validateGuestAccessById).not.toHaveBeenCalled();
     });
 
     it('should return true when user is null', async () => {
       const context = createMockExecutionContext({
         request: {
           user: null,
-          body: { model: 'gpt-4' },
+          body: { modelId: 'some-model-id' },
         },
       });
 
       const result = await guard.canActivate(context);
 
       expect(result).toBe(true);
-      expect(modelsService.validateGuestAccess).not.toHaveBeenCalled();
+      expect(modelsService.validateGuestAccessById).not.toHaveBeenCalled();
     });
 
     it('should return true when request body has no model', async () => {
@@ -93,7 +93,7 @@ describe('GuestModelAccessGuard', () => {
       const result = await guard.canActivate(context);
 
       expect(result).toBe(true);
-      expect(modelsService.validateGuestAccess).not.toHaveBeenCalled();
+      expect(modelsService.validateGuestAccessById).not.toHaveBeenCalled();
     });
 
     it('should validate guest access when user is guest and model is provided', async () => {
@@ -109,19 +109,19 @@ describe('GuestModelAccessGuard', () => {
       const context = createMockExecutionContext({
         request: {
           user,
-          body: { model: 'gpt-4' },
+          body: { modelId: 'gpt-4-id' },
         },
       });
 
-      (modelsService.validateGuestAccess as jest.Mock).mockResolvedValueOnce(
+      (modelsService.validateGuestAccessById as jest.Mock).mockResolvedValueOnce(
         undefined,
       );
 
       const result = await guard.canActivate(context);
 
       expect(result).toBe(true);
-      expect(modelsService.validateGuestAccess).toHaveBeenCalledWith(
-        'gpt-4',
+      expect(modelsService.validateGuestAccessById).toHaveBeenCalledWith(
+        'gpt-4-id',
         'guest',
       );
     });
@@ -139,12 +139,12 @@ describe('GuestModelAccessGuard', () => {
       const context = createMockExecutionContext({
         request: {
           user,
-          body: { model: 'gpt-4' },
+          body: { modelId: 'gpt-4-id' },
         },
       });
 
       const error = new Error('Guest access denied for this model');
-      (modelsService.validateGuestAccess as jest.Mock).mockRejectedValueOnce(
+      (modelsService.validateGuestAccessById as jest.Mock).mockRejectedValueOnce(
         error,
       );
 
@@ -164,14 +164,14 @@ describe('GuestModelAccessGuard', () => {
       const context = createMockExecutionContext({
         request: {
           user,
-          body: { model: null },
+          body: { modelId: null },
         },
       });
 
       const result = await guard.canActivate(context);
 
       expect(result).toBe(true);
-      expect(modelsService.validateGuestAccess).not.toHaveBeenCalled();
+      expect(modelsService.validateGuestAccessById).not.toHaveBeenCalled();
     });
 
     it('should return true for guest user with empty string model', async () => {
@@ -187,14 +187,14 @@ describe('GuestModelAccessGuard', () => {
       const context = createMockExecutionContext({
         request: {
           user,
-          body: { model: '' },
+          body: { modelId: '' },
         },
       });
 
       const result = await guard.canActivate(context);
 
       expect(result).toBe(true);
-      expect(modelsService.validateGuestAccess).not.toHaveBeenCalled();
+      expect(modelsService.validateGuestAccessById).not.toHaveBeenCalled();
     });
 
     it('should validate guest access with different model values', async () => {
@@ -207,25 +207,25 @@ describe('GuestModelAccessGuard', () => {
         iat: Math.floor(Date.now() / 1000),
       };
 
-      const models = ['gpt-3.5-turbo', 'claude-2', 'gemini-pro'];
+      const modelIds = ['model-id-1', 'model-id-2', 'model-id-3'];
 
-      for (const model of models) {
+      for (const modelId of modelIds) {
         const context = createMockExecutionContext({
           request: {
             user,
-            body: { model },
+            body: { modelId },
           },
         });
 
-        (modelsService.validateGuestAccess as jest.Mock).mockResolvedValueOnce(
+        (modelsService.validateGuestAccessById as jest.Mock).mockResolvedValueOnce(
           undefined,
         );
 
         const result = await guard.canActivate(context);
 
         expect(result).toBe(true);
-        expect(modelsService.validateGuestAccess).toHaveBeenCalledWith(
-          model,
+        expect(modelsService.validateGuestAccessById).toHaveBeenCalledWith(
+          modelId,
           'guest',
         );
       }
