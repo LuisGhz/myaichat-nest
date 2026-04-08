@@ -4,6 +4,7 @@ import {
   Entity,
   ManyToOne,
   PrimaryGeneratedColumn,
+  Relation,
 } from 'typeorm';
 import { Chat } from './chat.entity';
 
@@ -18,7 +19,7 @@ export class Message {
   id: string;
 
   @ManyToOne(() => Chat, (chat) => chat.messages, { onDelete: 'CASCADE' })
-  chat: Chat;
+  chat: Relation<Chat>;
 
   @Column({ type: 'text' })
   content: string;
