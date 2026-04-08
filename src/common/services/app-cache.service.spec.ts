@@ -185,9 +185,7 @@ describe('AppCacheService', () => {
       const testKey = 'non-existent-key';
       cacheManagerMock.del.mockResolvedValue(undefined);
 
-      await expect(
-        appCacheServiceInstance.del(testKey),
-      ).resolves.not.toThrow();
+      await expect(appCacheServiceInstance.del(testKey)).resolves.toBeUndefined();
 
       expect(cacheManagerMock.del).toHaveBeenCalledWith(testKey);
     });
