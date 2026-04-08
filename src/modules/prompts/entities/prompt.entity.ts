@@ -7,6 +7,7 @@ import {
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
+  Relation,
   UpdateDateColumn,
 } from 'typeorm';
 import { User } from '@usr/entities';
@@ -26,13 +27,13 @@ export class Prompt {
 
   @ManyToOne(() => User)
   @JoinColumn({ name: 'userId' })
-  user: User;
+  user: Relation<User>;
 
   @OneToMany(() => Chat, (chat) => chat.prompt)
-  chats: Chat[];
+  chats: Relation<Chat>[];
 
   @OneToMany(() => PromptMessage, (message) => message.prompt, { cascade: true })
-  messages: PromptMessage[];
+  messages: Relation<PromptMessage>[];
 
   @CreateDateColumn()
   createdAt: Date;
