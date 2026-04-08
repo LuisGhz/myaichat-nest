@@ -3,7 +3,7 @@ import {
   ResponseInputText,
   ResponseInputImage,
 } from 'openai/resources/responses/responses.js';
-import { Message } from '../entities';
+import type { Message } from '../entities/message.entity';
 
 export const setSystemMessage = (systemPrompt?: string): ResponseInput => {
   const content = systemPrompt ? systemPrompt : 'You are a helpful assistant.';
