@@ -5,6 +5,7 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  Relation,
   UpdateDateColumn,
 } from 'typeorm';
 import { User } from '../../user/entities';
@@ -20,13 +21,13 @@ export class Chat {
   title?: string;
 
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
-  user: User;
+  user: Relation<User>;
 
   @ManyToOne(() => Prompt, (prompt) => prompt.chats, { nullable: true, onDelete: 'RESTRICT' })
-  prompt?: Prompt;
+  prompt?: Relation<Prompt>;
 
   @OneToMany(() => Message, (message) => message.chat)
-  messages: Message[];
+  messages: Relation<Message>[];
 
   @Column({ type: 'int', default: 4096 })
   maxTokens: number;
