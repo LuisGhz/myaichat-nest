@@ -4,7 +4,6 @@ import {
   Entity,
   OneToMany,
   PrimaryGeneratedColumn,
-  Relation,
   UpdateDateColumn,
 } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
@@ -26,7 +25,7 @@ export class Role {
 
   @ApiProperty({ description: 'Users with this role', type: () => [User] })
   @OneToMany(() => User, (user) => user.role)
-  users: Relation<User>[];
+  users: User[];
 
   @ApiProperty({ description: 'Creation timestamp' })
   @CreateDateColumn()
