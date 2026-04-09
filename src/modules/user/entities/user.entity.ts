@@ -4,6 +4,7 @@ import {
   Entity,
   ManyToOne,
   PrimaryGeneratedColumn,
+  type Relation,
   UpdateDateColumn,
 } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
@@ -33,7 +34,7 @@ export class User {
 
   @ApiProperty({ description: 'User role', type: () => Role })
   @ManyToOne(() => Role, (role) => role.users)
-  role: Role;
+  role: Relation<Role>;
 
   @ApiProperty({ description: 'Creation timestamp' })
   @CreateDateColumn()

@@ -5,12 +5,12 @@ import {
   JoinColumn,
   ManyToOne,
   OneToMany,
-  OneToOne,
   PrimaryGeneratedColumn,
+  type Relation,
   UpdateDateColumn,
 } from 'typeorm';
-import { User } from '@usr/entities';
-import { Chat } from '@chat/entities';
+import { User } from '@usr/entities/user.entity';
+import { Chat } from '@chat/entities/chat.entity';
 import { PromptMessage } from './prompt-message.entity';
 
 @Entity('prompts')
@@ -26,13 +26,13 @@ export class Prompt {
 
   @ManyToOne(() => User)
   @JoinColumn({ name: 'userId' })
-  user: User;
+  user: Relation<User>;
 
   @OneToMany(() => Chat, (chat) => chat.prompt)
-  chats: Chat[];
+  chats: Relation<Chat[]>;
 
   @OneToMany(() => PromptMessage, (message) => message.prompt, { cascade: true })
-  messages: PromptMessage[];
+  messages: Relation<PromptMessage[]>;
 
   @CreateDateColumn()
   createdAt: Date;

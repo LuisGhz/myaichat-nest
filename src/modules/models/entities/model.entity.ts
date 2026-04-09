@@ -4,6 +4,7 @@ import {
   Entity,
   ManyToOne,
   PrimaryGeneratedColumn,
+  type Relation,
   UpdateDateColumn,
 } from 'typeorm';
 import { ModelDeveloper } from './model-developer.entity';
@@ -55,7 +56,7 @@ export class Model {
   @ManyToOne(() => ModelDeveloper, (developer) => developer.models, {
     onDelete: 'CASCADE',
   })
-  developer: ModelDeveloper;
+  developer: Relation<ModelDeveloper>;
 
   @CreateDateColumn()
   createdAt: Date;

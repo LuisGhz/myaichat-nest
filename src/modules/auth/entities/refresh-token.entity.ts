@@ -4,8 +4,9 @@ import {
   Entity,
   ManyToOne,
   PrimaryGeneratedColumn,
+  type Relation,
 } from 'typeorm';
-import { User } from '../../user/entities';
+import { User } from '@usr/entities/user.entity';
 
 @Entity('refresh_tokens')
 export class RefreshToken {
@@ -13,7 +14,7 @@ export class RefreshToken {
   id: string;
 
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
-  user: User;
+  user: Relation<User>;
 
   @Column({ unique: true })
   token: string;

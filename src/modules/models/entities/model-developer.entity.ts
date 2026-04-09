@@ -4,6 +4,7 @@ import {
   Entity,
   OneToMany,
   PrimaryGeneratedColumn,
+  type Relation,
   UpdateDateColumn,
 } from 'typeorm';
 import { Model } from './model.entity';
@@ -23,7 +24,7 @@ export class ModelDeveloper {
   imageUrl: string;
 
   @OneToMany(() => Model, (model) => model.developer)
-  models: Model[];
+  models: Relation<Model[]>;
 
   @CreateDateColumn()
   createdAt: Date;

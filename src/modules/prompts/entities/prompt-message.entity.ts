@@ -4,6 +4,7 @@ import {
   Entity,
   ManyToOne,
   PrimaryGeneratedColumn,
+  type Relation,
   UpdateDateColumn,
 } from 'typeorm';
 import { Prompt } from './prompt.entity';
@@ -25,7 +26,7 @@ export class PromptMessage {
   content: string;
 
   @ManyToOne(() => Prompt, (prompt) => prompt.messages, { onDelete: 'CASCADE' })
-  prompt: Prompt;
+  prompt: Relation<Prompt>;
 
   @CreateDateColumn()
   createdAt: Date;
