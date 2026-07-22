@@ -29,7 +29,7 @@ export function parseExpiration(
     );
   }
 
-  const amount = parseInt(match[1], 10);
+  const amount = Number.parseInt(match[1], 10);
   const unit = match[2];
 
   switch (unit) {
