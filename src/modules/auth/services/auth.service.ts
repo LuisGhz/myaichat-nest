@@ -160,7 +160,7 @@ export class AuthService {
     const payload: JwtSign = {
       sub: user.id,
       name: user.name || user.ghLogin,
-      email: user.ghLogin || user.ghLogin,
+      email: user.ghLogin,
       role: user.role.name,
     };
 
