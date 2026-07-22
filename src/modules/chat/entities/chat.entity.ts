@@ -39,7 +39,7 @@ export class Chat {
     default: 1.0,
     transformer: {
       to: (value: number) => value,
-      from: (value: string) => parseFloat(value),
+      from: (value: string) => Number.parseFloat(value),
     },
   })
   temperature: number;
