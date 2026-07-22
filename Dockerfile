@@ -6,6 +6,12 @@ COPY . .
 RUN npm run build
 
 FROM node:22-alpine as production
+
+RUN addgroup -S nonroot \
+    && adduser -S nonroot -G nonroot
+
+USER nonroot
+
 WORKDIR /app
 
 # Copy package files
