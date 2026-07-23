@@ -9,7 +9,7 @@
  *   npm run migration:<module>:create   --name=<MigrationName>
  */
 
-const { execSync } = require('child_process');
+const { execSync } = require('node:child_process');
 
 const [, , module, action] = process.argv;
 const name = process.env.npm_config_name || '';
