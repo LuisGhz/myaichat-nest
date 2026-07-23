@@ -135,9 +135,7 @@ export class AuthController {
       clearCookies();
 
       let errorMessage = 'Authentication failed. Please try again.';
-      if (err instanceof UnauthorizedException) {
-        errorMessage = err.message;
-      } else if (err instanceof Error) {
+      if (err instanceof Error) {
         errorMessage = err.message;
       }
 
