@@ -263,7 +263,7 @@ describe('EnvSchema', () => {
 
       expect(consoleErrorSpy).toHaveBeenCalledWith(
         '❌ Invalid environment variables:',
-        expect.any(Object),
+        expect.any(String),
       );
       expect(processExitSpy).toHaveBeenCalledWith(1);
     });
@@ -277,7 +277,7 @@ describe('EnvSchema', () => {
 
       expect(consoleErrorSpy).toHaveBeenCalledWith(
         '❌ Invalid environment variables:',
-        expect.any(Object),
+        expect.any(String),
       );
       expect(processExitSpy).toHaveBeenCalledWith(1);
     });
