@@ -145,6 +145,10 @@
       "!**/index.ts",
       "!**/main.ts"
     ],
+    "coveragePathIgnorePatterns": [
+      "/node_modules/",
+      "\\.entity\\.ts$"
+    ],
     "coverageDirectory": "../coverage",
     "coverageReporters": [
       "text",
