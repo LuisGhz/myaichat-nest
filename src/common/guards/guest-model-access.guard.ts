@@ -1,8 +1,4 @@
-import {
-  CanActivate,
-  ExecutionContext,
-  Injectable,
-} from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { ModelsService } from '@mdl/services';
 import type { JwtPayload } from '@cmn/interfaces';
 
@@ -15,10 +11,8 @@ export class GuestModelAccessGuard implements CanActivate {
     const user: JwtPayload = request.user;
     const body = request.body;
 
-    if (!user || user.role !== 'guest') return true;
-
     const modelId = body.modelId;
-    if (!modelId) return true;
+    if (!user || user.role !== 'guest' || !modelId) return true;
 
     await this.modelsService.validateGuestAccessById(modelId, user.role);
 
