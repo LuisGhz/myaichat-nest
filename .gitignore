@@ -59,3 +59,6 @@ app_cache_data
 
 # SonarQube
 .scannerwork
+
+# SWC
+.swc
