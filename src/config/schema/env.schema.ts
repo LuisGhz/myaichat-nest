@@ -28,13 +28,13 @@ export const envSchema = z.object({
   S3_SECRET_KEY: z.string(),
   S3_BUCKET_NAME: z.string(),
 
-  THROTTLE_TTL: z.string().transform((val) => Number(val)),
-  THROTTLE_LIMIT: z.string().transform((val) => Number(val)),
+  THROTTLE_TTL: z.string().transform(Number),
+  THROTTLE_LIMIT: z.string().transform(Number),
 
   REDIS_HOST: z.string(),
-  CACHE_SHORT_TTL: z.string().transform((val) => Number(val)),
-  CACHE_TTL: z.string().transform((val) => Number(val)),
-  CACHE_LONG_TTL: z.string().transform((val) => Number(val)),
+  CACHE_SHORT_TTL: z.string().transform(Number),
+  CACHE_TTL: z.string().transform(Number),
+  CACHE_LONG_TTL: z.string().transform(Number),
 });
 
 export type Env = z.infer<typeof envSchema>;
