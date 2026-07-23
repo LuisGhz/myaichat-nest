@@ -43,7 +43,7 @@ export const validateEnv = (env: Record<string, unknown>): Env => {
   const parsed = envSchema.safeParse(env);
 
   if (!parsed.success) {
-    console.error('❌ Invalid environment variables:', parsed.error.format());
+    console.error('❌ Invalid environment variables:', parsed.error.message);
     process.exit(1);
   }
 
