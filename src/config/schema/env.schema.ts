@@ -2,17 +2,17 @@ import { z } from 'zod';
 
 export const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']),
-  PORT: z.string().transform((val) => Number(val)),
+  PORT: z.string().transform(Number),
 
   DB_HOST: z.string(),
-  DB_PORT: z.string().transform((val) => Number(val)),
+  DB_PORT: z.string().transform(Number),
   DB_USERNAME: z.string(),
   DB_PASSWORD: z.string(),
   DB_NAME: z.string(),
 
   JWT_SECRET: z.string(),
   JWT_EXPIRES_IN: z.string(),
-  REFRESH_TOKEN_LENGTH: z.string().transform((val) => Number(val)),
+  REFRESH_TOKEN_LENGTH: z.string().transform(Number),
   REFRESH_TOKEN_EXPIRES_IN: z.string(),
 
   OPENAI_API_KEY: z.string(),
@@ -21,7 +21,7 @@ export const envSchema = z.object({
   GITHUB_CLIENT_SECRET: z.string(),
   GITHUB_CALLBACK_URL: z.string(),
   FRONTEND_URL: z.string(),
-  MAX_SESSIONS_PER_USER: z.string().transform((val) => Number(val)),
+  MAX_SESSIONS_PER_USER: z.string().transform(Number),
 
   CDN_DOMAIN: z.string(),
   S3_ACCESS_KEY: z.string(),
