@@ -44,8 +44,12 @@ describe('UserService', () => {
     }).compile();
 
     service = module.get<UserService>(UserService);
-    userRepositoryInstance = module.get<Repository<User>>(getRepositoryToken(User));
-    roleRepositoryInstance = module.get<Repository<Role>>(getRepositoryToken(Role));
+    userRepositoryInstance = module.get<Repository<User>>(
+      getRepositoryToken(User),
+    );
+    roleRepositoryInstance = module.get<Repository<Role>>(
+      getRepositoryToken(Role),
+    );
   });
 
   it('should be defined', () => {
@@ -53,11 +57,11 @@ describe('UserService', () => {
   });
 
   it('should find a user by GitHub login', async () => {
-    const mockUser = { 
-      id: '1', 
-      ghLogin: 'testuser', 
+    const mockUser = {
+      id: '1',
+      ghLogin: 'testuser',
       name: 'Test User',
-      role: { id: '1', name: 'user' }
+      role: { id: '1', name: 'user' },
     } as User;
     userRepositoryMock.findOne.mockResolvedValue(mockUser);
 
@@ -71,11 +75,11 @@ describe('UserService', () => {
   });
 
   it('should find a user by id', async () => {
-    const mockUser = { 
-      id: '123', 
-      ghLogin: 'testuser', 
+    const mockUser = {
+      id: '123',
+      ghLogin: 'testuser',
       name: 'Test User',
-      role: { id: '1', name: 'user' }
+      role: { id: '1', name: 'user' },
     } as User;
     userRepositoryMock.findOne.mockResolvedValue(mockUser);
 
@@ -107,7 +111,9 @@ describe('UserService', () => {
 
     expect(result).toEqual(mockUser);
     expect(userRepositoryMock.count).toHaveBeenCalled();
-    expect(roleRepositoryMock.findOne).toHaveBeenCalledWith({ where: { name: 'guest' } });
+    expect(roleRepositoryMock.findOne).toHaveBeenCalledWith({
+      where: { name: 'guest' },
+    });
     expect(userRepositoryMock.create).toHaveBeenCalledWith({
       ghLogin: userData.ghLogin,
       name: userData.name,
@@ -134,17 +140,22 @@ describe('UserService', () => {
     const result = await service.create(userData);
 
     expect(result).toEqual(mockUser);
-    expect(roleRepositoryMock.findOne).toHaveBeenCalledWith({ where: { name: 'admin' } });
+    expect(roleRepositoryMock.findOne).toHaveBeenCalledWith({
+      where: { name: 'admin' },
+    });
   });
 
   it('should update user successfully', async () => {
     const userId = '123';
-    const updateData = { name: 'Updated Name', avatar: 'https://example.com/new-avatar.png' };
-    const updatedUser = { 
-      id: userId, 
-      ghLogin: 'testuser', 
+    const updateData = {
+      name: 'Updated Name',
+      avatar: 'https://example.com/new-avatar.png',
+    };
+    const updatedUser = {
+      id: userId,
+      ghLogin: 'testuser',
       ...updateData,
-      role: { id: '1', name: 'user' }
+      role: { id: '1', name: 'user' },
     } as User;
 
     userRepositoryMock.update.mockResolvedValue({ affected: 1 });
@@ -166,16 +177,18 @@ describe('UserService', () => {
       name: 'Updated Name',
       avatar: 'https://example.com/new-avatar.png',
     };
-    const existingUser = { 
-      id: '789', 
+    const existingUser = {
+      id: '789',
       ghLogin: 'existinguser',
       name: 'Old Name',
       avatar: 'https://example.com/old-avatar.png',
-      role: { id: '1', name: 'user' }
+      role: { id: '1', name: 'user' },
     } as User;
     const updatedUser = { ...existingUser, ...userData } as User;
 
-    userRepositoryMock.findOne.mockResolvedValueOnce(existingUser).mockResolvedValueOnce(updatedUser);
+    userRepositoryMock.findOne
+      .mockResolvedValueOnce(existingUser)
+      .mockResolvedValueOnce(updatedUser);
     userRepositoryMock.update.mockResolvedValue({ affected: 1 });
 
     const result = await service.findOrCreate(userData);
@@ -230,10 +243,10 @@ describe('UserService', () => {
   it('should update user role successfully', async () => {
     const userId = '123';
     const roleId = '456';
-    const mockUser = { 
-      id: userId, 
+    const mockUser = {
+      id: userId,
       ghLogin: 'testuser',
-      role: { id: '1', name: 'user' }
+      role: { id: '1', name: 'user' },
     } as User;
     const newRole = { id: roleId, name: 'admin' } as Role;
     const updatedUser = { ...mockUser, role: newRole } as User;
@@ -249,7 +262,9 @@ describe('UserService', () => {
       where: { id: userId },
       relations: ['role'],
     });
-    expect(roleRepositoryMock.findOne).toHaveBeenCalledWith({ where: { id: roleId } });
+    expect(roleRepositoryMock.findOne).toHaveBeenCalledWith({
+      where: { id: roleId },
+    });
     expect(userRepositoryMock.save).toHaveBeenCalledWith(updatedUser);
   });
 

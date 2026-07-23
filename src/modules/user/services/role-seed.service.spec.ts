@@ -27,7 +27,9 @@ describe('RoleSeedService', () => {
     }).compile();
 
     service = module.get<RoleSeedService>(RoleSeedService);
-    roleRepositoryInstance = module.get<Repository<Role>>(getRepositoryToken(Role));
+    roleRepositoryInstance = module.get<Repository<Role>>(
+      getRepositoryToken(Role),
+    );
   });
 
   it('should be defined', () => {

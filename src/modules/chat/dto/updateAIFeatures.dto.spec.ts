@@ -56,7 +56,7 @@ describe('UpdateAIFeaturesReqDto', () => {
       const instance = plainToInstance(UpdateAIFeaturesReqDto, payload);
       const errors = await validate(instance);
 
-      const webSearchError = errors.find(e => e.property === 'isWebSearch');
+      const webSearchError = errors.find((e) => e.property === 'isWebSearch');
       expect(webSearchError).toBeDefined();
       expect(webSearchError?.constraints).toHaveProperty('isBoolean');
     });
@@ -70,7 +70,7 @@ describe('UpdateAIFeaturesReqDto', () => {
       const instance = plainToInstance(UpdateAIFeaturesReqDto, payload);
       const errors = await validate(instance);
 
-      const webSearchError = errors.find(e => e.property === 'isWebSearch');
+      const webSearchError = errors.find((e) => e.property === 'isWebSearch');
       expect(webSearchError).toBeDefined();
       expect(webSearchError?.constraints).toHaveProperty('isBoolean');
     });
@@ -84,7 +84,7 @@ describe('UpdateAIFeaturesReqDto', () => {
       const instance = plainToInstance(UpdateAIFeaturesReqDto, payload);
       const errors = await validate(instance);
 
-      const webSearchError = errors.find(e => e.property === 'isWebSearch');
+      const webSearchError = errors.find((e) => e.property === 'isWebSearch');
       expect(webSearchError).toBeDefined();
       expect(webSearchError?.constraints).toHaveProperty('isBoolean');
     });
@@ -98,7 +98,7 @@ describe('UpdateAIFeaturesReqDto', () => {
       const instance = plainToInstance(UpdateAIFeaturesReqDto, payload);
       const errors = await validate(instance);
 
-      const webSearchError = errors.find(e => e.property === 'isWebSearch');
+      const webSearchError = errors.find((e) => e.property === 'isWebSearch');
       expect(webSearchError).toBeDefined();
       expect(webSearchError?.constraints).toHaveProperty('isBoolean');
     });
@@ -112,7 +112,7 @@ describe('UpdateAIFeaturesReqDto', () => {
       const instance = plainToInstance(UpdateAIFeaturesReqDto, payload);
       const errors = await validate(instance);
 
-      const webSearchError = errors.find(e => e.property === 'isWebSearch');
+      const webSearchError = errors.find((e) => e.property === 'isWebSearch');
       expect(webSearchError).toBeDefined();
       expect(webSearchError?.constraints).toHaveProperty('isBoolean');
     });
@@ -127,7 +127,7 @@ describe('UpdateAIFeaturesReqDto', () => {
       const instance = plainToInstance(UpdateAIFeaturesReqDto, payload);
       const errors = await validate(instance);
 
-      const imageError = errors.find(e => e.property === 'isImageGeneration');
+      const imageError = errors.find((e) => e.property === 'isImageGeneration');
       expect(imageError).toBeDefined();
       expect(imageError?.constraints).toHaveProperty('isBoolean');
     });
@@ -141,7 +141,7 @@ describe('UpdateAIFeaturesReqDto', () => {
       const instance = plainToInstance(UpdateAIFeaturesReqDto, payload);
       const errors = await validate(instance);
 
-      const imageError = errors.find(e => e.property === 'isImageGeneration');
+      const imageError = errors.find((e) => e.property === 'isImageGeneration');
       expect(imageError).toBeDefined();
       expect(imageError?.constraints).toHaveProperty('isBoolean');
     });
@@ -155,7 +155,7 @@ describe('UpdateAIFeaturesReqDto', () => {
       const instance = plainToInstance(UpdateAIFeaturesReqDto, payload);
       const errors = await validate(instance);
 
-      const imageError = errors.find(e => e.property === 'isImageGeneration');
+      const imageError = errors.find((e) => e.property === 'isImageGeneration');
       expect(imageError).toBeDefined();
       expect(imageError?.constraints).toHaveProperty('isBoolean');
     });
@@ -169,7 +169,7 @@ describe('UpdateAIFeaturesReqDto', () => {
       const instance = plainToInstance(UpdateAIFeaturesReqDto, payload);
       const errors = await validate(instance);
 
-      const imageError = errors.find(e => e.property === 'isImageGeneration');
+      const imageError = errors.find((e) => e.property === 'isImageGeneration');
       expect(imageError).toBeDefined();
       expect(imageError?.constraints).toHaveProperty('isBoolean');
     });
@@ -183,7 +183,7 @@ describe('UpdateAIFeaturesReqDto', () => {
       const instance = plainToInstance(UpdateAIFeaturesReqDto, payload);
       const errors = await validate(instance);
 
-      const imageError = errors.find(e => e.property === 'isImageGeneration');
+      const imageError = errors.find((e) => e.property === 'isImageGeneration');
       expect(imageError).toBeDefined();
       expect(imageError?.constraints).toHaveProperty('isBoolean');
     });
@@ -197,8 +197,8 @@ describe('UpdateAIFeaturesReqDto', () => {
       const errors = await validate(instance);
 
       expect(errors).toHaveLength(2);
-      expect(errors.some(e => e.property === 'isWebSearch')).toBe(true);
-      expect(errors.some(e => e.property === 'isImageGeneration')).toBe(true);
+      expect(errors.some((e) => e.property === 'isWebSearch')).toBe(true);
+      expect(errors.some((e) => e.property === 'isImageGeneration')).toBe(true);
     });
   });
 });

@@ -242,7 +242,7 @@ describe('SendMessageReqDto', () => {
         'gemini-2.5-pro',
       ];
 
-      models.forEach(model => {
+      models.forEach((model) => {
         const payload = {
           message: 'Hello',
           modelId: '550e8400-e29b-41d4-a716-446655440000',

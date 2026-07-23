@@ -65,7 +65,7 @@ export class UserController {
   })
   @ApiResponse({
     status: 400,
-    description: "Cannot update own role",
+    description: 'Cannot update own role',
   })
   async updateUserRole(
     @Param('id', ParseUUIDPipe) userId: string,

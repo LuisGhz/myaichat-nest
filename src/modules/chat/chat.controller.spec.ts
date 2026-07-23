@@ -100,11 +100,15 @@ describe('ChatController', () => {
 
     chatStreamServiceMock = {
       handleStreamMessage: jest.fn(),
-    } as Partial<jest.Mocked<ChatStreamService>> as jest.Mocked<ChatStreamService>;
+    } as Partial<
+      jest.Mocked<ChatStreamService>
+    > as jest.Mocked<ChatStreamService>;
 
     transcriptionServiceMock = {
       transcribeAudio: jest.fn(),
-    } as Partial<jest.Mocked<TranscriptionService>> as jest.Mocked<TranscriptionService>;
+    } as Partial<
+      jest.Mocked<TranscriptionService>
+    > as jest.Mocked<TranscriptionService>;
 
     s3ServiceMock = {
       uploadFile: jest.fn(),
@@ -251,11 +255,7 @@ describe('ChatController', () => {
       chatServiceMock.findChatByIdOrFail.mockResolvedValue(mockChat);
       chatServiceMock.updateChatTitle.mockResolvedValue(undefined);
 
-      await controller.renameChat(
-        mockChat.id,
-        { title: newTitle },
-        mockUser,
-      );
+      await controller.renameChat(mockChat.id, { title: newTitle }, mockUser);
 
       expect(chatServiceMock.findChatByIdOrFail).toHaveBeenCalledWith(
         mockChat.id,
@@ -275,11 +275,7 @@ describe('ChatController', () => {
       chatServiceMock.findChatByIdOrFail.mockRejectedValue(notFoundError);
 
       await expect(
-        controller.renameChat(
-          'non-existent-id',
-          { title: newTitle },
-          mockUser,
-        ),
+        controller.renameChat('non-existent-id', { title: newTitle }, mockUser),
       ).rejects.toThrow('Chat not found');
 
       expect(chatServiceMock.updateChatTitle).not.toHaveBeenCalled();
@@ -292,11 +288,7 @@ describe('ChatController', () => {
       chatServiceMock.updateChatTitle.mockRejectedValue(updateError);
 
       await expect(
-        controller.renameChat(
-          mockChat.id,
-          { title: newTitle },
-          mockUser,
-        ),
+        controller.renameChat(mockChat.id, { title: newTitle }, mockUser),
       ).rejects.toThrow('Title update failed');
 
       expect(chatServiceMock.findChatByIdOrFail).toHaveBeenCalledTimes(1);
@@ -313,11 +305,7 @@ describe('ChatController', () => {
       chatServiceMock.findChatByIdOrFail.mockResolvedValue(mockChat);
       chatServiceMock.updateAIFeatures.mockResolvedValue(undefined);
 
-      await controller.updateAIFeatures(
-        mockChat.id,
-        updateDto,
-        mockUser,
-      );
+      await controller.updateAIFeatures(mockChat.id, updateDto, mockUser);
 
       expect(chatServiceMock.findChatByIdOrFail).toHaveBeenCalledWith(
         mockChat.id,
@@ -340,11 +328,7 @@ describe('ChatController', () => {
       chatServiceMock.findChatByIdOrFail.mockRejectedValue(notFoundError);
 
       await expect(
-        controller.updateAIFeatures(
-          'non-existent-id',
-          updateDto,
-          mockUser,
-        ),
+        controller.updateAIFeatures('non-existent-id', updateDto, mockUser),
       ).rejects.toThrow('Chat not found');
 
       expect(chatServiceMock.updateAIFeatures).not.toHaveBeenCalled();
@@ -360,11 +344,7 @@ describe('ChatController', () => {
       chatServiceMock.updateAIFeatures.mockRejectedValue(updateError);
 
       await expect(
-        controller.updateAIFeatures(
-          mockChat.id,
-          updateDto,
-          mockUser,
-        ),
+        controller.updateAIFeatures(mockChat.id, updateDto, mockUser),
       ).rejects.toThrow('Failed to update features');
     });
   });
@@ -375,11 +355,7 @@ describe('ChatController', () => {
       chatServiceMock.findChatByIdOrFail.mockResolvedValue(mockChat);
       chatServiceMock.updateChatMaxTokens.mockResolvedValue(undefined);
 
-      await controller.updateMaxTokens(
-        mockChat.id,
-        { maxTokens },
-        mockUser,
-      );
+      await controller.updateMaxTokens(mockChat.id, { maxTokens }, mockUser);
 
       expect(chatServiceMock.findChatByIdOrFail).toHaveBeenCalledWith(
         mockChat.id,
@@ -399,11 +375,7 @@ describe('ChatController', () => {
       chatServiceMock.findChatByIdOrFail.mockRejectedValue(notFoundError);
 
       await expect(
-        controller.updateMaxTokens(
-          'non-existent-id',
-          { maxTokens },
-          mockUser,
-        ),
+        controller.updateMaxTokens('non-existent-id', { maxTokens }, mockUser),
       ).rejects.toThrow('Chat not found');
 
       expect(chatServiceMock.updateChatMaxTokens).not.toHaveBeenCalled();
@@ -416,11 +388,7 @@ describe('ChatController', () => {
       chatServiceMock.updateChatMaxTokens.mockRejectedValue(updateError);
 
       await expect(
-        controller.updateMaxTokens(
-          mockChat.id,
-          { maxTokens },
-          mockUser,
-        ),
+        controller.updateMaxTokens(mockChat.id, { maxTokens }, mockUser),
       ).rejects.toThrow('Max tokens exceeds limit');
     });
   });
@@ -472,11 +440,7 @@ describe('ChatController', () => {
       chatServiceMock.updateChatTemperature.mockRejectedValue(updateError);
 
       await expect(
-        controller.updateTemperature(
-          mockChat.id,
-          { temperature },
-          mockUser,
-        ),
+        controller.updateTemperature(mockChat.id, { temperature }, mockUser),
       ).rejects.toThrow('Temperature must be between 0 and 1');
     });
   });
@@ -564,11 +528,7 @@ describe('ChatController', () => {
 
     it('should throw BadRequestException when audio file is missing', async () => {
       await expect(
-        controller.transcribeAudio(
-          undefined,
-          { temperature: 0 },
-          mockUser,
-        ),
+        controller.transcribeAudio(undefined, { temperature: 0 }, mockUser),
       ).rejects.toThrow(BadRequestException);
 
       expect(transcriptionServiceMock.transcribeAudio).not.toHaveBeenCalled();
@@ -598,11 +558,7 @@ describe('ChatController', () => {
       );
 
       await expect(
-        controller.transcribeAudio(
-          mockAudioFile,
-          { temperature: 0 },
-          mockUser,
-        ),
+        controller.transcribeAudio(mockAudioFile, { temperature: 0 }, mockUser),
       ).rejects.toThrow('API rate limit exceeded');
 
       expect(transcriptionServiceMock.transcribeAudio).toHaveBeenCalledTimes(1);
@@ -647,8 +603,14 @@ describe('ChatController', () => {
         'Content-Type',
         'text/event-stream',
       );
-      expect(mockRes.setHeader).toHaveBeenCalledWith('Cache-Control', 'no-cache');
-      expect(mockRes.setHeader).toHaveBeenCalledWith('Connection', 'keep-alive');
+      expect(mockRes.setHeader).toHaveBeenCalledWith(
+        'Cache-Control',
+        'no-cache',
+      );
+      expect(mockRes.setHeader).toHaveBeenCalledWith(
+        'Connection',
+        'keep-alive',
+      );
       expect(mockRes.flushHeaders).toHaveBeenCalled();
       expect(chatStreamServiceMock.handleStreamMessage).toHaveBeenCalled();
       expect(mockRes.end).toHaveBeenCalled();

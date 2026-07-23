@@ -1,1 +1,4 @@
-export { IsValidAudioTypeConstraint, IsValidAudioType } from './is-valid-audio-type.validator';
+export {
+  IsValidAudioTypeConstraint,
+  IsValidAudioType,
+} from './is-valid-audio-type.validator';

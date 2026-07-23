@@ -44,7 +44,8 @@ describe('ImageUploadService', () => {
   });
 
   it('should upload a base64 image successfully', async () => {
-    const base64Data = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
+    const base64Data =
+      'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
     s3ClientMock.send.mockResolvedValue({} as any);
 
     const result = await service.uploadBase64Image(base64Data);
@@ -54,7 +55,8 @@ describe('ImageUploadService', () => {
   });
 
   it('should create S3Client with correct configuration', async () => {
-    const base64Data = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
+    const base64Data =
+      'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
     s3ClientMock.send.mockResolvedValue({} as any);
 
     await service.uploadBase64Image(base64Data);
@@ -69,7 +71,8 @@ describe('ImageUploadService', () => {
   });
 
   it('should return valid S3 key format', async () => {
-    const base64Data = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
+    const base64Data =
+      'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
     s3ClientMock.send.mockResolvedValue({} as any);
 
     const result1 = await service.uploadBase64Image(base64Data);

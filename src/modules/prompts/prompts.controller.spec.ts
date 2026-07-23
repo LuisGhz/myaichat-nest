@@ -71,7 +71,9 @@ describe('PromptsController', () => {
         id: mockPromptId,
         name: 'Test Prompt',
         content: 'Test content',
-        messages: [{ id: mockMessageId, role: PromptMessageRole.USER, content: 'Hello' }],
+        messages: [
+          { id: mockMessageId, role: PromptMessageRole.USER, content: 'Hello' },
+        ],
         createdAt: new Date(),
         updatedAt: new Date(),
       };

@@ -84,7 +84,10 @@ describe('Model DTOs', () => {
       };
 
       const devResInstance = plainToInstance(ModelDeveloperResDto, payload);
-      const listItemInstance = plainToInstance(DeveloperListItemResDto, payload);
+      const listItemInstance = plainToInstance(
+        DeveloperListItemResDto,
+        payload,
+      );
 
       expect(devResInstance.id).toBe(listItemInstance.id);
       expect(devResInstance.name).toBe(listItemInstance.name);

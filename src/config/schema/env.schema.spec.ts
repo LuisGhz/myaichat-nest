@@ -51,7 +51,9 @@ describe('EnvSchema', () => {
       expect(result.GEMINI_API_KEY).toBe('gemini-key');
       expect(result.GITHUB_CLIENT_ID).toBe('github-client-id');
       expect(result.GITHUB_CLIENT_SECRET).toBe('github-secret');
-      expect(result.GITHUB_CALLBACK_URL).toBe('http://localhost:3000/auth/callback');
+      expect(result.GITHUB_CALLBACK_URL).toBe(
+        'http://localhost:3000/auth/callback',
+      );
       expect(result.FRONTEND_URL).toBe('http://localhost:4200');
       expect(result.MAX_SESSIONS_PER_USER).toBe(5);
       expect(result.CDN_DOMAIN).toBe('cdn.example.com');

@@ -1,6 +1,9 @@
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
-import { TranscribeAudioReqDto, TranscribeAudioResDto } from './transcribeAudio.dto';
+import {
+  TranscribeAudioReqDto,
+  TranscribeAudioResDto,
+} from './transcribeAudio.dto';
 
 describe('TranscribeAudioReqDto', () => {
   describe('valid payload', () => {

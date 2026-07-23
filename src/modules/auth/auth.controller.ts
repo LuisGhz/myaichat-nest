@@ -65,10 +65,22 @@ export class AuthController {
   @Public()
   @Get('callback')
   @ApiOperation({ summary: 'Handle OAuth callback from GitHub' })
-  @ApiQuery({ name: 'code', required: false, description: 'OAuth authorization code' })
-  @ApiQuery({ name: 'state', required: false, description: 'OAuth state parameter' })
+  @ApiQuery({
+    name: 'code',
+    required: false,
+    description: 'OAuth authorization code',
+  })
+  @ApiQuery({
+    name: 'state',
+    required: false,
+    description: 'OAuth state parameter',
+  })
   @ApiQuery({ name: 'error', required: false, description: 'OAuth error' })
-  @ApiQuery({ name: 'error_description', required: false, description: 'OAuth error description' })
+  @ApiQuery({
+    name: 'error_description',
+    required: false,
+    description: 'OAuth error description',
+  })
   @ApiResponse({
     status: 302,
     description: 'Redirects to frontend with access token or error',

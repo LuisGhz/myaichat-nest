@@ -16,7 +16,9 @@ export class RefreshTokenService {
   ) {}
 
   async create(user: User, agentInfo: string): Promise<RefreshToken> {
-    const token = crypto.randomBytes(this.envService.refreshTokenLength).toString('hex');
+    const token = crypto
+      .randomBytes(this.envService.refreshTokenLength)
+      .toString('hex');
     const exp = parseExpiration(this.envService.refreshTokenExpiresIn);
 
     const refreshToken = this.refreshTokenRepository.create({

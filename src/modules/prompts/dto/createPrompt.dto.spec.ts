@@ -410,7 +410,8 @@ describe('CreatePromptReqDto', () => {
 
     it('should validate with large messages array', async () => {
       const messages = Array.from({ length: 100 }, (_, i) => ({
-        role: i % 2 === 0 ? PromptMessageRole.USER : PromptMessageRole.ASSISTANT,
+        role:
+          i % 2 === 0 ? PromptMessageRole.USER : PromptMessageRole.ASSISTANT,
         content: `Message ${i}`,
       }));
 

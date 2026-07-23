@@ -1,5 +1,5 @@
 export class UserChatsResDto {
   id: string;
-  title?: string
+  title?: string;
   createdAt: Date;
 }

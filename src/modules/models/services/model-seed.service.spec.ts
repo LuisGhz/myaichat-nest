@@ -80,9 +80,7 @@ describe('ModelSeedService', () => {
 
   describe('checkTableExists', () => {
     it('should return true when table exists', async () => {
-      (dataSourceMock.query as jest.Mock).mockResolvedValue([
-        { exists: true },
-      ]);
+      (dataSourceMock.query as jest.Mock).mockResolvedValue([{ exists: true }]);
 
       const result = await (service as any).checkTableExists('models');
 
@@ -104,16 +102,13 @@ describe('ModelSeedService', () => {
     });
 
     it('should query the database with correct table name', async () => {
-      (dataSourceMock.query as jest.Mock).mockResolvedValue([
-        { exists: true },
-      ]);
+      (dataSourceMock.query as jest.Mock).mockResolvedValue([{ exists: true }]);
 
       await (service as any).checkTableExists('developers');
 
-      expect(dataSourceMock.query).toHaveBeenCalledWith(
-        expect.any(String),
-        ['developers'],
-      );
+      expect(dataSourceMock.query).toHaveBeenCalledWith(expect.any(String), [
+        'developers',
+      ]);
     });
   });
 
@@ -132,9 +127,7 @@ describe('ModelSeedService', () => {
     });
 
     it('should skip seeding when models already exist', async () => {
-      (dataSourceMock.query as jest.Mock).mockResolvedValue([
-        { exists: true },
-      ]);
+      (dataSourceMock.query as jest.Mock).mockResolvedValue([{ exists: true }]);
       (modelRepositoryMock.count as jest.Mock).mockResolvedValue(5);
 
       await (service as any).seedModels();
@@ -167,9 +160,7 @@ describe('ModelSeedService', () => {
         developer: mockDeveloper as ModelDeveloper,
       };
 
-      (dataSourceMock.query as jest.Mock).mockResolvedValue([
-        { exists: true },
-      ]);
+      (dataSourceMock.query as jest.Mock).mockResolvedValue([{ exists: true }]);
       (modelRepositoryMock.count as jest.Mock).mockResolvedValue(0);
       (developerRepositoryMock.findOne as jest.Mock).mockResolvedValue(null);
       (developerRepositoryMock.create as jest.Mock).mockReturnValue(
@@ -196,9 +187,7 @@ describe('ModelSeedService', () => {
         name: 'OpenAI',
       };
 
-      (dataSourceMock.query as jest.Mock).mockResolvedValue([
-        { exists: true },
-      ]);
+      (dataSourceMock.query as jest.Mock).mockResolvedValue([{ exists: true }]);
       (modelRepositoryMock.count as jest.Mock).mockResolvedValue(0);
       (developerRepositoryMock.findOne as jest.Mock).mockResolvedValue(
         mockDeveloper,
@@ -214,9 +203,7 @@ describe('ModelSeedService', () => {
     });
 
     it('should log successful completion with count of models created', async () => {
-      (dataSourceMock.query as jest.Mock).mockResolvedValue([
-        { exists: true },
-      ]);
+      (dataSourceMock.query as jest.Mock).mockResolvedValue([{ exists: true }]);
       (modelRepositoryMock.count as jest.Mock).mockResolvedValue(0);
       (developerRepositoryMock.findOne as jest.Mock).mockResolvedValue(null);
       (developerRepositoryMock.create as jest.Mock).mockReturnValue({
@@ -244,9 +231,7 @@ describe('ModelSeedService', () => {
         name: 'OpenAI',
       };
 
-      (dataSourceMock.query as jest.Mock).mockResolvedValue([
-        { exists: true },
-      ]);
+      (dataSourceMock.query as jest.Mock).mockResolvedValue([{ exists: true }]);
       (modelRepositoryMock.count as jest.Mock).mockResolvedValue(0);
       (developerRepositoryMock.findOne as jest.Mock).mockResolvedValue(
         mockDeveloper,

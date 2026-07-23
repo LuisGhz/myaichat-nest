@@ -36,10 +36,12 @@ describe('JwtGuard', () => {
     iat: Math.floor(Date.now() / 1000),
   };
 
-  const createMockExecutionContext = (overrides: {
-    request?: Record<string, any>;
-    response?: Record<string, any>;
-  } = {}) => {
+  const createMockExecutionContext = (
+    overrides: {
+      request?: Record<string, any>;
+      response?: Record<string, any>;
+    } = {},
+  ) => {
     const mockRequest = {
       headers: {
         authorization: 'Bearer valid-token',
@@ -182,12 +184,14 @@ describe('JwtGuard', () => {
   describe('handleExpiredToken', () => {
     it('should refresh token and return true with valid refresh token', async () => {
       const newToken = 'new-access-token';
-      const { context, mockRequest, mockResponse } = createMockExecutionContext({
-        request: {
-          headers: { authorization: 'Bearer expired-token' },
-          cookies: { [COOKIE_REFRESH_TOKEN]: 'valid-refresh-token' },
+      const { context, mockRequest, mockResponse } = createMockExecutionContext(
+        {
+          request: {
+            headers: { authorization: 'Bearer expired-token' },
+            cookies: { [COOKIE_REFRESH_TOKEN]: 'valid-refresh-token' },
+          },
         },
-      });
+      );
 
       (reflector.getAllAndOverride as jest.Mock)
         .mockReturnValueOnce(false)

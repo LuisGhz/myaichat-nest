@@ -44,7 +44,9 @@ export class CreateUserTables1764448774001 implements MigrationInterface {
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     // Drop foreign key
-    await queryRunner.query(`ALTER TABLE "users" DROP CONSTRAINT "FK_users_roleId"`);
+    await queryRunner.query(
+      `ALTER TABLE "users" DROP CONSTRAINT "FK_users_roleId"`,
+    );
 
     // Drop tables
     await queryRunner.query(`DROP TABLE "users"`);

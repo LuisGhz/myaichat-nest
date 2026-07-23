@@ -1,5 +1,8 @@
 import { IsValidAudioTypeConstraint } from './is-valid-audio-type.validator';
-import { ALLOWED_AUDIO_TYPES, ALLOWED_AUDIO_EXTENSIONS } from '../consts/audio.const';
+import {
+  ALLOWED_AUDIO_TYPES,
+  ALLOWED_AUDIO_EXTENSIONS,
+} from '../consts/audio.const';
 
 describe('IsValidAudioTypeConstraint', () => {
   let constraint: IsValidAudioTypeConstraint;

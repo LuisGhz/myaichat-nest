@@ -40,7 +40,10 @@ export class ModelSeedService implements OnModuleInit {
     this.logger.log('Seeding models...');
 
     // Group models by developer
-    const developerMap = new Map<string, typeof MODELS[number]['developBy']>();
+    const developerMap = new Map<
+      string,
+      (typeof MODELS)[number]['developBy']
+    >();
 
     for (const modelInfo of MODELS) {
       if (!developerMap.has(modelInfo.developBy.name)) {

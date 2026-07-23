@@ -38,7 +38,7 @@ export class Model {
   @Column({ type: 'int' })
   maxOutputTokens: number;
 
-  @Column({  type: 'boolean', default: true })
+  @Column({ type: 'boolean', default: true })
   supportsTemperature: boolean;
 
   @Column({ type: 'boolean', default: false })

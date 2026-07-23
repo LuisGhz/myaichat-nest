@@ -125,7 +125,9 @@ export interface WebSearchToolConfig {
 /**
  * Helper type to create an image generation tool with default values
  */
-export type CreateImageGenerationTool = Partial<Omit<ImageGenerationToolConfig, 'type'>> & {
+export type CreateImageGenerationTool = Partial<
+  Omit<ImageGenerationToolConfig, 'type'>
+> & {
   type: 'image_generation';
 };
 

@@ -80,15 +80,17 @@ describe('TranscriptionService', () => {
           totalTokens: 150,
         },
       });
-      expect(mockOpenAIClient.audio.transcriptions.create).toHaveBeenCalledWith({
-        file: expect.any(File),
-        model: 'gpt-4o-mini-transcribe',
-        temperature: 0,
-        response_format: 'json',
-      });
-      expect(mockOpenAIClient.audio.transcriptions.create).toHaveBeenCalledTimes(
-        1,
+      expect(mockOpenAIClient.audio.transcriptions.create).toHaveBeenCalledWith(
+        {
+          file: expect.any(File),
+          model: 'gpt-4o-mini-transcribe',
+          temperature: 0,
+          response_format: 'json',
+        },
       );
+      expect(
+        mockOpenAIClient.audio.transcriptions.create,
+      ).toHaveBeenCalledTimes(1);
     });
 
     it('should use default temperature of 0 when not provided', async () => {
@@ -219,8 +221,8 @@ describe('TranscriptionService', () => {
 
       await service.transcribeAudio(mockFile);
 
-      const callArgs = mockOpenAIClient.audio.transcriptions.create.mock
-        .calls[0][0];
+      const callArgs =
+        mockOpenAIClient.audio.transcriptions.create.mock.calls[0][0];
       expect(callArgs.file).toBeInstanceOf(File);
       expect((callArgs.file as File).name).toBe(mockFile.originalname);
       expect((callArgs.file as File).type).toBe(mockFile.mimetype);

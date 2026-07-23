@@ -42,6 +42,8 @@ async function bootstrap() {
 
   await app.listen(envService.port);
   logger.log(`Application is running on port: ${envService.port}`);
-  logger.log(`Swagger documentation available at: http://localhost:${envService.port}/api/docs`);
+  logger.log(
+    `Swagger documentation available at: http://localhost:${envService.port}/api/docs`,
+  );
 }
 bootstrap();

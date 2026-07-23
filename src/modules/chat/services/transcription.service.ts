@@ -25,9 +25,13 @@ export class TranscriptionService {
       );
 
       // Create a File object from the buffer
-      const audioFile = new File([new Uint8Array(file.buffer)], file.originalname, {
-        type: file.mimetype,
-      });
+      const audioFile = new File(
+        [new Uint8Array(file.buffer)],
+        file.originalname,
+        {
+          type: file.mimetype,
+        },
+      );
 
       const response = await this.client.audio.transcriptions.create({
         file: audioFile,

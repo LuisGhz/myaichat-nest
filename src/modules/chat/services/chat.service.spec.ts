@@ -72,8 +72,12 @@ describe('ChatService', () => {
     }).compile();
 
     service = module.get<ChatService>(ChatService);
-    chatRepositoryInstance = module.get<Repository<Chat>>(getRepositoryToken(Chat));
-    messageRepositoryInstance = module.get<Repository<Message>>(getRepositoryToken(Message));
+    chatRepositoryInstance = module.get<Repository<Chat>>(
+      getRepositoryToken(Chat),
+    );
+    messageRepositoryInstance = module.get<Repository<Message>>(
+      getRepositoryToken(Message),
+    );
     envServiceInstance = module.get<EnvService>(EnvService);
     s3ServiceInstance = module.get<S3Service>(S3Service);
   });
@@ -636,7 +640,9 @@ describe('ChatService', () => {
         getMany: jest.fn().mockResolvedValue([message]),
       };
 
-      messageRepositoryMock.createQueryBuilder.mockReturnValue(queryBuilderMock);
+      messageRepositoryMock.createQueryBuilder.mockReturnValue(
+        queryBuilderMock,
+      );
 
       await service.getChatMessages(chatId, userId, beforeMessageId);
 

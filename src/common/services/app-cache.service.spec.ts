@@ -123,7 +123,11 @@ describe('AppCacheService', () => {
 
       await appCacheServiceInstance.set(testKey, testValue, customTTL);
 
-      expect(cacheManagerMock.set).toHaveBeenCalledWith(testKey, testValue, customTTL);
+      expect(cacheManagerMock.set).toHaveBeenCalledWith(
+        testKey,
+        testValue,
+        customTTL,
+      );
       expect(cacheManagerMock.set).toHaveBeenCalledTimes(1);
     });
 
@@ -185,7 +189,9 @@ describe('AppCacheService', () => {
       const testKey = 'non-existent-key';
       cacheManagerMock.del.mockResolvedValue(undefined);
 
-      await expect(appCacheServiceInstance.del(testKey)).resolves.toBeUndefined();
+      await expect(
+        appCacheServiceInstance.del(testKey),
+      ).resolves.toBeUndefined();
 
       expect(cacheManagerMock.del).toHaveBeenCalledWith(testKey);
     });

@@ -451,7 +451,8 @@ describe('UpdatePromptReqDto', () => {
         const paddedIndex = String(i).padStart(2, '0');
         return {
           id: `550e8400-e29b-41d4-a716-44665544000${paddedIndex}`.slice(0, 36),
-          role: i % 2 === 0 ? PromptMessageRole.USER : PromptMessageRole.ASSISTANT,
+          role:
+            i % 2 === 0 ? PromptMessageRole.USER : PromptMessageRole.ASSISTANT,
           content: `Message ${i}`,
         };
       });

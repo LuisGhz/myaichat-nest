@@ -949,7 +949,9 @@ describe('ChatStreamService', () => {
       onEvent,
     });
 
-    expect(modelsServiceMock.findOne).toHaveBeenCalledWith('550e8400-e29b-41d4-a716-446655440000');
+    expect(modelsServiceMock.findOne).toHaveBeenCalledWith(
+      '550e8400-e29b-41d4-a716-446655440000',
+    );
     expect(streamResponseMock).toHaveBeenCalled();
   });
 
@@ -1012,7 +1014,9 @@ describe('ChatStreamService', () => {
       onEvent,
     });
 
-    expect(modelsServiceMock.findOne).toHaveBeenCalledWith('550e8400-e29b-41d4-a716-446655440000');
+    expect(modelsServiceMock.findOne).toHaveBeenCalledWith(
+      '550e8400-e29b-41d4-a716-446655440000',
+    );
     expect(streamResponseMock).toHaveBeenCalled();
     const callArgs = streamResponseMock.mock.calls[0][0];
     expect(callArgs.isReasoning).toBe(true);
@@ -1041,9 +1045,7 @@ describe('ChatStreamService', () => {
     } as Chat;
 
     chatServiceMock.findChatByIdOrFail.mockResolvedValue(existingChat);
-    modelsServiceMock.findOne.mockRejectedValue(
-      new Error('Model not found'),
-    );
+    modelsServiceMock.findOne.mockRejectedValue(new Error('Model not found'));
 
     await expect(
       service.handleStreamMessage({
@@ -1060,7 +1062,9 @@ describe('ChatStreamService', () => {
       }),
     ).rejects.toThrow('Model not found');
 
-    expect(modelsServiceMock.findOne).toHaveBeenCalledWith('550e8400-e29b-41d4-a716-446655440000');
+    expect(modelsServiceMock.findOne).toHaveBeenCalledWith(
+      '550e8400-e29b-41d4-a716-446655440000',
+    );
     expect(onEvent).not.toHaveBeenCalled();
   });
 

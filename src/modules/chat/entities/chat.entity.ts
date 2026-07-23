@@ -23,7 +23,10 @@ export class Chat {
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
   user: Relation<User>;
 
-  @ManyToOne(() => Prompt, (prompt) => prompt.chats, { nullable: true, onDelete: 'RESTRICT' })
+  @ManyToOne(() => Prompt, (prompt) => prompt.chats, {
+    nullable: true,
+    onDelete: 'RESTRICT',
+  })
   prompt?: Relation<Prompt>;
 
   @OneToMany(() => Message, (message) => message.chat)

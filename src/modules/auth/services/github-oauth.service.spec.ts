@@ -39,7 +39,9 @@ describe('GithubOauthService', () => {
 
     expect(result).toContain('https://github.com/login/oauth/authorize');
     expect(result).toContain(`client_id=${envServiceMock.githubClientId}`);
-    expect(result).toContain(`redirect_uri=${encodeURIComponent(envServiceMock.githubCallbackUrl)}`);
+    expect(result).toContain(
+      `redirect_uri=${encodeURIComponent(envServiceMock.githubCallbackUrl)}`,
+    );
     expect(result).toContain('scope=read%3Auser+user%3Aemail');
     expect(result).toContain(`state=${state}`);
     expect(result).toContain(`code_challenge=${codeChallenge}`);
@@ -58,7 +60,10 @@ describe('GithubOauthService', () => {
       json: jest.fn().mockResolvedValue(mockTokenResponse),
     });
 
-    const result = await githubOauthService.exchangeCodeForToken(code, codeVerifier);
+    const result = await githubOauthService.exchangeCodeForToken(
+      code,
+      codeVerifier,
+    );
 
     expect(result).toEqual(mockTokenResponse);
     expect(global.fetch).toHaveBeenCalledWith(
@@ -121,12 +126,15 @@ describe('GithubOauthService', () => {
     const result = await githubOauthService.fetchPrimaryEmail(accessToken);
 
     expect(result).toBe('primary@example.com');
-    expect(global.fetch).toHaveBeenCalledWith('https://api.github.com/user/emails', {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        Accept: 'application/json',
+    expect(global.fetch).toHaveBeenCalledWith(
+      'https://api.github.com/user/emails',
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          Accept: 'application/json',
+        },
       },
-    });
+    );
     expect(global.fetch).toHaveBeenCalledTimes(1);
   });
 

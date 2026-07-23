@@ -185,7 +185,8 @@ describe('PromptResDto', () => {
     it('should handle large messages array', () => {
       const messages = Array.from({ length: 1000 }, (_, i) => ({
         id: `msg-${i}`,
-        role: i % 2 === 0 ? PromptMessageRole.USER : PromptMessageRole.ASSISTANT,
+        role:
+          i % 2 === 0 ? PromptMessageRole.USER : PromptMessageRole.ASSISTANT,
         content: `Message ${i}`,
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -405,7 +406,7 @@ describe('PromptListItemSummaryResDto', () => {
       const instance = plainToInstance(PromptListItemSummaryResDto, payload);
 
       expect(Object.getOwnPropertyNames(instance)).toEqual(
-        expect.arrayContaining(['id', 'name'])
+        expect.arrayContaining(['id', 'name']),
       );
     });
   });

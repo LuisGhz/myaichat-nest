@@ -11,7 +11,7 @@ export class JwtService {
   }
 
   signWithPreviousToken(token: string) {
-    const { exp, iat, ...rest } = this.jwtService.decode(token) as JwtPayload;
+    const { exp, iat, ...rest } = this.jwtService.decode(token);
     return this.jwtService.sign(rest);
   }
 
@@ -20,6 +20,6 @@ export class JwtService {
   }
 
   decode(token: string): JwtPayload {
-    return this.jwtService.decode(token) as JwtPayload;
+    return this.jwtService.decode(token);
   }
 }

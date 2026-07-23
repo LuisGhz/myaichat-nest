@@ -79,8 +79,10 @@ describe('AuthService', () => {
     jwtServiceInstance = module.get<JwtService>(JwtService);
     envServiceInstance = module.get<EnvService>(EnvService);
     userServiceInstance = module.get<UserService>(UserService);
-    githubOauthServiceInstance = module.get<GithubOauthService>(GithubOauthService);
-    refreshTokenServiceInstance = module.get<RefreshTokenService>(RefreshTokenService);
+    githubOauthServiceInstance =
+      module.get<GithubOauthService>(GithubOauthService);
+    refreshTokenServiceInstance =
+      module.get<RefreshTokenService>(RefreshTokenService);
   });
 
   it('should generate PKCE data with state, code verifier, and code challenge', async () => {
@@ -106,7 +108,10 @@ describe('AuthService', () => {
     const result = authService.getGithubAuthorizeUrl(state, codeChallenge);
 
     expect(result).toBe(expectedUrl);
-    expect(githubOauthServiceMock.buildAuthorizeUrl).toHaveBeenCalledWith(state, codeChallenge);
+    expect(githubOauthServiceMock.buildAuthorizeUrl).toHaveBeenCalledWith(
+      state,
+      codeChallenge,
+    );
     expect(githubOauthServiceMock.buildAuthorizeUrl).toHaveBeenCalledTimes(1);
   });
 
@@ -133,30 +138,46 @@ describe('AuthService', () => {
     } as RefreshToken;
     const expectedAccessToken = 'jwt-access-token';
 
-    githubOauthServiceMock.exchangeCodeForToken.mockResolvedValue(mockTokenResponse);
+    githubOauthServiceMock.exchangeCodeForToken.mockResolvedValue(
+      mockTokenResponse,
+    );
     githubOauthServiceMock.fetchGithubUser.mockResolvedValue(mockGithubUser);
     userServiceMock.findOrCreate.mockResolvedValue(mockUser);
     refreshTokenServiceMock.countActiveSessions.mockResolvedValue(2);
     refreshTokenServiceMock.create.mockResolvedValue(mockRefreshToken);
     jwtServiceMock.sign.mockReturnValue(expectedAccessToken);
 
-    const result = await authService.handleCallback(code, codeVerifier, agentInfo);
+    const result = await authService.handleCallback(
+      code,
+      codeVerifier,
+      agentInfo,
+    );
 
     expect(result).toEqual({
       accessToken: expectedAccessToken,
       refreshToken: mockRefreshToken,
       user: mockUser,
     });
-    expect(githubOauthServiceMock.exchangeCodeForToken).toHaveBeenCalledWith(code, codeVerifier);
-    expect(githubOauthServiceMock.fetchGithubUser).toHaveBeenCalledWith(mockTokenResponse.access_token);
+    expect(githubOauthServiceMock.exchangeCodeForToken).toHaveBeenCalledWith(
+      code,
+      codeVerifier,
+    );
+    expect(githubOauthServiceMock.fetchGithubUser).toHaveBeenCalledWith(
+      mockTokenResponse.access_token,
+    );
     expect(userServiceMock.findOrCreate).toHaveBeenCalledWith({
       ghLogin: mockGithubUser.login,
       name: mockGithubUser.name,
       avatar: mockGithubUser.avatar_url,
       email: mockGithubUser.email,
     });
-    expect(refreshTokenServiceMock.countActiveSessions).toHaveBeenCalledWith(mockUser.id);
-    expect(refreshTokenServiceMock.create).toHaveBeenCalledWith(mockUser, agentInfo);
+    expect(refreshTokenServiceMock.countActiveSessions).toHaveBeenCalledWith(
+      mockUser.id,
+    );
+    expect(refreshTokenServiceMock.create).toHaveBeenCalledWith(
+      mockUser,
+      agentInfo,
+    );
     expect(jwtServiceMock.sign).toHaveBeenCalledWith({
       sub: mockUser.id,
       name: mockUser.name,
@@ -218,13 +239,17 @@ describe('AuthService', () => {
       user: mockUser,
     } as RefreshToken;
     const expectedAccessToken = 'new-access-token';
-    refreshTokenServiceMock.findValidByToken.mockResolvedValue(mockRefreshToken);
+    refreshTokenServiceMock.findValidByToken.mockResolvedValue(
+      mockRefreshToken,
+    );
     jwtServiceMock.sign.mockReturnValue(expectedAccessToken);
 
     const result = await authService.refreshAccessToken(token);
 
     expect(result).toBe(expectedAccessToken);
-    expect(refreshTokenServiceMock.findValidByToken).toHaveBeenCalledWith(token);
+    expect(refreshTokenServiceMock.findValidByToken).toHaveBeenCalledWith(
+      token,
+    );
     expect(jwtServiceMock.sign).toHaveBeenCalledWith({
       sub: mockUser.id,
       name: mockUser.name,

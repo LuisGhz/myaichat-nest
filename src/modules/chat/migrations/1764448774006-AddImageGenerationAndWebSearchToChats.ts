@@ -1,8 +1,6 @@
 import { MigrationInterface, QueryRunner, TableColumn } from 'typeorm';
 
-export class AddImageGenerationAndWebSearchToChats1764448774006
-  implements MigrationInterface
-{
+export class AddImageGenerationAndWebSearchToChats1764448774006 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.addColumn(
       'chats',

@@ -126,7 +126,9 @@ describe('parseExpiration', () => {
       const expectedMinTime = new Date(beforeCall.getTime() + 60 * 60 * 1000);
       const expectedMaxTime = new Date(afterCall.getTime() + 60 * 60 * 1000);
 
-      expect(result.getTime()).toBeGreaterThanOrEqual(expectedMinTime.getTime());
+      expect(result.getTime()).toBeGreaterThanOrEqual(
+        expectedMinTime.getTime(),
+      );
       expect(result.getTime()).toBeLessThanOrEqual(expectedMaxTime.getTime());
     });
   });

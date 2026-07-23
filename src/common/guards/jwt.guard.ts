@@ -3,6 +3,7 @@ import {
   ExecutionContext,
   ForbiddenException,
   Injectable,
+  Logger,
   UnauthorizedException,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
@@ -18,6 +19,8 @@ const NEW_ACCESS_TOKEN_HEADER = 'x-new-access-token';
 
 @Injectable()
 export class JwtGuard implements CanActivate {
+  readonly #logger = new Logger(JwtGuard.name);
+
   constructor(
     private readonly jwtService: JwtService,
     private readonly refreshTokenService: RefreshTokenService,
@@ -90,6 +93,7 @@ export class JwtGuard implements CanActivate {
 
       return true;
     } catch (error) {
+      this.#logger.error('Failed to refresh token', error);
       throw new UnauthorizedException('Failed to refresh token');
     }
   }

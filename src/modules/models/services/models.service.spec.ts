@@ -672,7 +672,11 @@ describe('ModelsService', () => {
 
     it('should update isReasoning and reasoningLevel', async () => {
       const updateDto = { isReasoning: true, reasoningLevel: 'high' };
-      const updatedModel = { ...mockModel, isReasoning: true, reasoningLevel: 'high' };
+      const updatedModel = {
+        ...mockModel,
+        isReasoning: true,
+        reasoningLevel: 'high',
+      };
 
       modelRepositoryMock.findOne.mockResolvedValue(mockModel as any);
       modelRepositoryMock.save.mockResolvedValue(updatedModel as any);
@@ -687,9 +691,17 @@ describe('ModelsService', () => {
     });
 
     it('should set reasoningLevel to null when isReasoning is set to false', async () => {
-      const reasoningModel = { ...mockModel, isReasoning: true, reasoningLevel: 'high' };
+      const reasoningModel = {
+        ...mockModel,
+        isReasoning: true,
+        reasoningLevel: 'high',
+      };
       const updateDto = { isReasoning: false, reasoningLevel: null };
-      const updatedModel = { ...reasoningModel, isReasoning: false, reasoningLevel: null };
+      const updatedModel = {
+        ...reasoningModel,
+        isReasoning: false,
+        reasoningLevel: null,
+      };
 
       modelRepositoryMock.findOne.mockResolvedValue(reasoningModel as any);
       modelRepositoryMock.save.mockResolvedValue(updatedModel as any);

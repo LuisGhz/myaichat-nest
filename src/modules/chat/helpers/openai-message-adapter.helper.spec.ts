@@ -22,7 +22,8 @@ describe('openai-message-adapter.helper', () => {
     });
 
     it('should return custom system message when prompt provided', () => {
-      const customPrompt = 'You are a coding assistant specialized in TypeScript.';
+      const customPrompt =
+        'You are a coding assistant specialized in TypeScript.';
 
       const result = setSystemMessage(customPrompt);
 

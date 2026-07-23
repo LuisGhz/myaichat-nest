@@ -8,7 +8,12 @@ import { IsValidModelConstraint, IsValidModelIdConstraint } from './validators';
 @Module({
   imports: [TypeOrmModule.forFeature([Model, ModelDeveloper])],
   controllers: [ModelsController],
-  providers: [ModelsService, ModelSeedService, IsValidModelConstraint, IsValidModelIdConstraint],
+  providers: [
+    ModelsService,
+    ModelSeedService,
+    IsValidModelConstraint,
+    IsValidModelIdConstraint,
+  ],
   exports: [ModelsService, IsValidModelConstraint, IsValidModelIdConstraint],
 })
 export class ModelsModule {}

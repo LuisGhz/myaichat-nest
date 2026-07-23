@@ -31,7 +31,9 @@ export class Prompt {
   @OneToMany(() => Chat, (chat) => chat.prompt)
   chats: Relation<Chat[]>;
 
-  @OneToMany(() => PromptMessage, (message) => message.prompt, { cascade: true })
+  @OneToMany(() => PromptMessage, (message) => message.prompt, {
+    cascade: true,
+  })
   messages: Relation<PromptMessage[]>;
 
   @CreateDateColumn()

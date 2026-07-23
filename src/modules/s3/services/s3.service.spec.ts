@@ -2,7 +2,11 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { BadRequestException } from '@nestjs/common';
 import { S3Service } from './s3.service';
 import { EnvService } from '@cfg/schema/env.service';
-import { S3Client, PutObjectCommand, DeleteObjectsCommand } from '@aws-sdk/client-s3';
+import {
+  S3Client,
+  PutObjectCommand,
+  DeleteObjectsCommand,
+} from '@aws-sdk/client-s3';
 
 jest.mock('@aws-sdk/client-s3');
 
@@ -88,7 +92,11 @@ describe('S3Service', () => {
   });
 
   it('should delete multiple files at once', async () => {
-    const keys = ['myaichat/test1.png', 'myaichat/test2.jpg', 'myaichat/test3.jpeg'];
+    const keys = [
+      'myaichat/test1.png',
+      'myaichat/test2.jpg',
+      'myaichat/test3.jpeg',
+    ];
     s3ClientMock.send.mockResolvedValue({} as any);
 
     await service.deleteFiles(keys);

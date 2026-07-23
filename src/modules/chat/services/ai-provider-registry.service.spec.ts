@@ -86,9 +86,8 @@ describe('AIProviderRegistry', () => {
         ],
       }).compile();
 
-      const emptyService = emptyModule.get<AIProviderRegistry>(
-        AIProviderRegistry,
-      );
+      const emptyService =
+        emptyModule.get<AIProviderRegistry>(AIProviderRegistry);
       const providers = emptyService.getAvailableProviders();
 
       expect(providers).toEqual([]);

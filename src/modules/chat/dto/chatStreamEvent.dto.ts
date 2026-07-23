@@ -28,4 +28,7 @@ export interface StreamDoneEvent {
   };
 }
 
-export type ChatStreamEvent = StreamDeltaEvent | StreamErrorEvent | StreamDoneEvent;
+export type ChatStreamEvent =
+  | StreamDeltaEvent
+  | StreamErrorEvent
+  | StreamDoneEvent;

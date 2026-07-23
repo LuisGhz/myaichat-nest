@@ -18,7 +18,9 @@ export class IsValidAudioTypeConstraint implements ValidatorConstraintInterface 
     const extension = path.extname(file.originalname).toLowerCase();
 
     const isValidMimeType = ALLOWED_AUDIO_TYPES.includes(mimeType as any);
-    const isValidExtension = ALLOWED_AUDIO_EXTENSIONS.includes(extension as any);
+    const isValidExtension = ALLOWED_AUDIO_EXTENSIONS.includes(
+      extension as any,
+    );
 
     return isValidMimeType && isValidExtension;
   }

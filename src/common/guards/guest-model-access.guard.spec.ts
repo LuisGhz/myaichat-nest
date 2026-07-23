@@ -7,9 +7,11 @@ describe('GuestModelAccessGuard', () => {
   let guard: GuestModelAccessGuard;
   let modelsService: jest.Mocked<ModelsService>;
 
-  const createMockExecutionContext = (overrides: {
-    request?: Record<string, any>;
-  } = {}) => {
+  const createMockExecutionContext = (
+    overrides: {
+      request?: Record<string, any>;
+    } = {},
+  ) => {
     const mockRequest = {
       user: null,
       body: {},
@@ -113,9 +115,9 @@ describe('GuestModelAccessGuard', () => {
         },
       });
 
-      (modelsService.validateGuestAccessById as jest.Mock).mockResolvedValueOnce(
-        undefined,
-      );
+      (
+        modelsService.validateGuestAccessById as jest.Mock
+      ).mockResolvedValueOnce(undefined);
 
       const result = await guard.canActivate(context);
 
@@ -144,9 +146,9 @@ describe('GuestModelAccessGuard', () => {
       });
 
       const error = new Error('Guest access denied for this model');
-      (modelsService.validateGuestAccessById as jest.Mock).mockRejectedValueOnce(
-        error,
-      );
+      (
+        modelsService.validateGuestAccessById as jest.Mock
+      ).mockRejectedValueOnce(error);
 
       await expect(guard.canActivate(context)).rejects.toThrow(error);
     });
@@ -217,9 +219,9 @@ describe('GuestModelAccessGuard', () => {
           },
         });
 
-        (modelsService.validateGuestAccessById as jest.Mock).mockResolvedValueOnce(
-          undefined,
-        );
+        (
+          modelsService.validateGuestAccessById as jest.Mock
+        ).mockResolvedValueOnce(undefined);
 
         const result = await guard.canActivate(context);
 
