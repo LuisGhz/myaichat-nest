@@ -5,7 +5,6 @@ import {
   Query,
   Req,
   Res,
-  UnauthorizedException,
   Logger,
 } from '@nestjs/common';
 import {
