@@ -4,166 +4,35 @@ import { UpdateWebSearchReqDto } from './updateWebSearch.dto';
 
 describe('UpdateWebSearchReqDto', () => {
   describe('valid payload', () => {
-    it('should create a valid instance when isWebSearch is true', async () => {
-      const payload = {
-        isWebSearch: true,
-      };
+    it.each([[true], [false]])(
+      'should create a valid instance when isWebSearch is %s',
+      async (val) => {
+        const payload = { isWebSearch: val };
 
-      const instance = plainToInstance(UpdateWebSearchReqDto, payload);
-      const errors = await validate(instance);
+        const instance = plainToInstance(UpdateWebSearchReqDto, payload);
+        const errors = await validate(instance);
 
-      expect(errors).toHaveLength(0);
-      expect(instance.isWebSearch).toBe(true);
-    });
-
-    it('should create a valid instance when isWebSearch is false', async () => {
-      const payload = {
-        isWebSearch: false,
-      };
-
-      const instance = plainToInstance(UpdateWebSearchReqDto, payload);
-      const errors = await validate(instance);
-
-      expect(errors).toHaveLength(0);
-      expect(instance.isWebSearch).toBe(false);
-    });
+        expect(errors).toHaveLength(0);
+        expect(instance.isWebSearch).toBe(val);
+      },
+    );
   });
 
   describe('isWebSearch field', () => {
-    it('should fail validation when isWebSearch is not provided', async () => {
-      const payload = {};
-
-      const instance = plainToInstance(UpdateWebSearchReqDto, payload);
-      const errors = await validate(instance);
-
-      expect(errors).toHaveLength(1);
-      expect(errors[0].property).toBe('isWebSearch');
-      expect(errors[0].constraints).toHaveProperty('isBoolean');
-    });
-
-    it('should fail validation when isWebSearch is null', async () => {
-      const payload = {
-        isWebSearch: null,
-      };
-
-      const instance = plainToInstance(UpdateWebSearchReqDto, payload);
-      const errors = await validate(instance);
-
-      expect(errors).toHaveLength(1);
-      expect(errors[0].property).toBe('isWebSearch');
-      expect(errors[0].constraints).toHaveProperty('isBoolean');
-    });
-
-    it('should fail validation when isWebSearch is undefined', async () => {
-      const payload = {
-        isWebSearch: undefined,
-      };
-
-      const instance = plainToInstance(UpdateWebSearchReqDto, payload);
-      const errors = await validate(instance);
-
-      expect(errors).toHaveLength(1);
-      expect(errors[0].property).toBe('isWebSearch');
-      expect(errors[0].constraints).toHaveProperty('isBoolean');
-    });
-
-    it('should fail validation when isWebSearch is a string', async () => {
-      const payload = {
-        isWebSearch: 'true',
-      };
-
-      const instance = plainToInstance(UpdateWebSearchReqDto, payload);
-      const errors = await validate(instance);
-
-      expect(errors).toHaveLength(1);
-      expect(errors[0].property).toBe('isWebSearch');
-      expect(errors[0].constraints).toHaveProperty('isBoolean');
-    });
-
-    it('should fail validation when isWebSearch is a string "false"', async () => {
-      const payload = {
-        isWebSearch: 'false',
-      };
-
-      const instance = plainToInstance(UpdateWebSearchReqDto, payload);
-      const errors = await validate(instance);
-
-      expect(errors).toHaveLength(1);
-      expect(errors[0].property).toBe('isWebSearch');
-      expect(errors[0].constraints).toHaveProperty('isBoolean');
-    });
-
-    it('should fail validation when isWebSearch is a number 1', async () => {
-      const payload = {
-        isWebSearch: 1,
-      };
-
-      const instance = plainToInstance(UpdateWebSearchReqDto, payload);
-      const errors = await validate(instance);
-
-      expect(errors).toHaveLength(1);
-      expect(errors[0].property).toBe('isWebSearch');
-      expect(errors[0].constraints).toHaveProperty('isBoolean');
-    });
-
-    it('should fail validation when isWebSearch is a number 0', async () => {
-      const payload = {
-        isWebSearch: 0,
-      };
-
-      const instance = plainToInstance(UpdateWebSearchReqDto, payload);
-      const errors = await validate(instance);
-
-      expect(errors).toHaveLength(1);
-      expect(errors[0].property).toBe('isWebSearch');
-      expect(errors[0].constraints).toHaveProperty('isBoolean');
-    });
-
-    it('should fail validation when isWebSearch is an empty string', async () => {
-      const payload = {
-        isWebSearch: '',
-      };
-
-      const instance = plainToInstance(UpdateWebSearchReqDto, payload);
-      const errors = await validate(instance);
-
-      expect(errors).toHaveLength(1);
-      expect(errors[0].property).toBe('isWebSearch');
-      expect(errors[0].constraints).toHaveProperty('isBoolean');
-    });
-
-    it('should fail validation when isWebSearch is an object', async () => {
-      const payload = {
-        isWebSearch: { value: true },
-      };
-
-      const instance = plainToInstance(UpdateWebSearchReqDto, payload);
-      const errors = await validate(instance);
-
-      expect(errors).toHaveLength(1);
-      expect(errors[0].property).toBe('isWebSearch');
-      expect(errors[0].constraints).toHaveProperty('isBoolean');
-    });
-
-    it('should fail validation when isWebSearch is an array', async () => {
-      const payload = {
-        isWebSearch: [true],
-      };
-
-      const instance = plainToInstance(UpdateWebSearchReqDto, payload);
-      const errors = await validate(instance);
-
-      expect(errors).toHaveLength(1);
-      expect(errors[0].property).toBe('isWebSearch');
-      expect(errors[0].constraints).toHaveProperty('isBoolean');
-    });
-
-    it('should fail validation when isWebSearch is NaN', async () => {
-      const payload = {
-        isWebSearch: NaN,
-      };
-
-      const instance = plainToInstance(UpdateWebSearchReqDto, payload);
+    it.each([
+      {},
+      { isWebSearch: null },
+      { isWebSearch: undefined },
+      { isWebSearch: 'true' },
+      { isWebSearch: 'false' },
+      { isWebSearch: 1 },
+      { isWebSearch: 0 },
+      { isWebSearch: '' },
+      { isWebSearch: { value: true } },
+      { isWebSearch: [true] },
+      { isWebSearch: NaN },
+    ])('should fail validation for payload %p', async (payload) => {
+      const instance = plainToInstance(UpdateWebSearchReqDto, payload as any);
       const errors = await validate(instance);
 
       expect(errors).toHaveLength(1);

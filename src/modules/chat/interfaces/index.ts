@@ -19,7 +19,6 @@ export {
   type OpenAIMessageContentList,
   type OpenAIMessageRole,
   type OpenAIMessageItem,
-  type OpenAIEasyInputMessage,
   type OpenAIInputItem,
   type OpenAIResponseInput,
 } from './openai-input.interface';

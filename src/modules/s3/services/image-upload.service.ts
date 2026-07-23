@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
-import { randomBytes } from 'crypto';
+import { randomBytes } from 'node:crypto';
 import { EnvService } from '@cfg/schema/env.service';
 
 @Injectable()

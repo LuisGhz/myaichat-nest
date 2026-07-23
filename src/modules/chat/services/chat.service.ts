@@ -185,7 +185,7 @@ export class ChatService {
     const paginatedMessages = hasMore ? messages.slice(0, pageSize) : messages;
 
     return {
-      messages: paginatedMessages.reverse().map((m) => ({
+      messages: paginatedMessages.toReversed().map((m) => ({
         id: m.id,
         content: m.content,
         role: m.role,

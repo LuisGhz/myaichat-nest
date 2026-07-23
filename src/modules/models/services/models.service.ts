@@ -150,72 +150,10 @@ export class ModelsService {
     const modelValue = model.value;
     await this.deleteCacheByValueIfApplicable(modelValue);
 
-    if (dto.name !== undefined) {
-      model.name = dto.name;
-    }
-
-    if (dto.shortName !== undefined) {
-      model.shortName = dto.shortName;
-    }
-
-    if (dto.value !== undefined) {
-      model.value = dto.value;
-    }
-
-    if (dto.link !== undefined) {
-      model.link = dto.link;
-    }
-
-    if (dto.guestAccess !== undefined) {
-      model.guestAccess = dto.guestAccess;
-    }
-
-    if (dto.price !== undefined) {
-      if (dto.price.input !== undefined) {
-        model.priceInput = dto.price.input;
-      }
-      if (dto.price.output !== undefined) {
-        model.priceOutput = dto.price.output;
-      }
-    }
-
-    if (dto.supportsTemperature !== undefined) {
-      model.supportsTemperature = dto.supportsTemperature;
-    }
-
-    if (dto.isReasoning !== undefined) {
-      model.isReasoning = dto.isReasoning;
-    }
-
-    if (dto.reasoningLevel !== undefined) {
-      model.reasoningLevel = dto.reasoningLevel;
-    }
-
-    if (dto.metadata !== undefined) {
-      if (dto.metadata.contextWindow !== undefined) {
-        model.contextWindow = dto.metadata.contextWindow;
-      }
-      if (dto.metadata.maxOutputTokens !== undefined) {
-        model.maxOutputTokens = dto.metadata.maxOutputTokens;
-      }
-      if (dto.metadata.knowledgeCutoff !== undefined) {
-        model.knowledgeCutoff = dto.metadata.knowledgeCutoff;
-      }
-    }
-
-    if (dto.developerId !== undefined) {
-      const developer = await this.developerRepository.findOne({
-        where: { id: dto.developerId },
-      });
-
-      if (!developer) {
-        throw new NotFoundException(
-          `Developer with id ${dto.developerId} not found`,
-        );
-      }
-
-      model.developer = developer;
-    }
+    this.#updateBasicFields(model, dto);
+    this.#updatePricing(model, dto);
+    this.#updateMetadata(model, dto);
+    await this.#updateDeveloper(model, dto);
 
     const savedModel = await this.modelRepository.save(model);
 
@@ -224,7 +162,53 @@ export class ModelsService {
     return this.mapToResponseDto(savedModel);
   }
 
+  #updateBasicFields(model: Model, dto: UpdateModelReqDto): void {
+    if (dto.name !== undefined) model.name = dto.name;
+    if (dto.shortName !== undefined) model.shortName = dto.shortName;
+    if (dto.value !== undefined) model.value = dto.value;
+    if (dto.link !== undefined) model.link = dto.link;
+    if (dto.guestAccess !== undefined) model.guestAccess = dto.guestAccess;
+    if (dto.supportsTemperature !== undefined)
+      model.supportsTemperature = dto.supportsTemperature;
+    if (dto.isReasoning !== undefined) model.isReasoning = dto.isReasoning;
+    if (dto.reasoningLevel !== undefined)
+      model.reasoningLevel = dto.reasoningLevel;
+  }
+
+  #updatePricing(model: Model, dto: UpdateModelReqDto): void {
+    if (!dto.price) return;
+    if (dto.price.input !== undefined) model.priceInput = dto.price.input;
+    if (dto.price.output !== undefined) model.priceOutput = dto.price.output;
+  }
+
+  #updateMetadata(model: Model, dto: UpdateModelReqDto): void {
+    if (!dto.metadata) return;
+    if (dto.metadata.contextWindow !== undefined)
+      model.contextWindow = dto.metadata.contextWindow;
+    if (dto.metadata.maxOutputTokens !== undefined)
+      model.maxOutputTokens = dto.metadata.maxOutputTokens;
+    if (dto.metadata.knowledgeCutoff !== undefined)
+      model.knowledgeCutoff = dto.metadata.knowledgeCutoff;
+  }
+
+  async #updateDeveloper(model: Model, dto: UpdateModelReqDto): Promise<void> {
+    if (dto.developerId === undefined) return;
+
+    const developer = await this.developerRepository.findOne({
+      where: { id: dto.developerId },
+    });
+
+    if (!developer) {
+      throw new NotFoundException(
+        `Developer with id ${dto.developerId} not found`,
+      );
+    }
+
+    model.developer = developer;
+  }
+
   async remove(id: string): Promise<void> {
+
     const model = await this.findByIdOrFail(id);
     const modelValue = model.value;
     await this.deleteCacheByValueIfApplicable(modelValue);
@@ -333,7 +317,10 @@ export class ModelsService {
         guestAccess: model.guestAccess,
       },
     );
+
+    return;
   }
+
 
   private async findByIdOrFail(id: string): Promise<Model> {
     const model = await this.modelRepository.findOne({

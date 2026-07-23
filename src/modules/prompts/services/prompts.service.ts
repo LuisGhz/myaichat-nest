@@ -116,11 +116,11 @@ export class PromptsService {
     if (dto.messages !== undefined) {
       // Remove existing messages that are not in the update
       const existingMessageIds = prompt.messages.map((m) => m.id);
-      const updatedMessageIds = dto.messages
-        .filter((m) => m.id)
-        .map((m) => m.id);
+      const updatedMessageIds = new Set(
+        dto.messages.filter((m) => m.id).map((m) => m.id),
+      );
       const messagesToDelete = existingMessageIds.filter(
-        (id) => !updatedMessageIds.includes(id),
+        (id) => !updatedMessageIds.has(id),
       );
 
       if (messagesToDelete.length > 0) {

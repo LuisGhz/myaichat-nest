@@ -4,53 +4,18 @@ import { UpdateTemperatureReqDto } from './updateTemperature.dto';
 
 describe('UpdateTemperatureReqDto', () => {
   describe('valid payload', () => {
-    it('should create a valid instance with minimum allowed value', async () => {
-      const payload = {
-        temperature: 0,
-      };
+    it.each([[0], [2], [0.7], [1.5]])(
+      'should create a valid instance with temperature %p',
+      async (val) => {
+        const payload = { temperature: val };
 
-      const instance = plainToInstance(UpdateTemperatureReqDto, payload);
-      const errors = await validate(instance);
+        const instance = plainToInstance(UpdateTemperatureReqDto, payload);
+        const errors = await validate(instance);
 
-      expect(errors).toHaveLength(0);
-      expect(instance.temperature).toBe(0);
-    });
-
-    it('should create a valid instance with maximum allowed value', async () => {
-      const payload = {
-        temperature: 2,
-      };
-
-      const instance = plainToInstance(UpdateTemperatureReqDto, payload);
-      const errors = await validate(instance);
-
-      expect(errors).toHaveLength(0);
-      expect(instance.temperature).toBe(2);
-    });
-
-    it('should create a valid instance with middle range value', async () => {
-      const payload = {
-        temperature: 0.7,
-      };
-
-      const instance = plainToInstance(UpdateTemperatureReqDto, payload);
-      const errors = await validate(instance);
-
-      expect(errors).toHaveLength(0);
-      expect(instance.temperature).toBe(0.7);
-    });
-
-    it('should create a valid instance with decimal value', async () => {
-      const payload = {
-        temperature: 1.5,
-      };
-
-      const instance = plainToInstance(UpdateTemperatureReqDto, payload);
-      const errors = await validate(instance);
-
-      expect(errors).toHaveLength(0);
-      expect(instance.temperature).toBe(1.5);
-    });
+        expect(errors).toHaveLength(0);
+        expect(instance.temperature).toBe(val);
+      },
+    );
   });
 
   describe('temperature field', () => {

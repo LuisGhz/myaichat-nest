@@ -4,102 +4,58 @@ describe('parseExpiration', () => {
   const baseDate = new Date('2025-12-14T12:00:00Z');
 
   describe('minutes', () => {
-    it('should add minutes to the current date', () => {
-      const result = parseExpiration('30m', baseDate);
-      const expected = new Date('2025-12-14T12:30:00Z');
-      expect(result).toEqual(expected);
-    });
-
-    it('should handle single minute', () => {
-      const result = parseExpiration('1m', baseDate);
-      const expected = new Date('2025-12-14T12:01:00Z');
-      expect(result).toEqual(expected);
-    });
-
-    it('should handle large minute values', () => {
-      const result = parseExpiration('1440m', baseDate);
-      const expected = new Date('2025-12-15T12:00:00Z');
-      expect(result).toEqual(expected);
+    it.each([
+      ['30m', '2025-12-14T12:30:00Z'],
+      ['1m', '2025-12-14T12:01:00Z'],
+      ['1440m', '2025-12-15T12:00:00Z'],
+    ])('should parse %s', (input, expectedDate) => {
+      const result = parseExpiration(input, baseDate);
+      expect(result).toEqual(new Date(expectedDate));
     });
   });
 
   describe('hours', () => {
-    it('should add hours to the current date', () => {
-      const result = parseExpiration('24h', baseDate);
-      const expected = new Date('2025-12-15T12:00:00Z');
-      expect(result).toEqual(expected);
-    });
-
-    it('should handle single hour', () => {
-      const result = parseExpiration('1h', baseDate);
-      const expected = new Date('2025-12-14T13:00:00Z');
-      expect(result).toEqual(expected);
-    });
-
-    it('should handle fractional hour calculation', () => {
-      const result = parseExpiration('2h', baseDate);
-      const expected = new Date('2025-12-14T14:00:00Z');
-      expect(result).toEqual(expected);
+    it.each([
+      ['24h', '2025-12-15T12:00:00Z'],
+      ['1h', '2025-12-14T13:00:00Z'],
+      ['2h', '2025-12-14T14:00:00Z'],
+    ])('should parse %s', (input, expectedDate) => {
+      const result = parseExpiration(input, baseDate);
+      expect(result).toEqual(new Date(expectedDate));
     });
   });
 
   describe('days', () => {
-    it('should add days to the current date', () => {
-      const result = parseExpiration('7d', baseDate);
-      const expected = new Date('2025-12-21T12:00:00Z');
-      expect(result).toEqual(expected);
-    });
-
-    it('should handle single day', () => {
-      const result = parseExpiration('1d', baseDate);
-      const expected = new Date('2025-12-15T12:00:00Z');
-      expect(result).toEqual(expected);
-    });
-
-    it('should handle large day values', () => {
-      const result = parseExpiration('365d', baseDate);
-      const expected = new Date('2026-12-14T12:00:00Z');
-      expect(result).toEqual(expected);
+    it.each([
+      ['7d', '2025-12-21T12:00:00Z'],
+      ['1d', '2025-12-15T12:00:00Z'],
+      ['365d', '2026-12-14T12:00:00Z'],
+    ])('should parse %s', (input, expectedDate) => {
+      const result = parseExpiration(input, baseDate);
+      expect(result).toEqual(new Date(expectedDate));
     });
   });
 
   describe('weeks', () => {
-    it('should add weeks to the current date', () => {
-      const result = parseExpiration('2w', baseDate);
-      const expected = new Date('2025-12-28T12:00:00Z');
-      expect(result).toEqual(expected);
-    });
-
-    it('should handle single week', () => {
-      const result = parseExpiration('1w', baseDate);
-      const expected = new Date('2025-12-21T12:00:00Z');
-      expect(result).toEqual(expected);
-    });
-
-    it('should handle multiple weeks', () => {
-      const result = parseExpiration('4w', baseDate);
-      const expected = new Date('2026-01-11T12:00:00Z');
-      expect(result).toEqual(expected);
+    it.each([
+      ['2w', '2025-12-28T12:00:00Z'],
+      ['1w', '2025-12-21T12:00:00Z'],
+      ['4w', '2026-01-11T12:00:00Z'],
+    ])('should parse %s', (input, expectedDate) => {
+      const result = parseExpiration(input, baseDate);
+      expect(result).toEqual(new Date(expectedDate));
     });
   });
 
+
   describe('months', () => {
-    it('should add months to the current date', () => {
-      const result = parseExpiration('1M', baseDate);
-      const expected = new Date('2026-01-14T12:00:00Z');
-      expect(result).toEqual(expected);
-    });
-
-    it('should handle multiple months', () => {
-      const result = parseExpiration('3M', baseDate);
-      const expected = new Date('2026-03-14T12:00:00Z');
-      expect(result).toEqual(expected);
-    });
-
-    it('should handle 12 months', () => {
-      const result = parseExpiration('12M', baseDate);
-      const expected = new Date('2026-12-14T12:00:00Z');
-      expect(result).toEqual(expected);
+    it.each([
+      ['1M', '2026-01-14T12:00:00Z'],
+      ['3M', '2026-03-14T12:00:00Z'],
+      ['12M', '2026-12-14T12:00:00Z'],
+    ])('should parse %s', (input, expectedDate) => {
+      const result = parseExpiration(input, baseDate);
+      expect(result).toEqual(new Date(expectedDate));
     });
   });
 

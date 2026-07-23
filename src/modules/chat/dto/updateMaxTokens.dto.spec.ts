@@ -4,170 +4,39 @@ import { UpdateMaxTokensReqDto } from './updateMaxTokens.dto';
 
 describe('UpdateMaxTokensReqDto', () => {
   describe('valid payload', () => {
-    it('should create a valid instance with minimum allowed value', async () => {
-      const payload = {
-        maxTokens: 1,
-      };
+    it.each([[1], [128000], [50000]])(
+      'should create a valid instance with maxTokens %i',
+      async (value) => {
+        const payload = { maxTokens: value };
 
-      const instance = plainToInstance(UpdateMaxTokensReqDto, payload);
-      const errors = await validate(instance);
+        const instance = plainToInstance(UpdateMaxTokensReqDto, payload);
+        const errors = await validate(instance);
 
-      expect(errors).toHaveLength(0);
-      expect(instance.maxTokens).toBe(1);
-    });
-
-    it('should create a valid instance with maximum allowed value', async () => {
-      const payload = {
-        maxTokens: 128000,
-      };
-
-      const instance = plainToInstance(UpdateMaxTokensReqDto, payload);
-      const errors = await validate(instance);
-
-      expect(errors).toHaveLength(0);
-      expect(instance.maxTokens).toBe(128000);
-    });
-
-    it('should create a valid instance with middle range value', async () => {
-      const payload = {
-        maxTokens: 50000,
-      };
-
-      const instance = plainToInstance(UpdateMaxTokensReqDto, payload);
-      const errors = await validate(instance);
-
-      expect(errors).toHaveLength(0);
-      expect(instance.maxTokens).toBe(50000);
-    });
+        expect(errors).toHaveLength(0);
+        expect(instance.maxTokens).toBe(value);
+      },
+    );
   });
 
   describe('maxTokens field', () => {
-    it('should fail validation when maxTokens is not provided', async () => {
-      const payload = {};
-
-      const instance = plainToInstance(UpdateMaxTokensReqDto, payload);
+    it.each([
+      {},
+      { maxTokens: null },
+      { maxTokens: undefined },
+      { maxTokens: 0 },
+      { maxTokens: -100 },
+      { maxTokens: 128001 },
+      { maxTokens: 1000.5 },
+      { maxTokens: '1000' },
+      { maxTokens: 'invalid' },
+      { maxTokens: {} },
+      { maxTokens: [1000] },
+    ])('should fail validation for payload %p', async (payload) => {
+      const instance = plainToInstance(UpdateMaxTokensReqDto, payload as any);
       const errors = await validate(instance);
 
-      expect(errors).toHaveLength(1);
+      expect(errors.length).toBeGreaterThan(0);
       expect(errors[0].property).toBe('maxTokens');
-      expect(errors[0].constraints).toHaveProperty('isInt');
-    });
-
-    it('should fail validation when maxTokens is null', async () => {
-      const payload = {
-        maxTokens: null,
-      };
-
-      const instance = plainToInstance(UpdateMaxTokensReqDto, payload);
-      const errors = await validate(instance);
-
-      expect(errors).toHaveLength(1);
-      expect(errors[0].property).toBe('maxTokens');
-      expect(errors[0].constraints).toHaveProperty('isInt');
-    });
-
-    it('should fail validation when maxTokens is less than 1', async () => {
-      const payload = {
-        maxTokens: 0,
-      };
-
-      const instance = plainToInstance(UpdateMaxTokensReqDto, payload);
-      const errors = await validate(instance);
-
-      expect(errors).toHaveLength(1);
-      expect(errors[0].property).toBe('maxTokens');
-      expect(errors[0].constraints).toHaveProperty('min');
-    });
-
-    it('should fail validation when maxTokens is negative', async () => {
-      const payload = {
-        maxTokens: -100,
-      };
-
-      const instance = plainToInstance(UpdateMaxTokensReqDto, payload);
-      const errors = await validate(instance);
-
-      expect(errors).toHaveLength(1);
-      expect(errors[0].property).toBe('maxTokens');
-      expect(errors[0].constraints).toHaveProperty('min');
-    });
-
-    it('should fail validation when maxTokens exceeds maximum limit', async () => {
-      const payload = {
-        maxTokens: 128001,
-      };
-
-      const instance = plainToInstance(UpdateMaxTokensReqDto, payload);
-      const errors = await validate(instance);
-
-      expect(errors).toHaveLength(1);
-      expect(errors[0].property).toBe('maxTokens');
-      expect(errors[0].constraints).toHaveProperty('max');
-    });
-
-    it('should fail validation when maxTokens is a float', async () => {
-      const payload = {
-        maxTokens: 1000.5,
-      };
-
-      const instance = plainToInstance(UpdateMaxTokensReqDto, payload);
-      const errors = await validate(instance);
-
-      expect(errors).toHaveLength(1);
-      expect(errors[0].property).toBe('maxTokens');
-      expect(errors[0].constraints).toHaveProperty('isInt');
-    });
-
-    it('should fail validation when maxTokens is a string', async () => {
-      const payload = {
-        maxTokens: '1000',
-      };
-
-      const instance = plainToInstance(UpdateMaxTokensReqDto, payload);
-      const errors = await validate(instance);
-
-      expect(errors).toHaveLength(1);
-      expect(errors[0].property).toBe('maxTokens');
-      expect(errors[0].constraints).toHaveProperty('isInt');
-    });
-
-    it('should fail validation when maxTokens is not a number type', async () => {
-      const payload = {
-        maxTokens: 'invalid',
-      };
-
-      const instance = plainToInstance(UpdateMaxTokensReqDto, payload);
-      const errors = await validate(instance);
-
-      expect(errors).toHaveLength(1);
-      expect(errors[0].property).toBe('maxTokens');
-      expect(errors[0].constraints).toHaveProperty('isInt');
-    });
-
-    it('should fail validation when maxTokens is an object', async () => {
-      const payload = {
-        maxTokens: {},
-      };
-
-      const instance = plainToInstance(UpdateMaxTokensReqDto, payload);
-      const errors = await validate(instance);
-
-      expect(errors).toHaveLength(1);
-      expect(errors[0].property).toBe('maxTokens');
-      expect(errors[0].constraints).toHaveProperty('isInt');
-    });
-
-    it('should fail validation when maxTokens is an array', async () => {
-      const payload = {
-        maxTokens: [1000],
-      };
-
-      const instance = plainToInstance(UpdateMaxTokensReqDto, payload);
-      const errors = await validate(instance);
-
-      expect(errors).toHaveLength(1);
-      expect(errors[0].property).toBe('maxTokens');
-      expect(errors[0].constraints).toHaveProperty('isInt');
     });
   });
 

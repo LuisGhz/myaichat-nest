@@ -151,9 +151,10 @@ export class CreateModelReqDto {
     description: 'Indicates if the model supports temperature parameter',
     example: true,
   })
-  @Transform(({ value }) => (value === 'true' || value === true ? true : false))
+  @Transform(({ value }) => value === 'true' || value === true)
   @IsBoolean()
   supportsTemperature: boolean;
+
 
   @ApiPropertyOptional({
     description: 'Update reasoning capability',

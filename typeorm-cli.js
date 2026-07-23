@@ -6,8 +6,9 @@
  * instead of requiring TypeScript dependencies (ts-node, tsconfig-paths)
  */
 
-const { exec } = require('child_process');
-const path = require('path');
+const { exec } = require('node:child_process');
+const path = require('node:path');
+
 
 // Get command from arguments (e.g., "migration:run", "migration:revert", "migration:show")
 const command = process.argv[2];

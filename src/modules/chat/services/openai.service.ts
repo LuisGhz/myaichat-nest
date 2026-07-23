@@ -52,7 +52,7 @@ export class OpenAIService implements AIProvider {
       ...transformNewMessageToOpenAIFormat(
         newMessage,
         this.envService.cdnDomain,
-        previousMessages[previousMessages.length - 1],
+        previousMessages.at(-1),
         fileKey,
       ),
     );
@@ -62,10 +62,9 @@ export class OpenAIService implements AIProvider {
         model: model,
         input: transformedMessages,
         instructions: systemPrompt,
-        // TODO: Adjust based on model context length
-        // max_output_tokens: maxTokens + 6000,
         ...(supportsTemperature && { temperature: temperature }),
         tools: tools,
+
         ...(isReasoning && {
           reasoning: { effort: (reasoningLevel as ReasoningEffort) || 'low' },
         }),

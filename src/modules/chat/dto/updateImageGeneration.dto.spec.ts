@@ -4,166 +4,35 @@ import { UpdateImageGenerationReqDto } from './updateImageGeneration.dto';
 
 describe('UpdateImageGenerationReqDto', () => {
   describe('valid payload', () => {
-    it('should create a valid instance when isImageGeneration is true', async () => {
-      const payload = {
-        isImageGeneration: true,
-      };
+    it.each([[true], [false]])(
+      'should create a valid instance when isImageGeneration is %s',
+      async (val) => {
+        const payload = { isImageGeneration: val };
 
-      const instance = plainToInstance(UpdateImageGenerationReqDto, payload);
-      const errors = await validate(instance);
+        const instance = plainToInstance(UpdateImageGenerationReqDto, payload);
+        const errors = await validate(instance);
 
-      expect(errors).toHaveLength(0);
-      expect(instance.isImageGeneration).toBe(true);
-    });
-
-    it('should create a valid instance when isImageGeneration is false', async () => {
-      const payload = {
-        isImageGeneration: false,
-      };
-
-      const instance = plainToInstance(UpdateImageGenerationReqDto, payload);
-      const errors = await validate(instance);
-
-      expect(errors).toHaveLength(0);
-      expect(instance.isImageGeneration).toBe(false);
-    });
+        expect(errors).toHaveLength(0);
+        expect(instance.isImageGeneration).toBe(val);
+      },
+    );
   });
 
   describe('isImageGeneration field', () => {
-    it('should fail validation when isImageGeneration is not provided', async () => {
-      const payload = {};
-
-      const instance = plainToInstance(UpdateImageGenerationReqDto, payload);
-      const errors = await validate(instance);
-
-      expect(errors).toHaveLength(1);
-      expect(errors[0].property).toBe('isImageGeneration');
-      expect(errors[0].constraints).toHaveProperty('isBoolean');
-    });
-
-    it('should fail validation when isImageGeneration is null', async () => {
-      const payload = {
-        isImageGeneration: null,
-      };
-
-      const instance = plainToInstance(UpdateImageGenerationReqDto, payload);
-      const errors = await validate(instance);
-
-      expect(errors).toHaveLength(1);
-      expect(errors[0].property).toBe('isImageGeneration');
-      expect(errors[0].constraints).toHaveProperty('isBoolean');
-    });
-
-    it('should fail validation when isImageGeneration is undefined', async () => {
-      const payload = {
-        isImageGeneration: undefined,
-      };
-
-      const instance = plainToInstance(UpdateImageGenerationReqDto, payload);
-      const errors = await validate(instance);
-
-      expect(errors).toHaveLength(1);
-      expect(errors[0].property).toBe('isImageGeneration');
-      expect(errors[0].constraints).toHaveProperty('isBoolean');
-    });
-
-    it('should fail validation when isImageGeneration is a string', async () => {
-      const payload = {
-        isImageGeneration: 'true',
-      };
-
-      const instance = plainToInstance(UpdateImageGenerationReqDto, payload);
-      const errors = await validate(instance);
-
-      expect(errors).toHaveLength(1);
-      expect(errors[0].property).toBe('isImageGeneration');
-      expect(errors[0].constraints).toHaveProperty('isBoolean');
-    });
-
-    it('should fail validation when isImageGeneration is a string "false"', async () => {
-      const payload = {
-        isImageGeneration: 'false',
-      };
-
-      const instance = plainToInstance(UpdateImageGenerationReqDto, payload);
-      const errors = await validate(instance);
-
-      expect(errors).toHaveLength(1);
-      expect(errors[0].property).toBe('isImageGeneration');
-      expect(errors[0].constraints).toHaveProperty('isBoolean');
-    });
-
-    it('should fail validation when isImageGeneration is a number 1', async () => {
-      const payload = {
-        isImageGeneration: 1,
-      };
-
-      const instance = plainToInstance(UpdateImageGenerationReqDto, payload);
-      const errors = await validate(instance);
-
-      expect(errors).toHaveLength(1);
-      expect(errors[0].property).toBe('isImageGeneration');
-      expect(errors[0].constraints).toHaveProperty('isBoolean');
-    });
-
-    it('should fail validation when isImageGeneration is a number 0', async () => {
-      const payload = {
-        isImageGeneration: 0,
-      };
-
-      const instance = plainToInstance(UpdateImageGenerationReqDto, payload);
-      const errors = await validate(instance);
-
-      expect(errors).toHaveLength(1);
-      expect(errors[0].property).toBe('isImageGeneration');
-      expect(errors[0].constraints).toHaveProperty('isBoolean');
-    });
-
-    it('should fail validation when isImageGeneration is an empty string', async () => {
-      const payload = {
-        isImageGeneration: '',
-      };
-
-      const instance = plainToInstance(UpdateImageGenerationReqDto, payload);
-      const errors = await validate(instance);
-
-      expect(errors).toHaveLength(1);
-      expect(errors[0].property).toBe('isImageGeneration');
-      expect(errors[0].constraints).toHaveProperty('isBoolean');
-    });
-
-    it('should fail validation when isImageGeneration is an object', async () => {
-      const payload = {
-        isImageGeneration: { value: true },
-      };
-
-      const instance = plainToInstance(UpdateImageGenerationReqDto, payload);
-      const errors = await validate(instance);
-
-      expect(errors).toHaveLength(1);
-      expect(errors[0].property).toBe('isImageGeneration');
-      expect(errors[0].constraints).toHaveProperty('isBoolean');
-    });
-
-    it('should fail validation when isImageGeneration is an array', async () => {
-      const payload = {
-        isImageGeneration: [true],
-      };
-
-      const instance = plainToInstance(UpdateImageGenerationReqDto, payload);
-      const errors = await validate(instance);
-
-      expect(errors).toHaveLength(1);
-      expect(errors[0].property).toBe('isImageGeneration');
-      expect(errors[0].constraints).toHaveProperty('isBoolean');
-    });
-
-    it('should fail validation when isImageGeneration is NaN', async () => {
-      const payload = {
-        isImageGeneration: NaN,
-      };
-
-      const instance = plainToInstance(UpdateImageGenerationReqDto, payload);
+    it.each([
+      {},
+      { isImageGeneration: null },
+      { isImageGeneration: undefined },
+      { isImageGeneration: 'true' },
+      { isImageGeneration: 'false' },
+      { isImageGeneration: 1 },
+      { isImageGeneration: 0 },
+      { isImageGeneration: '' },
+      { isImageGeneration: { value: true } },
+      { isImageGeneration: [true] },
+      { isImageGeneration: NaN },
+    ])('should fail validation for payload %p', async (payload) => {
+      const instance = plainToInstance(UpdateImageGenerationReqDto, payload as any);
       const errors = await validate(instance);
 
       expect(errors).toHaveLength(1);

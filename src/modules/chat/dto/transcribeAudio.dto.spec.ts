@@ -7,50 +7,17 @@ import {
 
 describe('TranscribeAudioReqDto', () => {
   describe('valid payload', () => {
-    it('should create a valid instance with no fields (using defaults)', async () => {
-      const payload = {};
-
+    it.each([
+      [{}, 0],
+      [{ temperature: 0 }, 0],
+      [{ temperature: 1 }, 1],
+      [{ temperature: 0.5 }, 0.5],
+    ])('should create a valid instance with payload %p', async (payload, expected) => {
       const instance = plainToInstance(TranscribeAudioReqDto, payload);
       const errors = await validate(instance);
 
       expect(errors).toHaveLength(0);
-      expect(instance.temperature).toBe(0);
-    });
-
-    it('should create a valid instance with minimum temperature', async () => {
-      const payload = {
-        temperature: 0,
-      };
-
-      const instance = plainToInstance(TranscribeAudioReqDto, payload);
-      const errors = await validate(instance);
-
-      expect(errors).toHaveLength(0);
-      expect(instance.temperature).toBe(0);
-    });
-
-    it('should create a valid instance with maximum temperature', async () => {
-      const payload = {
-        temperature: 1,
-      };
-
-      const instance = plainToInstance(TranscribeAudioReqDto, payload);
-      const errors = await validate(instance);
-
-      expect(errors).toHaveLength(0);
-      expect(instance.temperature).toBe(1);
-    });
-
-    it('should create a valid instance with middle range temperature', async () => {
-      const payload = {
-        temperature: 0.5,
-      };
-
-      const instance = plainToInstance(TranscribeAudioReqDto, payload);
-      const errors = await validate(instance);
-
-      expect(errors).toHaveLength(0);
-      expect(instance.temperature).toBe(0.5);
+      expect(instance.temperature).toBe(expected);
     });
   });
 

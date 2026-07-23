@@ -21,7 +21,7 @@ export function parseExpiration(
   expiration: string,
   fromDate: Date = new Date(),
 ): Date {
-  const match = expiration.match(/^(\d+)([mhdwMy])$/);
+  const match = /^(\d+)([mhdwMy])$/.exec(expiration);
 
   if (!match) {
     throw new Error(

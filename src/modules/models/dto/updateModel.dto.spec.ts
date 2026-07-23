@@ -746,10 +746,15 @@ describe('UpdateModel DTOs', () => {
       expect(errors).toHaveLength(0);
     });
 
-    it('should validate successfully with minimal reasoningLevel when isReasoning is true', async () => {
+    it.each([
+      ['minimal'],
+      ['low'],
+      ['medium'],
+      ['high'],
+    ])('should validate successfully with %s reasoningLevel when isReasoning is true', async (level) => {
       const payload = {
         isReasoning: true,
-        reasoningLevel: 'minimal',
+        reasoningLevel: level,
       };
 
       const instance = plainToInstance(UpdateModelReqDto, payload);
@@ -757,49 +762,7 @@ describe('UpdateModel DTOs', () => {
 
       expect(errors).toHaveLength(0);
       expect(instance.isReasoning).toBe(true);
-      expect(instance.reasoningLevel).toBe('minimal');
-    });
-
-    it('should validate successfully with low reasoningLevel when isReasoning is true', async () => {
-      const payload = {
-        isReasoning: true,
-        reasoningLevel: 'low',
-      };
-
-      const instance = plainToInstance(UpdateModelReqDto, payload);
-      const errors = await validate(instance);
-
-      expect(errors).toHaveLength(0);
-      expect(instance.isReasoning).toBe(true);
-      expect(instance.reasoningLevel).toBe('low');
-    });
-
-    it('should validate successfully with medium reasoningLevel when isReasoning is true', async () => {
-      const payload = {
-        isReasoning: true,
-        reasoningLevel: 'medium',
-      };
-
-      const instance = plainToInstance(UpdateModelReqDto, payload);
-      const errors = await validate(instance);
-
-      expect(errors).toHaveLength(0);
-      expect(instance.isReasoning).toBe(true);
-      expect(instance.reasoningLevel).toBe('medium');
-    });
-
-    it('should validate successfully with high reasoningLevel when isReasoning is true', async () => {
-      const payload = {
-        isReasoning: true,
-        reasoningLevel: 'high',
-      };
-
-      const instance = plainToInstance(UpdateModelReqDto, payload);
-      const errors = await validate(instance);
-
-      expect(errors).toHaveLength(0);
-      expect(instance.isReasoning).toBe(true);
-      expect(instance.reasoningLevel).toBe('high');
+      expect(instance.reasoningLevel).toBe(level);
     });
 
     it('should validate successfully with isReasoning and reasoningLevel together', async () => {

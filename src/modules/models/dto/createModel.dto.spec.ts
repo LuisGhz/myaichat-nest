@@ -644,7 +644,7 @@ describe('CreateModel DTOs', () => {
       const errors = await validate(instance);
 
       expect(errors).toHaveLength(0);
-      expect(instance.name.length).toBe(100);
+      expect(instance.name).toHaveLength(100);
     });
 
     it('should validate boundary value for shortName at max length', async () => {
@@ -653,7 +653,7 @@ describe('CreateModel DTOs', () => {
       const errors = await validate(instance);
 
       expect(errors).toHaveLength(0);
-      expect(instance.shortName.length).toBe(20);
+      expect(instance.shortName).toHaveLength(20);
     });
 
     it('should validate boundary value for value at max length', async () => {
@@ -662,7 +662,7 @@ describe('CreateModel DTOs', () => {
       const errors = await validate(instance);
 
       expect(errors).toHaveLength(0);
-      expect(instance.value.length).toBe(100);
+      expect(instance.value).toHaveLength(100);
     });
   });
 });

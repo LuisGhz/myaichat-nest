@@ -70,10 +70,9 @@ export class GeminiService implements AIProvider {
     }
 
     const configObject: GenerateContentConfig = {
-      // TODO: Adjust based on model context length
-      // maxOutputTokens: maxTokens,
       tools,
       thinkingConfig: {
+
         thinkingLevel: reasoningLevel
           ? (reasoningLevel.toUpperCase() as ThinkingLevel)
           : ('HIGH' as ThinkingLevel),

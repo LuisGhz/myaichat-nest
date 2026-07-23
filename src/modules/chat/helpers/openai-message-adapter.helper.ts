@@ -5,12 +5,17 @@ import {
 } from 'openai/resources/responses/responses.js';
 import type { Message } from '../entities/message.entity';
 
-export const setSystemMessage = (systemPrompt?: string): ResponseInput => {
-  const content = systemPrompt ? systemPrompt : 'You are a helpful assistant.';
+export const setSystemMessage = (
+  systemPrompt = 'You are a helpful assistant.',
+): ResponseInput => {
+  const prompt = typeof systemPrompt === 'string' && systemPrompt.trim()
+    ? systemPrompt
+    : 'You are a helpful assistant.';
+
   return [
     {
       role: 'system',
-      content,
+      content: prompt,
     },
   ];
 };
@@ -90,9 +95,8 @@ const handlePrevMessageWithImage = (
 ): Array<ResponseInputText | ResponseInputImage> => {
   const content: Array<ResponseInputText | ResponseInputImage> = [];
   if (
-    prevMessage &&
-    prevMessage.role === 'assistant' &&
-    prevMessage.fileKey &&
+    prevMessage?.role === 'assistant' &&
+    prevMessage?.fileKey &&
     isImage(prevMessage.fileKey)
   ) {
     const assistantImageUrl = `${cdnDomain}${prevMessage.fileKey}`;

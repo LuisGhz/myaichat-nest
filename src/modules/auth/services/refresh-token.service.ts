@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { LessThan, MoreThan, Repository } from 'typeorm';
-import * as crypto from 'crypto';
+import * as crypto from 'node:crypto';
 import { RefreshToken } from '../entities';
 import { User } from '../../user/entities';
 import { EnvService } from '@cfg/schema/env.service';

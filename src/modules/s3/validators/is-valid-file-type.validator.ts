@@ -5,7 +5,7 @@ import {
   ValidatorConstraint,
   ValidatorConstraintInterface,
 } from 'class-validator';
-import path from 'path';
+import path from 'node:path';
 import { ALLOWED_FILE_TYPES, ALLOWED_FILE_EXTENSIONS } from '../consts';
 
 @Injectable()

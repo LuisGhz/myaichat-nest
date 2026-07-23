@@ -4,10 +4,10 @@ import {
   PutObjectCommand,
   DeleteObjectsCommand,
 } from '@aws-sdk/client-s3';
-import { randomBytes } from 'crypto';
+import { randomBytes } from 'node:crypto';
 import { EnvService } from '@cfg/schema/env.service';
 import { ALLOWED_FILE_TYPES, ALLOWED_FILE_EXTENSIONS } from '../consts';
-import path from 'path';
+import path from 'node:path';
 
 @Injectable()
 export class S3Service {

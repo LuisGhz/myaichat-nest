@@ -66,12 +66,10 @@ export interface OpenAIMessageItem {
 }
 
 /** Simple string message (easy input format) */
-export type OpenAIEasyInputMessage = string;
-
 /**
  * Union type representing all valid input item types for OpenAI Responses API
  */
-export type OpenAIInputItem = OpenAIMessageItem | OpenAIEasyInputMessage;
+export type OpenAIInputItem = OpenAIMessageItem | string;
 
 /**
  * The full input type for OpenAI Responses API

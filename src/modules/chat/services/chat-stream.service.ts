@@ -64,8 +64,8 @@ export class ChatStreamService {
 
     const isNewChat = !chatId;
     let fullContent = '';
-    const messages = chat.messages || [];
-    if (chat.prompt && chat.prompt.messages) {
+    const messages = chat.messages ?? [];
+    if (chat.prompt?.messages) {
       const promptMessages = chat.prompt.messages.map((msg) => ({
         role: msg.role as unknown as MessageRole,
         content: msg.content,

@@ -3,99 +3,77 @@ import { SendMessageReqDto, SendMessageResDto } from './sendMessage.dto';
 
 describe('SendMessageReqDto', () => {
   describe('transformation and basic validation', () => {
-    it('should transform maxTokens from string to number', () => {
-      const payload = {
-        message: 'Hello',
-        modelId: '550e8400-e29b-41d4-a716-446655440000',
-        modelDeveloper: 'OpenAI',
-        maxTokens: '1000',
-        temperature: 0.7,
-        isImageGeneration: false,
-        isWebSearch: false,
-      };
+    const basePayload = {
+      message: 'Hello',
+      modelId: '550e8400-e29b-41d4-a716-446655440000',
+      modelDeveloper: 'OpenAI',
+      maxTokens: 1000,
+      temperature: 0.7,
+      isImageGeneration: false,
+      isWebSearch: false,
+    };
 
+    it.each([
+      [{ maxTokens: '1000' }, 'maxTokens', 1000],
+      [{ temperature: '0.7' }, 'temperature', 0.7],
+      [{ isImageGeneration: 'true' }, 'isImageGeneration', true],
+      [{ isImageGeneration: 'false' }, 'isImageGeneration', false],
+      [{ isWebSearch: 'true' }, 'isWebSearch', true],
+    ])('should transform %p into %s', (override, prop, expected) => {
+      const payload = { ...basePayload, ...override };
       const instance = plainToInstance(SendMessageReqDto, payload);
-      expect(instance.maxTokens).toBe(1000);
-      expect(typeof instance.maxTokens).toBe('number');
-    });
-
-    it('should transform temperature from string to number', () => {
-      const payload = {
-        message: 'Hello',
-        modelId: '550e8400-e29b-41d4-a716-446655440000',
-        modelDeveloper: 'OpenAI',
-        maxTokens: 1000,
-        temperature: '0.7',
-        isImageGeneration: false,
-        isWebSearch: false,
-      };
-
-      const instance = plainToInstance(SendMessageReqDto, payload);
-      expect(instance.temperature).toBe(0.7);
-      expect(typeof instance.temperature).toBe('number');
-    });
-
-    it('should transform isImageGeneration from string "true" to boolean', () => {
-      const payload = {
-        message: 'Hello',
-        modelId: '550e8400-e29b-41d4-a716-446655440000',
-        modelDeveloper: 'OpenAI',
-        maxTokens: 1000,
-        temperature: 0.7,
-        isImageGeneration: 'true',
-        isWebSearch: false,
-      };
-
-      const instance = plainToInstance(SendMessageReqDto, payload);
-      expect(instance.isImageGeneration).toBe(true);
-      expect(typeof instance.isImageGeneration).toBe('boolean');
-    });
-
-    it('should transform isImageGeneration from string "false" to boolean false', () => {
-      const payload = {
-        message: 'Hello',
-        modelId: '550e8400-e29b-41d4-a716-446655440000',
-        modelDeveloper: 'OpenAI',
-        maxTokens: 1000,
-        temperature: 0.7,
-        isImageGeneration: 'false',
-        isWebSearch: false,
-      };
-
-      const instance = plainToInstance(SendMessageReqDto, payload);
-      expect(instance.isImageGeneration).toBe(false);
-    });
-
-    it('should transform isWebSearch from string "true" to boolean', () => {
-      const payload = {
-        message: 'Hello',
-        modelId: '550e8400-e29b-41d4-a716-446655440000',
-        modelDeveloper: 'OpenAI',
-        maxTokens: 1000,
-        temperature: 0.7,
-        isImageGeneration: false,
-        isWebSearch: 'true',
-      };
-
-      const instance = plainToInstance(SendMessageReqDto, payload);
-      expect(instance.isWebSearch).toBe(true);
-      expect(typeof instance.isWebSearch).toBe('boolean');
+      const value = (instance as any)[prop];
+      expect(value).toBe(expected);
+      expect(typeof value).toBe(typeof expected);
     });
   });
 
   describe('instance creation and property assignment', () => {
-    it('should create instance with all required fields', () => {
-      const payload = {
-        message: 'Hello, how are you?',
-        modelId: '550e8400-e29b-41d4-a716-446655440000',
-        modelDeveloper: 'OpenAI',
-        maxTokens: 1000,
-        temperature: 0.7,
-        isImageGeneration: false,
-        isWebSearch: false,
-      };
+    const modelId = '550e8400-e29b-41d4-a716-446655440000';
+    const cases = [
+      [
+        'with required fields',
+        {
+          message: 'Hello, how are you?',
+          modelId,
+          modelDeveloper: 'OpenAI',
+          maxTokens: 1000,
+          temperature: 0.7,
+          isImageGeneration: false,
+          isWebSearch: false,
+        },
+      ],
+      [
+        'with optional chatId and promptId',
+        {
+          chatId: modelId,
+          promptId: '550e8400-e29b-41d4-a716-446655440001',
+          message: 'Test message',
+          modelId,
+          modelDeveloper: 'OpenAI',
+          maxTokens: 512,
+          temperature: 0.5,
+          isImageGeneration: true,
+          isWebSearch: true,
+        },
+      ],
+      [
+        'with optional fields omitted',
+        {
+          message: 'Hello',
+          modelId,
+          modelDeveloper: 'OpenAI',
+          maxTokens: 1000,
+          temperature: 0.7,
+          isImageGeneration: false,
+          isWebSearch: false,
+        },
+      ],
+    ];
 
-      const instance = plainToInstance(SendMessageReqDto, payload);
+    it.each(cases)('should create instance %s', (_desc, payload) => {
+      const instance = plainToInstance(SendMessageReqDto, payload as any);
+
       expect(instance.message).toBe(payload.message);
       expect(instance.modelId).toBe(payload.modelId);
       expect(instance.modelDeveloper).toBe(payload.modelDeveloper);
@@ -103,40 +81,16 @@ describe('SendMessageReqDto', () => {
       expect(instance.temperature).toBe(payload.temperature);
       expect(instance.isImageGeneration).toBe(payload.isImageGeneration);
       expect(instance.isWebSearch).toBe(payload.isWebSearch);
-    });
-
-    it('should create instance with optional chatId and promptId', () => {
-      const payload = {
-        chatId: '550e8400-e29b-41d4-a716-446655440000',
-        promptId: '550e8400-e29b-41d4-a716-446655440001',
-        message: 'Test message',
-        modelId: '550e8400-e29b-41d4-a716-446655440000',
-        modelDeveloper: 'OpenAI',
-        maxTokens: 512,
-        temperature: 0.5,
-        isImageGeneration: true,
-        isWebSearch: true,
-      };
-
-      const instance = plainToInstance(SendMessageReqDto, payload);
-      expect(instance.chatId).toBe(payload.chatId);
-      expect(instance.promptId).toBe(payload.promptId);
-    });
-
-    it('should set optional fields as undefined when not provided', () => {
-      const payload = {
-        message: 'Hello',
-        modelId: '550e8400-e29b-41d4-a716-446655440000',
-        modelDeveloper: 'OpenAI',
-        maxTokens: 1000,
-        temperature: 0.7,
-        isImageGeneration: false,
-        isWebSearch: false,
-      };
-
-      const instance = plainToInstance(SendMessageReqDto, payload);
-      expect(instance.chatId).toBeUndefined();
-      expect(instance.promptId).toBeUndefined();
+      if ('chatId' in payload) {
+        expect(instance.chatId).toBe((payload as any).chatId);
+      } else {
+        expect(instance.chatId).toBeUndefined();
+      }
+      if ('promptId' in payload) {
+        expect(instance.promptId).toBe((payload as any).promptId);
+      } else {
+        expect(instance.promptId).toBeUndefined();
+      }
     });
   });
 
@@ -170,51 +124,23 @@ describe('SendMessageReqDto', () => {
       const instance = plainToInstance(SendMessageReqDto, payload);
       expect(instance.maxTokens).toBe(16384);
     });
+    it.each([[0], [1], [0.75]])(
+      'should accept temperature value %p',
+      (temp) => {
+        const payload = {
+          message: 'Hello',
+          modelId: '550e8400-e29b-41d4-a716-446655440000',
+          modelDeveloper: 'OpenAI',
+          maxTokens: 1000,
+          temperature: temp,
+          isImageGeneration: false,
+          isWebSearch: false,
+        };
 
-    it('should accept temperature at minimum boundary (0)', () => {
-      const payload = {
-        message: 'Hello',
-        modelId: '550e8400-e29b-41d4-a716-446655440000',
-        modelDeveloper: 'OpenAI',
-        maxTokens: 1000,
-        temperature: 0,
-        isImageGeneration: false,
-        isWebSearch: false,
-      };
-
-      const instance = plainToInstance(SendMessageReqDto, payload);
-      expect(instance.temperature).toBe(0);
-    });
-
-    it('should accept temperature at maximum boundary (1)', () => {
-      const payload = {
-        message: 'Hello',
-        modelId: '550e8400-e29b-41d4-a716-446655440000',
-        modelDeveloper: 'OpenAI',
-        maxTokens: 1000,
-        temperature: 1,
-        isImageGeneration: false,
-        isWebSearch: false,
-      };
-
-      const instance = plainToInstance(SendMessageReqDto, payload);
-      expect(instance.temperature).toBe(1);
-    });
-
-    it('should handle decimal temperatures', () => {
-      const payload = {
-        message: 'Hello',
-        modelId: '550e8400-e29b-41d4-a716-446655440000',
-        modelDeveloper: 'OpenAI',
-        maxTokens: 1000,
-        temperature: 0.75,
-        isImageGeneration: false,
-        isWebSearch: false,
-      };
-
-      const instance = plainToInstance(SendMessageReqDto, payload);
-      expect(instance.temperature).toBe(0.75);
-    });
+        const instance = plainToInstance(SendMessageReqDto, payload as any);
+        expect(instance.temperature).toBe(temp);
+      },
+    );
 
     it('should handle long messages', () => {
       const longMessage = 'A'.repeat(5000);
@@ -230,32 +156,28 @@ describe('SendMessageReqDto', () => {
 
       const instance = plainToInstance(SendMessageReqDto, payload);
       expect(instance.message).toBe(longMessage);
-      expect(instance.message.length).toBe(5000);
+      expect(instance.message).toHaveLength(5000);
     });
 
-    it('should handle different model values', () => {
-      const models = [
-        'gpt-4o',
-        'gpt-4o-mini',
-        'gpt-4.1-2025-04-14',
-        'gemini-2.0-flash-lite',
-        'gemini-2.5-pro',
-      ];
+    it.each([
+      'gpt-4o',
+      'gpt-4o-mini',
+      'gpt-4.1-2025-04-14',
+      'gemini-2.0-flash-lite',
+      'gemini-2.5-pro',
+    ])('should handle different model values: %s', (model) => {
+      const payload = {
+        message: 'Hello',
+        modelId: '550e8400-e29b-41d4-a716-446655440000',
+        modelDeveloper: 'OpenAI',
+        maxTokens: 1000,
+        temperature: 0.7,
+        isImageGeneration: false,
+        isWebSearch: false,
+      };
 
-      models.forEach((model) => {
-        const payload = {
-          message: 'Hello',
-          modelId: '550e8400-e29b-41d4-a716-446655440000',
-          modelDeveloper: 'OpenAI',
-          maxTokens: 1000,
-          temperature: 0.7,
-          isImageGeneration: false,
-          isWebSearch: false,
-        };
-
-        const instance = plainToInstance(SendMessageReqDto, payload);
-        expect(instance.modelId).toBe('550e8400-e29b-41d4-a716-446655440000');
-      });
+      const instance = plainToInstance(SendMessageReqDto, payload);
+      expect(instance.modelId).toBe('550e8400-e29b-41d4-a716-446655440000');
     });
   });
 });
