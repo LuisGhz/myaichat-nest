@@ -22,8 +22,8 @@ import { EnvService } from '@cfg/schema/env.service';
     S3Module,
     ThrottlerModule.forRootAsync({
       inject: [EnvService],
-      useFactory: async (envService: EnvService) => {
-        const throttle = await envService.throttle;
+      useFactory: (envService: EnvService) => {
+        const throttle = envService.throttle;
         return [
           {
             ttl: throttle.ttl,
