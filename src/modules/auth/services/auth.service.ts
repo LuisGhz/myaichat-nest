@@ -1,6 +1,6 @@
 import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import * as crypto from 'crypto';
+import * as crypto from 'node:crypto';
 import pkceChallenge from 'pkce-challenge';
 import { EnvService } from '@cfg/schema/env.service';
 import { UserService } from '../../user/services';
@@ -106,7 +106,6 @@ export class AuthService {
       res.redirect(
         `${this.envService.frontendUrl}/auth/login?errorMessage=${errorMessage}`,
       );
-      return;
     }
   }
 
