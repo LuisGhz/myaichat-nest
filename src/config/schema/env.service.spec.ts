@@ -267,28 +267,17 @@ describe('EnvService', () => {
   });
 
   describe('isProduction', () => {
-    it('should return true when NODE_ENV is production', () => {
-      configServiceMock.get.mockReturnValue('production');
+
+    test.each([
+      "production",
+      "development",
+      "test"
+    ])('should return true when NODE_ENV is %s', (env) => {
+      configServiceMock.get.mockReturnValue(env);
 
       const result = service.isProduction;
 
-      expect(result).toBe(true);
-    });
-
-    it('should return false when NODE_ENV is development', () => {
-      configServiceMock.get.mockReturnValue('development');
-
-      const result = service.isProduction;
-
-      expect(result).toBe(false);
-    });
-
-    it('should return false when NODE_ENV is test', () => {
-      configServiceMock.get.mockReturnValue('test');
-
-      const result = service.isProduction;
-
-      expect(result).toBe(false);
+      expect(result).toBe(env === 'production');
     });
   });
 
